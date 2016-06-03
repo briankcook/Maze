@@ -9,7 +9,7 @@ public class Solver{
         super();
         this.location = location;
         location.solving = true;
-        location.facing = Maze.SOUTH;
+        location.facing = Compass.SOUTH;
         moved = true;
     }
     
@@ -17,10 +17,10 @@ public class Solver{
         if (location.isGoal) 
             return null;
         if (moved) {
-            location.facing = Maze.turnRight(location.facing);
+            location.facing = Compass.turnRight(location.facing);
             moved = false;
         }else if (!move()) {
-            location.facing = Maze.turnLeft(location.facing);
+            location.facing = Compass.turnLeft(location.facing);
             moved = false;
         }
         return location;

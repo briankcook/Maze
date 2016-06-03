@@ -10,7 +10,8 @@ import javax.swing.Timer;
 public class MazeView extends JPanel{
     private final Cell[][] maze;
     private final HashMap<Cell, CellView> map;
-    public MazeSettings settings;
+    private final MazeSettings settings;
+    
     private CellView toUpdate;
     private Timer timer;
      
@@ -41,14 +42,6 @@ public class MazeView extends JPanel{
         });
     }
     
-    public Cell getStartCell() {
-        return maze[0][0];
-    }
-    
-    public void start() {
-        timer.start();
-    }
-    
     public void solveMode(MazeSettings settings, Solver solver) {
         this.settings.setFrameDelay(settings.getFrameDelay());
         this.settings.setShowUnseen(settings.showUnseen());
@@ -69,16 +62,25 @@ public class MazeView extends JPanel{
         timer = new Timer(settings.getFrameDelay(), (ActionEvent e) -> {  
             update(solver.step());
         });
-        
-        timer.start();
     }
     
     private void update(Cell source) {
         toUpdate.repaint();
         toUpdate = map.get(source);
-        if (source == null) 
+        if (source == null) {
             timer.stop();
-        else
+            settings.setShowUnseen(true);
+            repaint();
+        } else {
             toUpdate.repaint();
+        }
+    }
+    
+    public Cell getStartCell() {
+        return maze[0][0];
+    }
+    
+    public void start() {
+        timer.start();
     }
 }

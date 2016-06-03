@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
+import maze.Compass.Direction;
 
 public class Maker{
     
@@ -13,7 +14,7 @@ public class Maker{
     private final MazeSettings settings;
     private final Random r;
     private final Stack<Point> history;
-    private final ArrayList<Point> choices;
+    private final ArrayList<Direction> choices;
     
     public Maker(MazeSettings settings) {
         this.settings = settings;
@@ -29,8 +30,8 @@ public class Maker{
                 maze[j][i] = new Cell();
         x = 0;
         y = 0;
-        maze[x][y].visited = true;
-        maze[x][y].making = true;
+        currentCell().visited = true;
+        currentCell().making = true;
         history.push(new Point(x,y));
         maze[settings.getMazeWidth()-1][settings.getMazeHeight()-1].isGoal = true;
     }
@@ -38,47 +39,43 @@ public class Maker{
     public Cell step() {
         choices.clear();
         
-        for (Point direction : Maze.DIRECTIONS)
-            if (canGo(direction) && maze[x+direction.x][y+direction.y].visited == false)
+        for (Direction direction : Compass.DIRECTIONS)
+            if (canGo(direction) && haventGone(direction))
                 add(direction);
 
+        currentCell().making = false;
+        
         if (choices.isEmpty()) {
             if (history.isEmpty()){
-                maze[x][y].making = false;
                 return null;
             } else {
-                maze[x][y].making = false;
                 Point p = history.pop();
                 x = p.x;
                 y = p.y;
-                maze[x][y].making = true;
+                currentCell().making = true;
             }
         } else {
-            Point direction = choices.get(r.nextInt(choices.size()));
+            Direction direction = choices.get(r.nextInt(choices.size()));
 
-            Cell current = maze[x][y];
-            Cell next = maze[x+direction.x][y+direction.y];
+            Cell nextCell = look(direction);
 
-            current.neighbors.put(direction, next);
-            next.neighbors.put(Maze.turnAround(direction), current);
+            currentCell().neighbors.put(direction, nextCell);
+            nextCell.neighbors.put(Compass.turnAround(direction), currentCell());
 
-            current.making = false;
-            next.making = true;
+            nextCell.making = true;
+            nextCell.visited = true;
 
             history.push(new Point(x,y));
 
             x += direction.x;
             y += direction.y;
-
-            maze[x][y].visited = true;
-
         }
-        return maze[x][y];
+        return currentCell();
     }
     
-    private void add(Point direction) {
+    private void add(Direction direction) {
         int numTimes;
-        if (direction.equals(Maze.NORTH) || direction.equals(Maze.SOUTH))
+        if (direction.equals(Compass.NORTH) || direction.equals(Compass.SOUTH))
             numTimes = settings.getVweight();
         else
             numTimes = settings.getHweight();
@@ -86,10 +83,22 @@ public class Maker{
             choices.add(direction);
     }
     
-    private boolean canGo(Point direction) {
+    private boolean canGo(Direction direction) {
         int x2 = x + direction.x,
             y2 = y + direction.y;
         return (x2 >= 0 && x2 < settings.getMazeWidth() &&
                 y2 >= 0 && y2 < settings.getMazeHeight());
+    }
+    
+    private Cell currentCell() {
+        return maze[x][y];
+    }
+    
+    private Cell look(Direction direction) {
+        return maze[x+direction.x][y+direction.y];
+    }
+    
+    private boolean haventGone(Direction direction) {
+        return !(look(direction).visited);
     }
 }

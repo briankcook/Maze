@@ -1,7 +1,7 @@
 package maze;
 
-import java.awt.Point;
 import java.util.HashMap;
+import maze.Compass.Direction;
 
 public class Cell {
     boolean visited;
@@ -9,8 +9,8 @@ public class Cell {
     boolean onPath;
     boolean solving;
     boolean making;
-    Point facing;
-    HashMap<Point,Cell> neighbors;
+    Direction facing;
+    HashMap<Direction,Cell> neighbors;
     
     public Cell() {
         visited = false;

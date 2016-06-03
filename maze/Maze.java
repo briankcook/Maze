@@ -1,6 +1,5 @@
 package maze;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.text.NumberFormat;
 import javax.swing.AbstractAction;
@@ -21,31 +20,6 @@ import static pagelayout.EasyCell.row;
 import static pagelayout.EasyCell.column;
 
 public class Maze extends JFrame{
-    public static final Point NORTH = new Point( 0, -1);
-    public static final Point SOUTH = new Point( 0,  1);
-    public static final Point EAST  = new Point( 1,  0);
-    public static final Point WEST  = new Point(-1,  0);
-    public static final Point[] DIRECTIONS = new Point[]{NORTH, EAST, SOUTH, WEST};
-    
-    public static final Point turn(Point facing, int amount) {
-        int index = 0;
-        for (int i = 0 ; i < DIRECTIONS.length ; i++)
-            if (facing.equals(DIRECTIONS[i]))
-                index = (i+amount) % DIRECTIONS.length;
-        return DIRECTIONS[index];
-    }
-    
-    public static final Point turnRight(Point facing) {
-        return turn(facing, 1);
-    }
-    
-    public static final Point turnAround(Point direction) {
-        return turn(direction, 2);
-    }
-    
-    public static final Point turnLeft(Point facing) {
-        return turn(facing, 3);
-    }
     
     private Column menu;
     private CellGrid textfields;
@@ -176,13 +150,17 @@ public class Maze extends JFrame{
                 return;
             
             MazeSettings settings = getSettings();
+            
+            MazeView mazeview = mazewindow.getMazeView();
 
             if (settings == null) 
                 return;
 
-            Solver solver = new Solver(mazewindow.getMazeView().getStartCell());
+            Solver solver = new Solver(mazeview.getStartCell());
 
-            mazewindow.getMazeView().solveMode(settings, solver);
+            mazeview.solveMode(settings, solver);
+            
+            mazeview.start();
         }
     }
     
