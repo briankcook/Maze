@@ -130,7 +130,7 @@ public class Maze extends JFrame{
             Maker maker = new Maker(settings);
             maker.init();
 
-            MazeView mazeview = new MazeView(maker.maze, settings);
+            MazeView mazeview = new MazeView(maker.getMaze(), settings);
             mazeview.init(maker);
 
             mazewindow = new MazeWindow(mazeview);

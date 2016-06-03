@@ -5,16 +5,16 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.HashMap;
 import javax.swing.JPanel;
-import maze.Compass.Direction;
 
 public class CellView extends JPanel {
     
     private final Cell cell;
     private final int wall;
     private final int pane;
-    private boolean genMode = true;
     private final MazeSettings settings;
     private final HashMap<Direction,Polygon> pointers;
+    
+    private boolean genMode = true;
     
     public CellView(Cell cell, MazeSettings settings) {
         super();
@@ -41,27 +41,27 @@ public class CellView extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (cell.visited) {
+        if (cell.isVisited()) {
             g.setColor(Color.pink);
             g.fillRect(0, 0, pane, pane);
         }
-        if (cell.isGoal) {
+        if (cell.isGoal()) {
             g.setColor(Color.GRAY);
             g.fillOval(wall*2, wall*2, pane-wall*4, pane-wall*4);
         }
-        if (cell.onPath) {
+        if (cell.isOnPath()) {
             g.setColor(Color.BLACK);
             g.fillOval(pane/2-2, pane/2-2, 4, 4);
         }
-        if (cell.making) {
+        if (cell.isMaking()) {
             g.setColor(Color.BLUE);
             g.fillRect(wall*2, wall*2, pane-wall*4, pane-wall*4);
         }
-        if (cell.solving) {
+        if (cell.isSolving()) {
             g.setColor(Color.RED);
-            g.fillPolygon(pointers.get(cell.facing));
+            g.fillPolygon(pointers.get(cell.getFacing()));
         }
-        if (genMode || settings.showUnseen() || cell.visited) {
+        if (genMode || settings.showUnseen() || cell.isVisited()) {
             g.setColor(Color.BLACK);
             
             // fill corners

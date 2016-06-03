@@ -8,35 +8,28 @@ public class Solver{
     public Solver(Cell location) {
         super();
         this.location = location;
-        location.solving = true;
-        location.facing = Compass.SOUTH;
+        location.setSolving(true);
+        location.setFacing(Compass.SOUTH);
         moved = true;
     }
     
     public Cell step() {
-        if (location.isGoal) 
+        if (location.isGoal()) 
             return null;
-        if (moved) {
-            location.facing = Compass.turnRight(location.facing);
+        Cell nextLocation = location.neighbors.get(location.getFacing());
+        if (moved || nextLocation == null) {
+            int way = moved ? Compass.RIGHT : Compass.LEFT;
+            location.setFacing(Compass.turn(location.getFacing(), way));
             moved = false;
-        }else if (!move()) {
-            location.facing = Compass.turnLeft(location.facing);
-            moved = false;
+        } else {
+            nextLocation.setFacing(location.getFacing());
+            nextLocation.setSolving(true);
+            nextLocation.setVisited(true);
+            location.setFacing(null);
+            location.setSolving(false);
+            location = nextLocation;
+            moved = true;
         }
         return location;
-    }
-
-    private boolean move() {
-        Cell nextLocation = location.neighbors.get(location.facing);
-        if (nextLocation == null)
-            return false;
-        nextLocation.facing = location.facing;
-        location.facing = null;
-        location.solving = false;
-        location = nextLocation;
-        location.solving = true;
-        location.visited = true;
-        moved = true;
-        return true;
     }
 }

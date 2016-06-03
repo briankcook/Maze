@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class MazeView extends JPanel{
+    
     private final Cell[][] maze;
     private final HashMap<Cell, CellView> map;
     private final MazeSettings settings;
@@ -47,14 +48,14 @@ public class MazeView extends JPanel{
         this.settings.setShowUnseen(settings.showUnseen());
         
         map.keySet().stream().forEach((cell) -> {
-            cell.visited = false;
+            cell.setVisited(false);
         });
         
         map.values().stream().forEach((view) -> {
             view.setGenMode(false);
         });
         
-        maze[0][0].visited=true;
+        maze[0][0].setVisited(true);
         repaint();
         
         toUpdate = map.get(maze[0][0]);
