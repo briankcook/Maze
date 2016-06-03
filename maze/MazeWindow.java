@@ -20,14 +20,6 @@ public class MazeWindow extends JFrame{
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
     
-    public Cell getStartCell() {
-        return mazeview.getStartCell();
-    }
-    
-    public void solveMode(MazeSettings settings, Solver solver) {
-        mazeview.solveMode(settings, solver);
-    }
-    
     public MazeView getMazeView() {
         return mazeview;
     }

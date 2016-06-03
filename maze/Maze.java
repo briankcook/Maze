@@ -11,7 +11,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.Timer;
 import javax.swing.text.NumberFormatter;
 import pagelayout.CellGrid;
 import pagelayout.Column;
@@ -21,29 +20,31 @@ import static pagelayout.EasyCell.grid;
 import static pagelayout.EasyCell.row;
 import static pagelayout.EasyCell.column;
 
-/*
-control ideas:
-toggle gif writing          checkbox, file select
-toggle show actual solution
-maze editing                click
-*/
-
 public class Maze extends JFrame{
     public static final Point NORTH = new Point( 0, -1);
     public static final Point SOUTH = new Point( 0,  1);
     public static final Point EAST  = new Point( 1,  0);
     public static final Point WEST  = new Point(-1,  0);
+    public static final Point[] DIRECTIONS = new Point[]{NORTH, EAST, SOUTH, WEST};
     
-    public static final Point reverse(Point direction) {
-        if (direction.equals(NORTH))
-            return SOUTH;
-        if (direction.equals(SOUTH))
-            return NORTH;
-        if (direction.equals(EAST))
-            return WEST;
-        if (direction.equals(WEST))
-            return EAST;
-        return null;
+    public static final Point turn(Point facing, int amount) {
+        int index = 0;
+        for (int i = 0 ; i < DIRECTIONS.length ; i++)
+            if (facing.equals(DIRECTIONS[i]))
+                index = (i+amount) % DIRECTIONS.length;
+        return DIRECTIONS[index];
+    }
+    
+    public static final Point turnRight(Point facing) {
+        return turn(facing, 1);
+    }
+    
+    public static final Point turnAround(Point direction) {
+        return turn(direction, 2);
+    }
+    
+    public static final Point turnLeft(Point facing) {
+        return turn(facing, 3);
     }
     
     private Column menu;
@@ -179,9 +180,9 @@ public class Maze extends JFrame{
             if (settings == null) 
                 return;
 
-            Solver solver = new Solver(mazewindow.getStartCell());
+            Solver solver = new Solver(mazewindow.getMazeView().getStartCell());
 
-            mazewindow.solveMode(settings, solver);
+            mazewindow.getMazeView().solveMode(settings, solver);
         }
     }
     

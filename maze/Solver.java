@@ -1,9 +1,7 @@
 package maze;
 
 public class Solver{
-    private static final boolean RIGHT = false;
-    private static final boolean LEFT = true;
-
+    
     private Cell location;
     private boolean moved;
 
@@ -18,23 +16,14 @@ public class Solver{
     public Cell step() {
         if (location.isGoal) 
             return null;
-        if (moved) 
-            turn(RIGHT);
-        else if (!move()) 
-            turn(LEFT); 
+        if (moved) {
+            location.facing = Maze.turnRight(location.facing);
+            moved = false;
+        }else if (!move()) {
+            location.facing = Maze.turnLeft(location.facing);
+            moved = false;
+        }
         return location;
-    }
-
-    private void turn(boolean left) {
-        if (location.facing == Maze.NORTH)
-            location.facing = left ? Maze.WEST : Maze.EAST;
-        else if (location.facing == Maze.EAST)
-            location.facing = left ? Maze.NORTH : Maze.SOUTH;
-        else if (location.facing == Maze.SOUTH)
-            location.facing = left ? Maze.EAST : Maze.WEST;
-        else if (location.facing == Maze.WEST)
-            location.facing = left ? Maze.SOUTH : Maze.NORTH;
-        moved = false;
     }
 
     private boolean move() {
