@@ -1,18 +1,20 @@
 package maze;
 
-public class Solver{
+public class RightHandSolver implements MazeActor {
     
     private Cell location;
     private boolean moved;
 
-    public Solver(Cell location) {
+    public RightHandSolver(Maze maze) {
         super();
-        this.location = location;
+        this.location = maze.getCell(0, 0);
         location.setSolving(true);
+        location.setVisited(true);
         location.setFacing(Compass.SOUTH);
         moved = true;
     }
     
+    @Override
     public Cell step() {
         if (location.isGoal()) 
             return null;

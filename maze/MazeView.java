@@ -3,85 +3,60 @@ package maze;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.HashMap;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class MazeView extends JPanel{
     
-    private final Cell[][] maze;
-    private final HashMap<Cell, CellView> map;
+    private final Maze maze;
+    private final CellView[][] cells;
     private final MazeSettings settings;
     
     private CellView toUpdate;
     private Timer timer;
      
-    public MazeView(Cell[][] maze, MazeSettings settings) {
+    public MazeView(Maze maze) {
         super();
         this.maze = maze;
-        this.settings = settings;
-        map = new HashMap();
+        this.settings = maze.getSettings();
+        cells = new CellView[settings.getMazeWidth()][settings.getMazeHeight()];
     }
     
-    public void init(Maker maker) {
+    public void init() {
         setLayout(new GridLayout(settings.getMazeHeight(), settings.getMazeWidth()));
         Dimension size = new Dimension(settings.getCellSize(), settings.getCellSize());
         
         for (int i = 0 ; i < settings.getMazeHeight() ; i++) {
             for (int j = 0 ; j < settings.getMazeWidth() ; j++) {
-                CellView view = new CellView(maze[j][i], settings);
-                view.setPreferredSize(size);
-                map.put(maze[j][i], view);
-                add(view);
+                cells[j][i] = new CellView(maze.getCell(j, i), settings);
+                cells[j][i].setPreferredSize(size);
+                add(cells[j][i]);
             }
         }
-        
-        toUpdate = map.get(maze[0][0]);
-        
-        timer = new Timer(settings.getFrameDelay(), (ActionEvent e) -> {  
-            update(maker.step());
-        });
     }
     
-    public void solveMode(MazeSettings settings, Solver solver) {
+    public void runActor(MazeSettings settings, MazeActor actor) {
         this.settings.setFrameDelay(settings.getFrameDelay());
-        this.settings.setShowUnseen(settings.showUnseen());
+        this.settings.setShowUnseen(true);
         
-        map.keySet().stream().forEach((cell) -> {
-            cell.setVisited(false);
-        });
-        
-        map.values().stream().forEach((view) -> {
-            view.setGenMode(false);
-        });
-        
-        maze[0][0].setVisited(true);
+        maze.reset();
         repaint();
         
-        toUpdate = map.get(maze[0][0]);
+        toUpdate = cells[0][0];
         
         timer = new Timer(settings.getFrameDelay(), (ActionEvent e) -> {  
-            update(solver.step());
-        });
-    }
-    
-    private void update(Cell source) {
-        toUpdate.repaint();
-        toUpdate = map.get(source);
-        if (source == null) {
-            timer.stop();
-            settings.setShowUnseen(true);
-            repaint();
-        } else {
+            Cell source = actor.step();
             toUpdate.repaint();
-        }
-    }
-    
-    public Cell getStartCell() {
-        return maze[0][0];
-    }
-    
-    public void start() {
+            if (source == null) {
+                timer.stop();
+                settings.setShowUnseen(true);
+                repaint();
+            } else {
+                toUpdate = cells[source.getX()][source.getY()];
+                toUpdate.repaint();
+            }
+        });
+        
         timer.start();
     }
 }

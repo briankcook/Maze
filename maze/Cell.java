@@ -3,6 +3,8 @@ package maze;
 import java.util.HashMap;
 
 public class Cell {
+    private final int x;
+    private final int y;
     private boolean visited;
     private boolean goal;
     private boolean onPath;
@@ -12,7 +14,9 @@ public class Cell {
     
     HashMap<Direction,Cell> neighbors;
     
-    public Cell() {
+    public Cell(int x, int y) {
+        this.x = x;
+        this.y = y;
         visited = false;
         goal = false;
         onPath = false;
@@ -20,6 +24,14 @@ public class Cell {
         making = false;
         facing = null;
         neighbors = new HashMap();
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     public boolean isVisited() {

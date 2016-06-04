@@ -14,8 +14,6 @@ public class CellView extends JPanel {
     private final MazeSettings settings;
     private final HashMap<Direction,Polygon> pointers;
     
-    private boolean genMode = true;
-    
     public CellView(Cell cell, MazeSettings settings) {
         super();
         this.cell = cell;
@@ -32,10 +30,6 @@ public class CellView extends JPanel {
         pointers.put(Compass.SOUTH, new Polygon(SLM, SSL, 3));
         pointers.put( Compass.EAST, new Polygon(SSL, SLM, 3));
         pointers.put( Compass.WEST, new Polygon(LLS, SLM, 3));
-    }
-    
-    public void setGenMode(boolean mode) {
-        genMode = mode;
     }
 
     @Override
@@ -61,7 +55,7 @@ public class CellView extends JPanel {
             g.setColor(Color.RED);
             g.fillPolygon(pointers.get(cell.getFacing()));
         }
-        if (genMode || settings.showUnseen() || cell.isVisited()) {
+        if (settings.showUnseen() || cell.isVisited()) {
             g.setColor(Color.BLACK);
             
             // fill corners
