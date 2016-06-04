@@ -17,27 +17,28 @@ import static pagelayout.EasyCell.eol;
 import static pagelayout.EasyCell.grid;
 import static pagelayout.EasyCell.column;
 
-public class MazeMaker extends JFrame{
-    
-    private Column menu;
-    private CellGrid textfields;
+public class MazeMaker extends JFrame {
     
     private final JPanel menupanel;
+    
     private final NumberFormatter validator;
     private final JFormattedTextField rows;
     private final JFormattedTextField cols;
     private final JFormattedTextField cellsize;
     private final JFormattedTextField wallsize;
     private final JFormattedTextField framedelay;
+    
     private final JSlider slider;
-    private final JCheckBox makershow;
     private final JButton makebutton;
     private final JButton genbutton;
     private final JButton solvebutton;
+    private final JCheckBox makershow;
     private final JCheckBox seeAll;
     
+    private Column menu;
+    private CellGrid textfields;
+    
     private MazeWindow mazewindow;
-    private MazeSettings settings;
 
     public MazeMaker() {
         super();
@@ -49,11 +50,11 @@ public class MazeMaker extends JFrame{
         wallsize = new JFormattedTextField(validator);
         framedelay = new JFormattedTextField(validator);
         slider = new JSlider(1, 5, 3);
+        makebutton = new JButton(new MazeAction("Initialize Maze", MazeAction.ACTION_INITIALIZE));
+        genbutton = new JButton(new MazeAction("Generate Maze", MazeAction.ACTION_GENERATE));
+        solvebutton = new JButton(new MazeAction("Solve Maze", MazeAction.ACTION_SOLVE));
         makershow = new JCheckBox("Show generation");
-        makebutton = new JButton(new Make("Initialize Maze"));
-        genbutton = new JButton(new Generate("Generate Maze"));
-        solvebutton = new JButton(new Solve("Solve Maze"));
-        seeAll = new JCheckBox("Show unvisited cells while solving");
+        seeAll = new JCheckBox("Show unvisited cells");
     }
     
     public void init() {
@@ -73,6 +74,7 @@ public class MazeMaker extends JFrame{
         framedelay.setValue(100);
         
         makershow.setSelected(true);
+        seeAll.setSelected(true);
         
         textfields = grid(new JLabel("Maze Rows:"),           rows,           eol(), 
                           new JLabel("Maze Columns:"),        cols,           eol(), 
@@ -99,57 +101,82 @@ public class MazeMaker extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
-    private void refreshSettings(boolean forceSeeAll) {
-        settings = new MazeSettings((int)rows.getValue(),
-                                    (int)cols.getValue(),
-                                    (int)cellsize.getValue(),
-                                    (int)wallsize.getValue(),
-                                    (int)framedelay.getValue(),
-                                    slider.getValue(),
-                                    slider.getMaximum() + 1 - slider.getValue(),
-                                    forceSeeAll || seeAll.isSelected(),
-                                    makershow.isSelected());
+    private int getMazeHeight() {
+        return (int)rows.getValue();
     }
     
+    private int getMazeWidth() {
+        return (int)cols.getValue();
+    }
     
+    private int getCellSize() {
+        return (int)cellsize.getValue();
+    }
     
-    private class Make extends AbstractAction {
-        public Make(String name) {
+    private int getWallThickness() {
+        return (int)wallsize.getValue();
+    }
+    
+    private int getFrameDelay() {
+        return (int)framedelay.getValue();
+    }
+    
+    private int getHWeight() {
+        return slider.getValue();
+    }
+    
+    private int getVWeight() {
+        return slider.getMaximum() + 1 - slider.getValue();
+    }
+    
+    private boolean getShowUnseen() {
+        return seeAll.isSelected();
+    }
+    
+    private boolean getShowGeneration() {
+        return makershow.isSelected();
+    }
+    
+    private class MazeAction extends AbstractAction {
+    
+        public static final int ACTION_INITIALIZE = 1;
+        public static final int ACTION_GENERATE = 2;
+        public static final int ACTION_SOLVE = 3;
+        
+        private final int action;
+        public MazeAction(String name, int action) {
             super(name);
+            this.action = action;
         }
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (mazewindow != null)
-                mazewindow.dispose();
-            refreshSettings(true);
-            mazewindow = new MazeWindow(new Maze(settings));
-            mazewindow.init();
-        }
-    }
-    
-    private class Generate extends AbstractAction {
-        public Generate(String name) {
-            super(name);
-        }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (mazewindow == null || !mazewindow.isShowing()) 
-                return;
-            refreshSettings(true);
-            mazewindow.getMazeView().runActor(settings, new BackstepGenerator(mazewindow.getMaze()));
-        }
-    }
-    
-    private class Solve extends AbstractAction {
-        public Solve(String name) {
-            super(name);
-        }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (mazewindow == null || !mazewindow.isShowing()) 
-                return;
-            refreshSettings(false);
-            mazewindow.getMazeView().runActor(settings, new RightHandSolver(mazewindow.getMaze()));
+            if (action == ACTION_INITIALIZE) {
+                if (mazewindow != null)
+                    mazewindow.dispose();
+                
+                mazewindow = new MazeWindow(new Maze(getMazeWidth(), getMazeHeight()),
+                                            getCellSize(),
+                                            getWallThickness(),
+                                            getFrameDelay(),
+                                            getShowUnseen());
+                mazewindow.init();
+            } else {
+                if (mazewindow == null || !mazewindow.isShowing()) 
+                    return;
+                
+                MazeActor actor = null;
+                if (action == ACTION_GENERATE) {
+                    actor = new BackstepGenerator(mazewindow.getMaze(), 
+                                                  getHWeight(), 
+                                                  getVWeight(),
+                                                  getShowGeneration());
+                } else if (action == ACTION_SOLVE) {
+                    actor = new RightHandSolver(mazewindow.getMaze());
+                }
+                mazewindow.getMazeView().setShowUnseen(getShowUnseen());
+                mazewindow.getMazeView().setFrameDelay(getFrameDelay());
+                mazewindow.getMazeView().runActor(actor);
+            }
         }
     }
     

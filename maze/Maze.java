@@ -1,15 +1,18 @@
 package maze;
 
 public class Maze {
-    private final Cell[][] maze;
-    private final MazeSettings settings;
     
-    public Maze(MazeSettings settings) {
-        this.settings = settings;
-        maze = new Cell[settings.getMazeWidth()][settings.getMazeHeight()];
+    private final Cell[][] maze;
+    private final int width;
+    private final int height;
+    
+    public Maze(int width, int height) {
+        this.width = width;
+        this.height = height;
+        maze = new Cell[width][height];
         
-        for (int i = 0 ; i < settings.getMazeHeight() ; i++) 
-            for (int j = 0 ; j < settings.getMazeWidth() ; j++) 
+        for (int i = 0 ; i < height ; i++) 
+            for (int j = 0 ; j < width ; j++) 
                 maze[j][i] = new Cell(j, i);
     }
     
@@ -23,8 +26,8 @@ public class Maze {
     public boolean canGo(Cell cell, Direction direction) {
         int x2 = cell.getX() + direction.x,
             y2 = cell.getY() + direction.y;
-        return (x2 >= 0 && x2 < settings.getMazeWidth() &&
-                y2 >= 0 && y2 < settings.getMazeHeight());
+        return (x2 >= 0 && x2 < getWidth() &&
+                y2 >= 0 && y2 < getHeight());
     }
     
     public boolean visited(Cell cell, Direction direction) {
@@ -40,14 +43,18 @@ public class Maze {
     }
     
     public Cell getLastCell() {
-        return getCell(settings.getMazeWidth()-1, settings.getMazeHeight()-1);
+        return getCell(getWidth()-1, getHeight()-1);
     }
 
     public Cell[][] getMaze() {
         return maze;
     }
 
-    public MazeSettings getSettings() {
-        return settings;
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

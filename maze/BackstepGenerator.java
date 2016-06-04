@@ -7,14 +7,20 @@ import java.util.Stack;
 public class BackstepGenerator implements MazeActor {
     
     private final Maze maze;
+    private final int hWeight;
+    private final int vWeight;
+    private final boolean animate;
     private final Random r;
     private final Stack<Cell> history;
     private final ArrayList<Direction> choices;
     
     private Cell currentCell;
     
-    public BackstepGenerator(Maze maze) {
+    public BackstepGenerator(Maze maze, int hWeight, int vWeight, boolean animate) {
         this.maze = maze;
+        this.hWeight = hWeight;
+        this.vWeight = vWeight;
+        this.animate = animate;
         r = new Random();
         history = new Stack();
         choices = new ArrayList();
@@ -57,12 +63,17 @@ public class BackstepGenerator implements MazeActor {
         return currentCell;
     }
     
+    @Override
+    public boolean animate() {
+        return animate;
+    }
+    
     private void add(Direction direction) {
         int numTimes;
         if (direction.equals(Compass.NORTH) || direction.equals(Compass.SOUTH))
-            numTimes = maze.getSettings().getVweight();
+            numTimes = vWeight;
         else
-            numTimes = maze.getSettings().getHweight();
+            numTimes = hWeight;
         for (int  i = 0 ; i < numTimes ; i++)
             choices.add(direction);
     }

@@ -7,10 +7,10 @@ public class MazeWindow extends JFrame{
     private final Maze maze;
     private final MazeView mazeview;
     
-    public MazeWindow(Maze maze) {
+    public MazeWindow(Maze maze, int cellSize, int wallThickness, int frameDelay, boolean showUnseen) {
         super();
         this.maze = maze;
-        mazeview = new MazeView(maze);
+        mazeview = new MazeView(maze, cellSize, wallThickness, frameDelay, showUnseen);
     }
     
     public void init() {

@@ -8,18 +8,18 @@ import javax.swing.JPanel;
 
 public class CellView extends JPanel {
     
+    private final MazeView parent;
     private final Cell cell;
     private final int wall;
     private final int pane;
-    private final MazeSettings settings;
     private final HashMap<Direction,Polygon> pointers;
     
-    public CellView(Cell cell, MazeSettings settings) {
+    public CellView(MazeView parent, Cell cell, int cellSize, int wallThickness) {
         super();
+        this.parent = parent;
         this.cell = cell;
-        this.settings = settings;
-        pane = settings.getCellSize();
-        wall = settings.getWallThickness();
+        pane = cellSize;
+        wall = wallThickness;
         pointers = new HashMap();
         
         // undocumented triangle magic, just go with it
@@ -55,7 +55,7 @@ public class CellView extends JPanel {
             g.setColor(Color.RED);
             g.fillPolygon(pointers.get(cell.getFacing()));
         }
-        if (settings.showUnseen() || cell.isVisited()) {
+        if (parent.getShowUnseen() || cell.isVisited()) {
             g.setColor(Color.BLACK);
             
             // fill corners

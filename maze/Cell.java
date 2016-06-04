@@ -3,8 +3,10 @@ package maze;
 import java.util.HashMap;
 
 public class Cell {
+    
     private final int x;
     private final int y;
+    
     private boolean visited;
     private boolean goal;
     private boolean onPath;
