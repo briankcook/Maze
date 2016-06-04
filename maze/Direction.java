@@ -1,8 +1,10 @@
 package maze;
 
-public class Direction {
-    public final int x,
-                     y;
+import java.io.Serializable;
+
+public class Direction implements Serializable {
+    public final int x;
+    public final int y;
 
     public Direction(int x, int y) {
         this.x = x;

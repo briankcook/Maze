@@ -1,8 +1,9 @@
 package maze;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class Cell {
+public class Cell implements Serializable {
     
     private final int x;
     private final int y;

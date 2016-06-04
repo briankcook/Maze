@@ -8,7 +8,9 @@ public abstract class Compass {
     public static final Direction SOUTH = new Direction( 0,  1);
     public static final Direction EAST  = new Direction( 1,  0);
     public static final Direction WEST  = new Direction(-1,  0);
-    public static final Direction[] DIRECTIONS = new Direction[]{NORTH, EAST, SOUTH, WEST};
+    private static final Direction[] DIRECTIONS = new Direction[]{NORTH, EAST, SOUTH, WEST};
+    
+    private Compass(){};
     
     public static Direction turn(Direction facing, int way) {
         int index = 0;
@@ -16,5 +18,9 @@ public abstract class Compass {
             if (facing.equals(DIRECTIONS[i]))
                 index = (i+way) % DIRECTIONS.length;
         return DIRECTIONS[index];
+    }
+    
+    public static Direction[] getDirections() {
+        return DIRECTIONS;
     }
 }

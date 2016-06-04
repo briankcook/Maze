@@ -1,8 +1,9 @@
 package maze;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Random;
-import java.util.Stack;
 
 public class BackstepGenerator implements MazeActor {
     
@@ -11,7 +12,7 @@ public class BackstepGenerator implements MazeActor {
     private final int vWeight;
     private final boolean animate;
     private final Random r;
-    private final Stack<Cell> history;
+    private final Deque<Cell> history;
     private final ArrayList<Direction> choices;
     
     private Cell currentCell;
@@ -22,7 +23,7 @@ public class BackstepGenerator implements MazeActor {
         this.vWeight = vWeight;
         this.animate = animate;
         r = new Random();
-        history = new Stack();
+        history = new ArrayDeque();
         choices = new ArrayList();
         currentCell = maze.getCell(0, 0);
         currentCell.setMaking(true);
@@ -37,7 +38,7 @@ public class BackstepGenerator implements MazeActor {
 
         currentCell.setMaking(false);
         
-        for (Direction direction : Compass.DIRECTIONS)
+        for (Direction direction : Compass.getDirections())
             if (maze.canGo(currentCell, direction) && !maze.visited(currentCell, direction))
                 add(direction);
         

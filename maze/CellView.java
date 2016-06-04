@@ -4,32 +4,32 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.HashMap;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 
-public class CellView extends JPanel {
+public class CellView extends JComponent {
     
-    private final MazeView parent;
+    private final MazeView mazeview;
     private final Cell cell;
     private final int wall;
     private final int pane;
     private final HashMap<Direction,Polygon> pointers;
     
-    public CellView(MazeView parent, Cell cell, int cellSize, int wallThickness) {
+    public CellView(MazeView mazeview, Cell cell, int cellSize, int wallThickness) {
         super();
-        this.parent = parent;
+        this.mazeview = mazeview;
         this.cell = cell;
         pane = cellSize;
         wall = wallThickness;
         pointers = new HashMap();
         
         // undocumented triangle magic, just go with it
-        int[] SLM = new int[]{     wall*2, pane-wall*2,      pane/2},
-              SSL = new int[]{     wall*2,      wall*2, pane-wall*2},
-              LLS = new int[]{pane-wall*2, pane-wall*2,      wall*2};
-        pointers.put(Compass.NORTH, new Polygon(SLM, LLS, 3));
-        pointers.put(Compass.SOUTH, new Polygon(SLM, SSL, 3));
-        pointers.put( Compass.EAST, new Polygon(SSL, SLM, 3));
-        pointers.put( Compass.WEST, new Polygon(LLS, SLM, 3));
+        int[] slm = new int[]{     wall*2, pane-wall*2,      pane/2};
+        int[] ssl = new int[]{     wall*2,      wall*2, pane-wall*2};
+        int[] lls = new int[]{pane-wall*2, pane-wall*2,      wall*2};
+        pointers.put(Compass.NORTH, new Polygon(slm, lls, 3));
+        pointers.put(Compass.SOUTH, new Polygon(slm, ssl, 3));
+        pointers.put( Compass.EAST, new Polygon(ssl, slm, 3));
+        pointers.put( Compass.WEST, new Polygon(lls, slm, 3));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class CellView extends JPanel {
             g.setColor(Color.RED);
             g.fillPolygon(pointers.get(cell.getFacing()));
         }
-        if (parent.getShowUnseen() || cell.isVisited()) {
+        if (mazeview.getShowUnseen() || cell.isVisited()) {
             g.setColor(Color.BLACK);
             
             // fill corners

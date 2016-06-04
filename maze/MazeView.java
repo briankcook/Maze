@@ -29,12 +29,12 @@ public class MazeView extends JPanel{
     }
     
     public void init() {
-        setLayout(new GridLayout(maze.getHeight(), maze.getWidth()));
+        setLayout(new GridLayout(getMaze().getHeight(), getMaze().getWidth()));
         Dimension size = new Dimension(cellSize, cellSize);
         
-        for (int i = 0 ; i < maze.getHeight() ; i++) {
-            for (int j = 0 ; j < maze.getWidth() ; j++) {
-                cells[j][i] = new CellView(this, maze.getCell(j, i), cellSize, wallThickness);
+        for (int i = 0 ; i < getMaze().getHeight() ; i++) {
+            for (int j = 0 ; j < getMaze().getWidth() ; j++) {
+                cells[j][i] = new CellView(this, getMaze().getCell(j, i), cellSize, wallThickness);
                 cells[j][i].setPreferredSize(size);
                 add(cells[j][i]);
             }
@@ -43,7 +43,7 @@ public class MazeView extends JPanel{
     
     public void runActor(MazeActor actor) {
         
-        maze.reset();
+        getMaze().reset();
         repaint();
         
         if (actor.animate()) {
@@ -78,5 +78,9 @@ public class MazeView extends JPanel{
 
     public void setFrameDelay(int frameDelay) {
         this.frameDelay = frameDelay;
+    }
+
+    public Maze getMaze() {
+        return maze;
     }
 }

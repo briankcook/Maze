@@ -1,8 +1,9 @@
 package maze;
 
-import GifSequencer.GifSequenceWriter;
+import gifsequencewriter.GifSequenceWriter;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 
@@ -13,28 +14,22 @@ public class GifWriter {
     ImageOutputStream output;
     GifSequenceWriter writer;
     
-    public GifWriter(MazeView mazeview) {
+    public GifWriter(MazeView mazeview) throws IOException {
         this.mazeview = mazeview;
-        try {
             imageBuffer = new BufferedImage(mazeview.getWidth(), mazeview.getHeight(),BufferedImage.TYPE_INT_RGB);
             output = new FileImageOutputStream(new File("out.gif"));
             writer = new GifSequenceWriter(output, imageBuffer.getType(), 100, false);
-        } catch (Exception e){e.printStackTrace();}
     }
         
-    public void snapshot() {
-        try {
+    public void snapshot() throws IOException {
             mazeview.repaint();
             mazeview.paintAll(imageBuffer.getGraphics());
             writer.writeToSequence(imageBuffer);
-        } catch (Exception e){e.printStackTrace();}
     }
     
-    public void close() {
-        try {
+    public void close() throws IOException {
             writer.writeToSequence(imageBuffer);
             writer.close();
             output.close();
-        } catch (Exception e){e.printStackTrace();}
     }
 }

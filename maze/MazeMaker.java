@@ -13,15 +13,10 @@ import javax.swing.JSlider;
 import javax.swing.text.NumberFormatter;
 import pagelayout.CellGrid;
 import pagelayout.Column;
-import static pagelayout.EasyCell.eol;
-import static pagelayout.EasyCell.grid;
-import static pagelayout.EasyCell.column;
+import pagelayout.EasyCell;
 
-public class MazeMaker extends JFrame {
+public class MazeMaker extends JPanel {
     
-    private final JPanel menupanel;
-    
-    private final NumberFormatter validator;
     private final JFormattedTextField rows;
     private final JFormattedTextField cols;
     private final JFormattedTextField cellsize;
@@ -35,15 +30,16 @@ public class MazeMaker extends JFrame {
     private final JCheckBox makershow;
     private final JCheckBox seeAll;
     
-    private Column menu;
-    private CellGrid textfields;
-    
-    private MazeWindow mazewindow;
+    private JFrame mazewindow;
+    private MazeView mazeview;
 
     public MazeMaker() {
         super();
-        menupanel = new JPanel();
-        validator = new NumberFormatter(NumberFormat.getIntegerInstance());
+        NumberFormatter validator = new NumberFormatter(NumberFormat.getIntegerInstance());
+        validator.setMinimum(0);
+        validator.setMaximum(1000);
+        validator.setAllowsInvalid(false);
+        validator.setValueClass(Integer.class);
         rows = new JFormattedTextField(validator);
         cols = new JFormattedTextField(validator);
         cellsize = new JFormattedTextField(validator);
@@ -58,10 +54,6 @@ public class MazeMaker extends JFrame {
     }
     
     public void init() {
-        validator.setMinimum(0);
-        validator.setMaximum(1000);
-        validator.setAllowsInvalid(false);
-        validator.setValueClass(Integer.class);
         
         slider.setPaintTicks(true);
         slider.setMinorTickSpacing(1);
@@ -76,65 +68,22 @@ public class MazeMaker extends JFrame {
         makershow.setSelected(true);
         seeAll.setSelected(true);
         
-        textfields = grid(new JLabel("Maze Rows:"),           rows,           eol(), 
-                          new JLabel("Maze Columns:"),        cols,           eol(), 
-                          new JLabel("Cell size (px):"),      cellsize,       eol(), 
-                          new JLabel("Walls (px):"),          wallsize,       eol(), 
-                          new JLabel("Frame delay (ms):"),    framedelay);
+        CellGrid textfields = EasyCell.grid(new JLabel("Maze Rows:"),           rows,           EasyCell.eol(), 
+                                            new JLabel("Maze Columns:"),        cols,           EasyCell.eol(), 
+                                            new JLabel("Cell size (px):"),      cellsize,       EasyCell.eol(), 
+                                            new JLabel("Walls (px):"),          wallsize,       EasyCell.eol(), 
+                                            new JLabel("Frame delay (ms):"),    framedelay);
 
-        menu = column(textfields,  
-                      new JLabel("Horizontalness", JLabel.CENTER),  
-                      slider,  
-                      makershow,  
-                      makebutton,
-                      genbutton,
-                      solvebutton,
-                      seeAll);
+        Column menu = EasyCell.column(textfields,  
+                                      new JLabel("Horizontalness"),  
+                                      slider,  
+                                      makershow,  
+                                      makebutton,
+                                      genbutton,
+                                      solvebutton,
+                                      seeAll);
         
-        menu.createLayout(menupanel);
-        add(menupanel);
-        
-        pack();
-        setTitle("Maze Maker");
-        setVisible(true);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-    
-    private int getMazeHeight() {
-        return (int)rows.getValue();
-    }
-    
-    private int getMazeWidth() {
-        return (int)cols.getValue();
-    }
-    
-    private int getCellSize() {
-        return (int)cellsize.getValue();
-    }
-    
-    private int getWallThickness() {
-        return (int)wallsize.getValue();
-    }
-    
-    private int getFrameDelay() {
-        return (int)framedelay.getValue();
-    }
-    
-    private int getHWeight() {
-        return slider.getValue();
-    }
-    
-    private int getVWeight() {
-        return slider.getMaximum() + 1 - slider.getValue();
-    }
-    
-    private boolean getShowUnseen() {
-        return seeAll.isSelected();
-    }
-    
-    private boolean getShowGeneration() {
-        return makershow.isSelected();
+        menu.createLayout(this);
     }
     
     private class MazeAction extends AbstractAction {
@@ -144,6 +93,7 @@ public class MazeMaker extends JFrame {
         public static final int ACTION_SOLVE = 3;
         
         private final int action;
+        
         public MazeAction(String name, int action) {
             super(name);
             this.action = action;
@@ -154,34 +104,84 @@ public class MazeMaker extends JFrame {
                 if (mazewindow != null)
                     mazewindow.dispose();
                 
-                mazewindow = new MazeWindow(new Maze(getMazeWidth(), getMazeHeight()),
-                                            getCellSize(),
-                                            getWallThickness(),
-                                            getFrameDelay(),
-                                            getShowUnseen());
-                mazewindow.init();
+                mazewindow = new JFrame();
+                mazeview = new MazeView(new Maze(getMazeWidth(), getMazeHeight()),
+                                        getCellSize(),
+                                        getWallThickness(),
+                                        getFrameDelay(),
+                                        getShowUnseen());
+                mazeview.init();
+                mazewindow.add(mazeview);
+                mazewindow.pack();
+                mazewindow.setTitle("Maze Viewer");
+                mazewindow.setVisible(true);
+                mazewindow.setLocationRelativeTo(null);
+                mazewindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             } else {
                 if (mazewindow == null || !mazewindow.isShowing()) 
                     return;
                 
                 MazeActor actor = null;
                 if (action == ACTION_GENERATE) {
-                    actor = new BackstepGenerator(mazewindow.getMaze(), 
+                    actor = new BackstepGenerator(mazeview.getMaze(), 
                                                   getHWeight(), 
                                                   getVWeight(),
                                                   getShowGeneration());
                 } else if (action == ACTION_SOLVE) {
-                    actor = new RightHandSolver(mazewindow.getMaze());
+                    actor = new RightHandSolver(mazeview.getMaze());
                 }
-                mazewindow.getMazeView().setShowUnseen(getShowUnseen());
-                mazewindow.getMazeView().setFrameDelay(getFrameDelay());
-                mazewindow.getMazeView().runActor(actor);
+                mazeview.setShowUnseen(getShowUnseen());
+                mazeview.setFrameDelay(getFrameDelay());
+                mazeview.runActor(actor);
             }
+        }
+    
+        private int getMazeHeight() {
+            return (int)rows.getValue();
+        }
+
+        private int getMazeWidth() {
+            return (int)cols.getValue();
+        }
+
+        private int getCellSize() {
+            return (int)cellsize.getValue();
+        }
+
+        private int getWallThickness() {
+            return (int)wallsize.getValue();
+        }
+
+        private int getFrameDelay() {
+            return (int)framedelay.getValue();
+        }
+
+        private int getHWeight() {
+            return slider.getValue();
+        }
+
+        private int getVWeight() {
+            return slider.getMaximum() + 1 - slider.getValue();
+        }
+
+        private boolean getShowUnseen() {
+            return seeAll.isSelected();
+        }
+
+        private boolean getShowGeneration() {
+            return makershow.isSelected();
         }
     }
     
     public static void main (String[] args) {
-        MazeMaker view = new MazeMaker();
-        view.init();
+        MazeMaker mazemaker = new MazeMaker();
+        mazemaker.init();
+        JFrame view = new JFrame();
+        view.add(mazemaker);
+        view.pack();
+        view.setTitle("Maze Maker");
+        view.setVisible(true);
+        view.setLocationRelativeTo(null);
+        view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
