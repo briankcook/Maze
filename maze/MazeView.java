@@ -57,7 +57,8 @@ public class MazeView extends JPanel{
                 Cell source = actor.step();
                 toUpdate.repaint();
                 if (source == null) {
-                    stop(false);
+                    stop();
+                    reveal();
                 } else {
                     toUpdate = cells[source.getX()][source.getY()];
                     toUpdate.repaint();
@@ -75,9 +76,14 @@ public class MazeView extends JPanel{
         }
     }
     
+    public void reveal() {
+        setShowUnseen(true);
+        repaint();
+    }
+    
     public void cleanUp() {
-        stop(true);
-        getMaze().reset(false);
+        stop();
+        getMaze().reset(Maze.SOFT_RESET);
         repaint();
     }
     
@@ -93,16 +99,13 @@ public class MazeView extends JPanel{
         }
     }
     
-    public void stop(boolean hard) {
+    public void stop() {
         if (timer != null) {
             pause();
+            reveal();
             timer = null;
-            if (hard)
-                maze.reset(false);
-            setShowUnseen(true);
-            repaint();
         }
-        if (!hard && gifWriter != null) {
+        if (gifWriter != null) {
             gifWriter.close();
             gifWriter = null;
         }

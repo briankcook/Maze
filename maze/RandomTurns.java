@@ -48,7 +48,8 @@ public class RandomTurns implements MazeActor{
             currentCell.setFacing(direction);
             currentCell.setVisited(true);
         }
-        previousCell.setFacing(null);
+        if (!previousCell.equals(currentCell))
+            previousCell.setFacing(null);
         currentCell.setSolving(true);
         return currentCell;
     }

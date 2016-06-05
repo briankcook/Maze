@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 public class Maze implements Serializable{
     
+    public static final boolean HARD_RESET = true;
+    public static final boolean SOFT_RESET = false;
+    
     private final Cell[][] cells;
     private final int width;
     private final int height;
@@ -18,10 +21,10 @@ public class Maze implements Serializable{
                 cells[j][i] = new Cell(j, i);
     }
     
-    public void reset(boolean hard) {
+    public void reset(boolean type) {
         for (Cell[] column : cells) {
             for (Cell cell : column) {
-                if (hard)
+                if (type == HARD_RESET)
                     cell.neighbors.clear();
                 cell.setVisited(false);
                 cell.setMaking(false);

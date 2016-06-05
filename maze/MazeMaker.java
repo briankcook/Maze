@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.Serializable;
 import java.net.URL;
 import java.text.NumberFormat;
 import javax.swing.AbstractAction;
@@ -82,6 +80,7 @@ public class MazeMaker extends JPanel {
         add(toolBar, BorderLayout.NORTH);
         add(content, BorderLayout.CENTER);
         content.setPreferredSize(new Dimension(800, 600));
+        newMaze();
     }
     
     private void initSettingsPanel() {
@@ -142,7 +141,8 @@ public class MazeMaker extends JPanel {
                                       new AbstractAction(){
                                           @Override
                                           public void actionPerformed(ActionEvent e) {
-                                              mazeview.getMaze().reset(true);
+                                              mazeview.getMaze().reset(Maze.HARD_RESET);
+                                              mazeview.setShowUnseen(getShowUnseen());
                                               mazeview.runActor(getGenerator());
                                           }
                                       }));
@@ -157,6 +157,7 @@ public class MazeMaker extends JPanel {
                                       new AbstractAction(){
                                           @Override
                                           public void actionPerformed(ActionEvent e) {
+                                              mazeview.stop();
                                               mazeview.setShowUnseen(getShowUnseen());
                                               mazeview.runActor(getSolver());
                                           }
@@ -187,7 +188,7 @@ public class MazeMaker extends JPanel {
                                       new AbstractAction(){
                                           @Override
                                           public void actionPerformed(ActionEvent e) {
-                                              mazeview.stop(true);
+                                              mazeview.stop();
                                           }
                                       }));
         
@@ -270,6 +271,8 @@ public class MazeMaker extends JPanel {
     }
 
     private void newMaze() {
+        if (mazeview != null)
+            mazeview.stop();
         mazeview = new MazeView(new Maze(getMazeWidth(),
                                          getMazeHeight()),
                                 getCellSize(),
