@@ -1,6 +1,6 @@
 package maze;
 
-import gifsequencewriter.GifSequenceWriter;
+import net.kroo.elliot.gifsequencewriter.GifSequenceWriter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;

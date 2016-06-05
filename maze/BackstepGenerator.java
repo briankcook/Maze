@@ -10,18 +10,16 @@ public class BackstepGenerator implements MazeActor {
     private final Maze maze;
     private final int hWeight;
     private final int vWeight;
-    private final boolean animate;
     private final Random r;
     private final Deque<Cell> history;
     private final ArrayList<Direction> choices;
     
     private Cell currentCell;
     
-    public BackstepGenerator(Maze maze, int hWeight, int vWeight, boolean animate) {
+    public BackstepGenerator(Maze maze, int hWeight, int vWeight) {
         this.maze = maze;
         this.hWeight = hWeight;
         this.vWeight = vWeight;
-        this.animate = animate;
         r = new Random();
         history = new ArrayDeque();
         choices = new ArrayList();
@@ -66,11 +64,6 @@ public class BackstepGenerator implements MazeActor {
             currentCell.setVisited(true);
         }
         return currentCell;
-    }
-    
-    @Override
-    public boolean animate() {
-        return animate;
     }
     
     private void add(Direction direction) {

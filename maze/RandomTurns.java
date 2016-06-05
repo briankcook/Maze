@@ -53,9 +53,4 @@ public class RandomTurns implements MazeActor{
         currentCell.setSolving(true);
         return currentCell;
     }
-    
-    @Override
-    public boolean animate() {
-        return true;
-    }
 }

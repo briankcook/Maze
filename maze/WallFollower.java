@@ -41,9 +41,4 @@ public class WallFollower implements MazeActor {
         }
         return currentCell;
     }
-    
-    @Override
-    public boolean animate() {
-        return true;
-    }
 }

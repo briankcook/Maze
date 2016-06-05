@@ -27,11 +27,16 @@ import pagelayout.Column;
 import pagelayout.EasyCell;
 
 public class MazeMaker extends JPanel {
+    
+    private static final Dimension DEFAULT_SCREEN_SIZE = new Dimension(800, 600);
         
-    private static final String BACKSTEP = "backstep";
-    private static final String RIGHTHAND = "righthand";
-    private static final String LEFTHAND = "lefthand";
-    private static final String RANDOMTURNS = "random";
+    private static final String GENERATOR_PREFIX = "<html>Generator:<br />";
+    private static final String BACKSTEP = "Backtrace";
+        
+    private static final String SOLVER_PREFIX = "<html>Solver:<br />";
+    private static final String RIGHTHAND = "Right Hand Rule";
+    private static final String LEFTHAND = "Left hand Rule";
+    private static final String RANDOMTURNS = "Random Turns";
     
     private final JToolBar toolBar;
     private final JComboBox generatorComboBox;
@@ -58,16 +63,19 @@ public class MazeMaker extends JPanel {
         solverComboBox = new JComboBox();
         content = new JScrollPane();
         settingsPanel = new JPanel();
+        
         NumberFormatter validator = new NumberFormatter(NumberFormat.getIntegerInstance());
         validator.setMinimum(0);
         validator.setMaximum(1000);
         validator.setAllowsInvalid(false);
         validator.setValueClass(Integer.class);
+        
         rows = new JFormattedTextField(validator);
         cols = new JFormattedTextField(validator);
         cellsize = new JFormattedTextField(validator);
         wallsize = new JFormattedTextField(validator);
         framedelay = new JFormattedTextField(validator);
+        
         slider = new JSlider(1, 5, 3);
         makershow = new JCheckBox("Show generation");
         seeAll = new JCheckBox("Show unvisited cells");
@@ -79,7 +87,7 @@ public class MazeMaker extends JPanel {
         setLayout(new BorderLayout());
         add(toolBar, BorderLayout.NORTH);
         add(content, BorderLayout.CENTER);
-        content.setPreferredSize(new Dimension(800, 600));
+        content.setPreferredSize(DEFAULT_SCREEN_SIZE);
         newMaze();
     }
     
@@ -133,7 +141,9 @@ public class MazeMaker extends JPanel {
         
         toolBar.addSeparator();
         
-        toolBar.add(generatorComboBox);
+        toolBar.add(initComboBox(generatorComboBox,
+                                 GENERATOR_PREFIX,
+                                 BACKSTEP));
         
         toolBar.add(makeToolBarButton("generate.png",
                                       "Generate Maze",
@@ -143,13 +153,17 @@ public class MazeMaker extends JPanel {
                                           public void actionPerformed(ActionEvent e) {
                                               mazeview.getMaze().reset(Maze.HARD_RESET);
                                               mazeview.setShowUnseen(getShowUnseen());
-                                              mazeview.runActor(getGenerator());
+                                              mazeview.runActor(getGenerator(), getShowGeneration());
                                           }
                                       }));
         
         toolBar.addSeparator();
         
-        toolBar.add(solverComboBox);
+        toolBar.add(initComboBox(solverComboBox,
+                                 SOLVER_PREFIX,
+                                 RIGHTHAND,
+                                 LEFTHAND,
+                                 RANDOMTURNS));
         
         toolBar.add(makeToolBarButton("solve.png",
                                       "Start Solver",
@@ -159,7 +173,7 @@ public class MazeMaker extends JPanel {
                                           public void actionPerformed(ActionEvent e) {
                                               mazeview.stop();
                                               mazeview.setShowUnseen(getShowUnseen());
-                                              mazeview.runActor(getSolver());
+                                              mazeview.runActor(getSolver(), true);
                                           }
                                       }));
         
@@ -231,11 +245,14 @@ public class MazeMaker extends JPanel {
                                               mazeview.cleanUp();
                                           }
                                       }));
-        
-        generatorComboBox.addItem(BACKSTEP);
-        solverComboBox.addItem(RIGHTHAND);
-        solverComboBox.addItem(LEFTHAND);
-        solverComboBox.addItem(RANDOMTURNS);
+    }
+    
+    private JComboBox initComboBox(JComboBox comboBox,
+                                   String prefix,
+                                   String... options) {
+        for (String option : options)
+            comboBox.addItem(prefix + option);
+        return comboBox;
     }
     
     private JButton makeToolBarButton(String imageName,
@@ -292,19 +309,18 @@ public class MazeMaker extends JPanel {
     }
 
     private MazeActor getGenerator() {
-        switch ((String)generatorComboBox.getSelectedItem()) {
+        switch (getSelectedActor(generatorComboBox)) {
             case BACKSTEP:
                 return new BackstepGenerator(mazeview.getMaze(),
                                              getHWeight(),
-                                             getVWeight(),
-                                             getShowGeneration());
+                                             getVWeight());
             default:
                 return null;
         }
     }
 
     private MazeActor getSolver() {
-        switch ((String)solverComboBox.getSelectedItem()) {
+        switch (getSelectedActor(solverComboBox)) {
             case RIGHTHAND:
                 return new WallFollower(mazeview.getMaze(), true);
             case LEFTHAND:
@@ -314,6 +330,11 @@ public class MazeMaker extends JPanel {
             default:
                 return null;
         }
+    }
+    
+    private String getSelectedActor(JComboBox comboBox) {
+        String s = (String)comboBox.getSelectedItem();
+        return s.substring(s.indexOf("/>")+2);
     }
 
     private int getMazeHeight() {

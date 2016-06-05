@@ -1,8 +1,10 @@
 package maze;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -32,6 +34,7 @@ public class MazeView extends JPanel{
     }
     
     public void init() {
+        setBorder(BorderFactory.createLineBorder(Color.BLACK, wallThickness));
         setLayout(new GridLayout(maze.getHeight(), maze.getWidth()));
         Dimension size = new Dimension(cellSize, cellSize);
         
@@ -42,15 +45,17 @@ public class MazeView extends JPanel{
                 add(cells[j][i]);
             }
         }
+        
+        reveal();
     }
     
-    public void runActor(MazeActor actor) {
+    public void runActor(MazeActor actor, boolean animate) {
         
         cleanUp();
         
         actor.init();
         
-        if (actor.animate()) {
+        if (animate) {
             toUpdate = cells[0][0];
             
             timer = new Timer(frameDelay, (ActionEvent e) -> {  
@@ -72,7 +77,7 @@ public class MazeView extends JPanel{
             while (actor.step() != null)
                 if (gifWriter != null)
                     gifWriter.snapshot();
-            repaint();
+            reveal();
         }
     }
     
