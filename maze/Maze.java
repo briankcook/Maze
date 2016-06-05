@@ -19,10 +19,13 @@ public class Maze implements Serializable{
     }
     
     public void reset() {
-        for (Cell[] column : cells)
-            for (Cell cell : column)
+        for (Cell[] column : cells) {
+            for (Cell cell : column) {
                 cell.setVisited(false);
-        cells[0][0].setVisited(true);
+                cell.setMaking(false);
+                cell.setSolving(false);
+            }
+        }
     }
     
     public boolean canGo(Cell cell, Direction direction) {

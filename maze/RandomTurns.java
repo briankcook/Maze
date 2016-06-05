@@ -14,6 +14,10 @@ public class RandomTurns implements MazeActor{
         choices = new ArrayList();
         r = new Random();
         previousCell = maze.getCell(0, 0);
+    }
+    
+    @Override
+    public void init() {
         currentCell = previousCell;
         currentCell.setSolving(true);
         currentCell.setVisited(true);

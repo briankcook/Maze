@@ -118,17 +118,14 @@ public class MazeMaker extends JPanel {
                                       "Toggle Settings Panel",
                                       ToolBarListener.SETTINGS));
         
-        toolBar.add(makeToolBarButton("clear.png",
-                                      "Clear Maze",
-                                      ToolBarListener.CLEAR));
-        
         toolBar.addSeparator();
         
         toolBar.add(generatorComboBox);
         
         toolBar.add(makeToolBarButton("generate.png",
                                       "Generate Maze",
-                                      ToolBarListener.GENERATE));
+                                      ToolBarListener.GENERATE,
+                                      true));
         
         toolBar.addSeparator();
         
@@ -136,7 +133,8 @@ public class MazeMaker extends JPanel {
         
         toolBar.add(makeToolBarButton("solve.png",
                                       "Start Solver",
-                                      ToolBarListener.SOLVE));
+                                      ToolBarListener.SOLVE,
+                                      true));
         
         toolBar.addSeparator();
         
@@ -166,6 +164,12 @@ public class MazeMaker extends JPanel {
                                       "Speed Up Animation",
                                       ToolBarListener.FASTER));
         
+        toolBar.addSeparator();
+        
+        toolBar.add(makeToolBarButton("clear.png",
+                                      "Clear Maze",
+                                      ToolBarListener.CLEAR));
+        
         generatorComboBox.addItem(BACKSTEP);
         solverComboBox.addItem(RIGHTHAND);
         solverComboBox.addItem(LEFTHAND);
@@ -175,9 +179,19 @@ public class MazeMaker extends JPanel {
     private JButton makeToolBarButton(String imageName,
                                       String toolTip,
                                       String actionCommand) {
+        return makeToolBarButton(imageName, 
+                                 toolTip, 
+                                 actionCommand, 
+                                 false);
+    }
+    
+    private JButton makeToolBarButton(String imageName,
+                                      String toolTip,
+                                      String actionCommand,
+                                      boolean showBorder) {
         URL imageURL = MazeMaker.class.getResource("resources/" + imageName);
         JButton button = new JButton(new ImageIcon(imageURL));
-        button.setBorderPainted(false);
+        button.setBorderPainted(showBorder);
         button.setToolTipText(toolTip);
         button.addActionListener(toolBarListener);
         button.setActionCommand(actionCommand);
@@ -197,7 +211,6 @@ public class MazeMaker extends JPanel {
     
     private class ToolBarListener implements ActionListener, Serializable {
         private static final String SETTINGS = "settings";
-        private static final String CLEAR = "clear";
         private static final String GENERATE = "generate";
         private static final String SOLVE = "solve";
         private static final String PAUSE = "pause";
@@ -206,6 +219,7 @@ public class MazeMaker extends JPanel {
         private static final String RECORD = "record";
         private static final String FASTER = "faster";
         private static final String SLOWER = "slower";
+        private static final String CLEAR = "clear";
         
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -213,26 +227,32 @@ public class MazeMaker extends JPanel {
                 case SETTINGS: 
                     buildAndShowSettingsDialog();
                     break;
-                case CLEAR: 
-                    mazeview.getMaze().reset();
-                    break;
                 case GENERATE: 
                     newMaze();
                     break;
                 case SOLVE: 
+                    mazeview.setShowUnseen(getShowUnseen());
                     mazeview.runActor(getSolver());
                     break;
                 case PAUSE: 
+                    mazeview.pause();
                     break;
                 case PLAY: 
+                    mazeview.resume();
                     break;
                 case STOP: 
+                    mazeview.stop();
                     break;
                 case RECORD: 
                     break;
                 case FASTER: 
+                    mazeview.speedUp();
                     break;
                 case SLOWER: 
+                    mazeview.slowDown();
+                    break;
+                case CLEAR: 
+                    mazeview.cleanUp();
                     break;
                 default:
                     break;

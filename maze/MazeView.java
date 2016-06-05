@@ -8,6 +8,8 @@ import javax.swing.Timer;
 
 public class MazeView extends JPanel{
     
+    private static final double SPEEDFACTOR = 0.7;
+    
     private final Maze maze;
     private final CellView[][] cells;
     private final int cellSize;
@@ -29,11 +31,11 @@ public class MazeView extends JPanel{
     }
     
     public void init() {
-        setLayout(new GridLayout(getMaze().getHeight(), getMaze().getWidth()));
+        setLayout(new GridLayout(maze.getHeight(), maze.getWidth()));
         Dimension size = new Dimension(cellSize, cellSize);
         
-        for (int i = 0 ; i < getMaze().getHeight() ; i++) {
-            for (int j = 0 ; j < getMaze().getWidth() ; j++) {
+        for (int i = 0 ; i < maze.getHeight() ; i++) {
+            for (int j = 0 ; j < maze.getWidth() ; j++) {
                 cells[j][i] = new CellView(this, getMaze().getCell(j, i), cellSize, wallThickness);
                 cells[j][i].setPreferredSize(size);
                 add(cells[j][i]);
@@ -43,8 +45,9 @@ public class MazeView extends JPanel{
     
     public void runActor(MazeActor actor) {
         
-        getMaze().reset();
-        repaint();
+        cleanUp();
+        
+        actor.init();
         
         if (actor.animate()) {
             toUpdate = cells[0][0];
@@ -54,6 +57,8 @@ public class MazeView extends JPanel{
                 toUpdate.repaint();
                 if (source == null) {
                     timer.stop();
+                    timer = null;
+                    setShowUnseen(true);
                     repaint();
                 } else {
                     toUpdate = cells[source.getX()][source.getY()];
@@ -66,6 +71,41 @@ public class MazeView extends JPanel{
             while (actor.step() != null);
             repaint();
         }
+    }
+    
+    public void cleanUp() {
+        getMaze().reset();
+        repaint();
+    }
+    
+    public void speedUp() {
+        if (timer != null) {
+            timer.setDelay((int)(timer.getDelay() * SPEEDFACTOR));
+        }
+    }
+    
+    public void slowDown() {
+        if (timer != null) {
+            timer.setDelay((int)(timer.getDelay() / SPEEDFACTOR));
+        }
+    }
+    
+    public void stop() {
+        if (timer != null) {
+            pause();
+            timer = null;
+            maze.reset();
+        }
+    }
+    
+    public void pause() {
+        if (timer != null)
+            timer.stop();
+    }
+    
+    public void resume() {
+        if (timer != null)
+            timer.start();
     }
     
     public boolean getShowUnseen() {

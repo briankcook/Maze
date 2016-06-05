@@ -25,6 +25,10 @@ public class BackstepGenerator implements MazeActor {
         r = new Random();
         history = new ArrayDeque();
         choices = new ArrayList();
+    }
+    
+    @Override
+    public void init() {
         currentCell = maze.getCell(0, 0);
         currentCell.setMaking(true);
         currentCell.setVisited(true);
@@ -35,7 +39,7 @@ public class BackstepGenerator implements MazeActor {
     @Override
     public Cell step() {
         choices.clear();
-
+        
         currentCell.setMaking(false);
         
         for (Direction direction : Compass.getDirections())

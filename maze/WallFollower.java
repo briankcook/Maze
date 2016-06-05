@@ -11,6 +11,10 @@ public class WallFollower implements MazeActor {
         preferredDirection = rightHanded ? Compass.RIGHT : Compass.LEFT;
         alternateDirection = rightHanded ? Compass.LEFT : Compass.RIGHT;
         currentCell = maze.getCell(0, 0);
+    }
+    
+    @Override
+    public void init() {
         currentCell.setSolving(true);
         currentCell.setVisited(true);
         currentCell.setFacing(Compass.SOUTH);
