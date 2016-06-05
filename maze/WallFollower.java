@@ -25,13 +25,14 @@ public class WallFollower implements MazeActor {
     public Cell step() {
         if (currentCell.isGoal()) 
             return null;
-        Cell nextLocation = currentCell.neighbors.get(currentCell.getFacing());
+        Direction direction = currentCell.getFacing();
+        Cell nextLocation = currentCell.neighbors.get(direction);
         if (moved || nextLocation == null) {
             int way = moved ? preferredDirection : alternateDirection;
-            currentCell.setFacing(Compass.turn(currentCell.getFacing(), way));
+            currentCell.setFacing(Compass.turn(direction, way));
             moved = false;
         } else {
-            nextLocation.setFacing(currentCell.getFacing());
+            nextLocation.setFacing(direction);
             nextLocation.setSolving(true);
             nextLocation.setVisited(true);
             currentCell.setFacing(null);

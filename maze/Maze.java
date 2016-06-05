@@ -42,7 +42,7 @@ public class Maze {
         Cell b = look(a, direction);
         Direction reverse = Compass.turn(direction, Compass.AROUND);
         a.neighbors.put(direction, b);
-        b.neighbors.put(reverse, b);
+        b.neighbors.put(reverse, a);
         return b;
     }
     

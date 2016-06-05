@@ -37,10 +37,8 @@ public class RandomTurns implements MazeActor{
         
         currentCell.setSolving(false);
         if (choices.isEmpty()) {
-            previousCell.setFacing(Compass.turn(currentCell.getFacing(), Compass.AROUND));
-            Cell swap = currentCell;
-            currentCell = previousCell;
-            previousCell = swap;
+            currentCell.setFacing(Compass.turn(currentCell.getFacing(), Compass.AROUND));
+            previousCell = currentCell;
         } else {
             Direction direction = choices.get(r.nextInt(choices.size()));
             previousCell = currentCell;

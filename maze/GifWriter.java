@@ -10,7 +10,7 @@ import javax.imageio.stream.ImageOutputStream;
 
 public class GifWriter {
        
-    private static Logger logger;
+    private static final Logger LOGGER = Logger.getAnonymousLogger();
     private MazeView mazeview;
     private BufferedImage imageBuffer;
     private ImageOutputStream output;
@@ -18,7 +18,6 @@ public class GifWriter {
     
     public GifWriter(MazeView mazeview) {
         this.mazeview = mazeview;
-        logger = Logger.getAnonymousLogger();
         try {
             imageBuffer = new BufferedImage(mazeview.getWidth(), 
                                             mazeview.getHeight(), 
@@ -28,9 +27,9 @@ public class GifWriter {
                                            imageBuffer.getType(), 
                                            mazeview.getFrameDelay(), 
                                            false);
-            logger.log(Level.INFO, "GifWriter construction successful");
+            LOGGER.log(Level.INFO, "GifWriter construction successful");
         } catch (IOException e) {
-            logger.log(Level.WARNING, "GifWriter construction failed", e);
+            LOGGER.log(Level.WARNING, "GifWriter construction failed", e);
         }
     }
         
@@ -38,9 +37,9 @@ public class GifWriter {
         try {
             mazeview.paintAll(imageBuffer.getGraphics());
             writer.writeToSequence(imageBuffer);
-            logger.log(Level.INFO, "GifWriter snapshot successful");
+            LOGGER.log(Level.INFO, "GifWriter snapshot successful");
         } catch (IOException e) {
-            logger.log(Level.WARNING, "GifWriter snapshot failed", e);
+            LOGGER.log(Level.WARNING, "GifWriter snapshot failed", e);
         }
     }
     
@@ -48,9 +47,9 @@ public class GifWriter {
         try {
             writer.close();
             output.close();
-            logger.log(Level.INFO, "GifWriter finalization successful");
+            LOGGER.log(Level.INFO, "GifWriter finalization successful");
         } catch (IOException e) {
-            logger.log(Level.WARNING, "GifWriter finalization failed", e);
+            LOGGER.log(Level.WARNING, "GifWriter finalization failed", e);
         }
     }
 }

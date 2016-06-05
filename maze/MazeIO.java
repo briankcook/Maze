@@ -36,6 +36,7 @@ public abstract class MazeIO {
             int width = in.read();
             int height = in.read();
             maze = new Maze(width, height);
+            maze.getCell(width-1, height-1).setGoal(true);
             for (Cell[] column : maze.getCells()) {
                 for (Cell cell : column) {
                     int b = in.read();
