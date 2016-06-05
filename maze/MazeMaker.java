@@ -2,7 +2,9 @@ package maze;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.text.NumberFormat;
@@ -22,13 +24,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.text.NumberFormatter;
-import pagelayout.CellGrid;
-import pagelayout.Column;
-import pagelayout.EasyCell;
 
 public class MazeMaker extends JPanel {
     
     private static final Dimension DEFAULT_SCREEN_SIZE = new Dimension(800, 600);
+    private static final Insets INSETS = new Insets(3, 3, 3, 3);
         
     private static final String GENERATOR_PREFIX = "<html>Generator:<br />";
     private static final String BACKSTEP = "Backtrace";
@@ -62,7 +62,7 @@ public class MazeMaker extends JPanel {
         generatorComboBox = new JComboBox();
         solverComboBox = new JComboBox();
         content = new JScrollPane();
-        settingsPanel = new JPanel();
+        settingsPanel = new JPanel(new GridBagLayout());
         
         NumberFormatter validator = new NumberFormatter(NumberFormat.getIntegerInstance());
         validator.setMinimum(0);
@@ -105,19 +105,44 @@ public class MazeMaker extends JPanel {
         makershow.setSelected(true);
         seeAll.setSelected(true);
         
-        CellGrid textfields = EasyCell.grid(new JLabel("Maze Rows:"),           rows,           EasyCell.eol(), 
-                                            new JLabel("Maze Columns:"),        cols,           EasyCell.eol(), 
-                                            new JLabel("Cell size (px):"),      cellsize,       EasyCell.eol(), 
-                                            new JLabel("Walls (px):"),          wallsize,       EasyCell.eol(), 
-                                            new JLabel("Frame delay (ms):"),    framedelay);
-
-        Column menu = EasyCell.column(textfields,  
-                                      new JLabel("Horizontalness"),
-                                      slider,
-                                      makershow,
-                                      seeAll);
-        
-        menu.createLayout(settingsPanel);
+        addSettingsItem(new JLabel("Maze Rows:"),
+                        1, 0, 0);
+        addSettingsItem(rows,
+                        1, 0, 1);
+        addSettingsItem(new JLabel("Maze Columns:"),
+                        1, 1, 0);
+        addSettingsItem(cols,
+                        1, 1, 1);
+        addSettingsItem(new JLabel("Cell size (px):"),
+                        1, 2, 0);
+        addSettingsItem(cellsize,
+                        1, 2, 1);
+        addSettingsItem(new JLabel("Walls (px):"),
+                        1, 3, 0);
+        addSettingsItem(wallsize,
+                        1, 3, 1);
+        addSettingsItem(new JLabel("Frame delay (ms):"), 
+                        1, 4, 0);
+        addSettingsItem(framedelay, 
+                        1, 4, 1);
+        addSettingsItem(new JLabel("Horizontalness", JLabel.CENTER), 
+                        2, 5, 0);
+        addSettingsItem(slider, 
+                        2, 6, 0);
+        addSettingsItem(makershow, 
+                        2, 7, 0);
+        addSettingsItem(seeAll, 
+                        2, 8, 0);
+    }
+    
+    private void addSettingsItem(JComponent component, int span, int row, int col) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridwidth = span;
+        constraints.gridx = col;
+        constraints.gridy = row;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.insets = INSETS;
+        settingsPanel.add(component, constraints);
     }
     
     private void initToolBar() {        
