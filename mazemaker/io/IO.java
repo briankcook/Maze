@@ -1,11 +1,11 @@
-package maze;
+package mazemaker.io;
 
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public abstract class IO {
+public interface IO {
     
     public static File pickFile(String extension, boolean save) throws IOException {
         String dot = "." + extension;

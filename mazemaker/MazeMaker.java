@@ -1,5 +1,8 @@
-package maze;
+package mazemaker;
 
+import mazemaker.mazeactor.*;
+import mazemaker.io.MazeIO;
+import mazemaker.maze.Maze;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

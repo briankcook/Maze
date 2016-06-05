@@ -1,4 +1,6 @@
-package maze;
+package mazemaker.mazeactor;
+
+import mazemaker.maze.*;
 
 public class WallFollower implements MazeActor {
     
@@ -26,7 +28,7 @@ public class WallFollower implements MazeActor {
         if (currentCell.isGoal()) 
             return null;
         Direction direction = currentCell.getFacing();
-        Cell nextLocation = currentCell.neighbors.get(direction);
+        Cell nextLocation = currentCell.getNeighbor(direction);
         if (moved || nextLocation == null) {
             int way = moved ? preferredDirection : alternateDirection;
             currentCell.setFacing(Compass.turn(direction, way));

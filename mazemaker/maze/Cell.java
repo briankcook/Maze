@@ -1,9 +1,9 @@
-package maze;
+package mazemaker.maze;
 
-import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Set;
 
-public class Cell implements Serializable {
+public class Cell {
     
     private final int x;
     private final int y;
@@ -15,7 +15,7 @@ public class Cell implements Serializable {
     private boolean making;
     private Direction facing;
     
-    HashMap<Direction,Cell> neighbors;
+    private HashMap<Direction,Cell> neighbors;
     
     public Cell(int x, int y) {
         this.x = x;
@@ -27,6 +27,10 @@ public class Cell implements Serializable {
         making = false;
         facing = null;
         neighbors = new HashMap();
+    }
+    
+    public Cell look(Direction direction) {
+        return neighbors.get(direction);
     }
 
     public int getX() {
@@ -83,5 +87,21 @@ public class Cell implements Serializable {
 
     public void setFacing(Direction facing) {
         this.facing = facing;
+    }
+
+    public void clearNeighbors() {
+        neighbors.clear();
+    }
+
+    public Cell getNeighbor(Direction direction) {
+        return neighbors.get(direction);
+    }
+
+    public void putNeighbor(Direction direction, Cell cell) {
+        neighbors.put(direction, cell);
+    }
+    
+    public Set<Direction> getDirections() {
+        return neighbors.keySet();
     }
 }

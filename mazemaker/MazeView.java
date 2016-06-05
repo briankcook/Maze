@@ -1,5 +1,9 @@
-package maze;
+package mazemaker;
 
+import mazemaker.io.GifWriter;
+import mazemaker.mazeactor.MazeActor;
+import mazemaker.maze.Cell;
+import mazemaker.maze.Maze;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;

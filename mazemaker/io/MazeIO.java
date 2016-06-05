@@ -1,14 +1,21 @@
-package maze;
+package mazemaker.io;
 
+import mazemaker.maze.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class MazeIO {
+       
+    private static final Logger LOGGER = Logger.getAnonymousLogger();
     
     private static final int NORTH = 0b1000;
     private static final int EAST  = 0b0100;
     private static final int SOUTH = 0b0010;
     private static final int WEST  = 0b0001;
+    
+    private MazeIO(){}
     
     public static void saveMaze(Maze maze) {
         
@@ -20,14 +27,16 @@ public abstract class MazeIO {
             for (Cell[] column : maze.getCells()) {
                 for (Cell cell : column) {
                     byte b = 0;
-                    b |= cell.neighbors.get(Compass.NORTH) != null ? NORTH : 0;
-                    b |= cell.neighbors.get(Compass.EAST)  != null ? EAST  : 0;
-                    b |= cell.neighbors.get(Compass.SOUTH) != null ? SOUTH : 0;
-                    b |= cell.neighbors.get(Compass.WEST)  != null ? WEST  : 0;
+                    b |= cell.getNeighbor(Compass.NORTH) != null ? NORTH : 0;
+                    b |= cell.getNeighbor(Compass.EAST)  != null ? EAST  : 0;
+                    b |= cell.getNeighbor(Compass.SOUTH) != null ? SOUTH : 0;
+                    b |= cell.getNeighbor(Compass.WEST)  != null ? WEST  : 0;
                     out.write(b);
                 }
             }
-        } catch (Exception ex) { }
+        } catch (Exception e) { 
+            LOGGER.log(Level.WARNING, "Maze save failed", e);
+        }
     }
     
     public static Maze openMaze() {
@@ -50,7 +59,8 @@ public abstract class MazeIO {
                         maze.join(cell, Compass.WEST);
                 }
             }
-        } catch (Exception ex) { 
+        } catch (Exception e) { 
+            LOGGER.log(Level.WARNING, "Maze load failed", e);
             return null;
         }
         return maze;

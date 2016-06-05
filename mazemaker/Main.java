@@ -1,4 +1,4 @@
-package maze;
+package mazemaker;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;

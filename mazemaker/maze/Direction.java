@@ -1,8 +1,6 @@
-package maze;
+package mazemaker.maze;
 
-import java.io.Serializable;
-
-public class Direction implements Serializable {
+public class Direction {
     public final int x;
     public final int y;
 

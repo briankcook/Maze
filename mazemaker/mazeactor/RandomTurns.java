@@ -1,5 +1,6 @@
-package maze;
+package mazemaker.mazeactor;
 
+import mazemaker.maze.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -31,8 +32,8 @@ public class RandomTurns implements MazeActor{
         
         choices.clear();
         
-        for (Direction direction : currentCell.neighbors.keySet())
-            if (!currentCell.neighbors.get(direction).equals(previousCell))
+        for (Direction direction : currentCell.getDirections())
+            if (!currentCell.getNeighbor(direction).equals(previousCell))
                 choices.add(direction);
         
         currentCell.setSolving(false);
@@ -42,7 +43,7 @@ public class RandomTurns implements MazeActor{
         } else {
             Direction direction = choices.get(r.nextInt(choices.size()));
             previousCell = currentCell;
-            currentCell = currentCell.neighbors.get(direction);
+            currentCell = currentCell.getNeighbor(direction);
             currentCell.setFacing(direction);
             currentCell.setVisited(true);
         }

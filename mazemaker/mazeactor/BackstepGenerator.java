@@ -1,5 +1,6 @@
-package maze;
+package mazemaker.mazeactor;
 
+import mazemaker.maze.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;

@@ -1,4 +1,4 @@
-package maze;
+package mazemaker.maze;
 
 public class Maze {
     
@@ -23,7 +23,7 @@ public class Maze {
         for (Cell[] column : cells) {
             for (Cell cell : column) {
                 if (type == HARD_RESET)
-                    cell.neighbors.clear();
+                    cell.clearNeighbors();
                 cell.setVisited(false);
                 cell.setMaking(false);
                 cell.setSolving(false);
@@ -41,8 +41,8 @@ public class Maze {
     public Cell join(Cell a, Direction direction) {
         Cell b = look(a, direction);
         Direction reverse = Compass.turn(direction, Compass.AROUND);
-        a.neighbors.put(direction, b);
-        b.neighbors.put(reverse, a);
+        a.putNeighbor(direction, b);
+        b.putNeighbor(reverse, a);
         return b;
     }
     

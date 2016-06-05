@@ -1,5 +1,6 @@
-package maze;
+package mazemaker;
 
+import mazemaker.maze.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
@@ -9,7 +10,7 @@ import javax.swing.JComponent;
 public class CellView extends JComponent {
     
     private final MazeView mazeview;
-    private final Cell cell;
+    private final transient Cell cell;
     private final int wall;
     private final int pane;
     private final HashMap<Direction,Polygon> pointers;
@@ -65,13 +66,13 @@ public class CellView extends JComponent {
             g.fillRect(pane-wall, pane-wall, wall, wall);
             
             // draw walls
-            if (cell.neighbors.get(Compass.NORTH) == null)
+            if (cell.look(Compass.NORTH) == null)
                 g.fillRect(        0,        0, pane, wall);
-            if (cell.neighbors.get(Compass.SOUTH) == null)
+            if (cell.look(Compass.SOUTH) == null)
                 g.fillRect(        0,pane-wall, pane, wall);
-            if (cell.neighbors.get(Compass.EAST) == null)
+            if (cell.look(Compass.EAST) == null)
                 g.fillRect(pane-wall,        0, wall, pane);
-            if (cell.neighbors.get(Compass.WEST) == null)
+            if (cell.look(Compass.WEST) == null)
                 g.fillRect(        0,        0, wall, pane);
         }
     }

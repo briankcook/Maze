@@ -1,4 +1,4 @@
-package maze;
+package mazemaker.maze;
 
 public abstract class Compass {
     public static final int RIGHT = 1;

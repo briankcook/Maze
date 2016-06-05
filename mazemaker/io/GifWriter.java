@@ -1,4 +1,4 @@
-package maze;
+package mazemaker.io;
 
 import net.kroo.elliot.gifsequencewriter.GifSequenceWriter;
 import java.awt.image.BufferedImage;
@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+import mazemaker.MazeView;
 
 public class GifWriter {
        
