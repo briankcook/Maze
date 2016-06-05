@@ -1,12 +1,15 @@
 package maze;
 
-public class RightHandSolver implements MazeActor {
+public class WallFollower implements MazeActor {
     
+    private final int preferredDirection;
+    private final int alternateDirection;
     private Cell currentCell;
     private boolean moved;
 
-    public RightHandSolver(Maze maze) {
-        super();
+    public WallFollower(Maze maze, boolean rightHanded) {
+        preferredDirection = rightHanded ? Compass.RIGHT : Compass.LEFT;
+        alternateDirection = rightHanded ? Compass.LEFT : Compass.RIGHT;
         currentCell = maze.getCell(0, 0);
         currentCell.setSolving(true);
         currentCell.setVisited(true);
@@ -20,7 +23,7 @@ public class RightHandSolver implements MazeActor {
             return null;
         Cell nextLocation = currentCell.neighbors.get(currentCell.getFacing());
         if (moved || nextLocation == null) {
-            int way = moved ? Compass.RIGHT : Compass.LEFT;
+            int way = moved ? preferredDirection : alternateDirection;
             currentCell.setFacing(Compass.turn(currentCell.getFacing(), way));
             moved = false;
         } else {

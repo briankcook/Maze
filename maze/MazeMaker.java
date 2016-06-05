@@ -30,6 +30,8 @@ public class MazeMaker extends JPanel {
         
     private static final String BACKSTEP = "backstep";
     private static final String RIGHTHAND = "righthand";
+    private static final String LEFTHAND = "lefthand";
+    private static final String RANDOMTURNS = "random";
     
     private final JToolBar toolBar;
     private final ToolBarListener toolBarListener;
@@ -166,6 +168,8 @@ public class MazeMaker extends JPanel {
         
         generatorComboBox.addItem(BACKSTEP);
         solverComboBox.addItem(RIGHTHAND);
+        solverComboBox.addItem(LEFTHAND);
+        solverComboBox.addItem(RANDOMTURNS);
     }
     
     private JButton makeToolBarButton(String imageName,
@@ -270,7 +274,11 @@ public class MazeMaker extends JPanel {
         private MazeActor getSolver() {
             switch ((String)solverComboBox.getSelectedItem()) {
                 case RIGHTHAND:
-                    return new RightHandSolver(mazeview.getMaze());
+                    return new WallFollower(mazeview.getMaze(), true);
+                case LEFTHAND:
+                    return new WallFollower(mazeview.getMaze(), false);
+                case RANDOMTURNS:
+                    return new RandomTurns(mazeview.getMaze());
                 default:
                     return null;
             }
