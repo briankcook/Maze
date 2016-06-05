@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.net.URL;
 import java.text.NumberFormat;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -34,7 +36,6 @@ public class MazeMaker extends JPanel {
     private static final String RANDOMTURNS = "random";
     
     private final JToolBar toolBar;
-    private final ToolBarListener toolBarListener;
     private final JComboBox generatorComboBox;
     private final JComboBox solverComboBox;
     private final JScrollPane content;
@@ -55,7 +56,6 @@ public class MazeMaker extends JPanel {
     public MazeMaker() {
         super();
         toolBar = new JToolBar();
-        toolBarListener = new ToolBarListener();
         generatorComboBox = new JComboBox();
         solverComboBox = new JComboBox();
         content = new JScrollPane();
@@ -116,11 +116,21 @@ public class MazeMaker extends JPanel {
     private void initToolBar() {        
         toolBar.add(makeToolBarButton("settings.png",
                                       "Toggle Settings Panel",
-                                      ToolBarListener.SETTINGS));
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              buildAndShowSettingsDialog();
+                                          }
+                                      }));
         
         toolBar.add(makeToolBarButton("new.png",
                                       "New Blank Maze",
-                                      ToolBarListener.NEW));
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              newMaze();
+                                          }
+                                      }));
         
         toolBar.addSeparator();
         
@@ -128,8 +138,14 @@ public class MazeMaker extends JPanel {
         
         toolBar.add(makeToolBarButton("generate.png",
                                       "Generate Maze",
-                                      ToolBarListener.GENERATE,
-                                      true));
+                                      true,
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              mazeview.getMaze().reset(true);
+                                              mazeview.runActor(getGenerator());
+                                          }
+                                      }));
         
         toolBar.addSeparator();
         
@@ -137,42 +153,83 @@ public class MazeMaker extends JPanel {
         
         toolBar.add(makeToolBarButton("solve.png",
                                       "Start Solver",
-                                      ToolBarListener.SOLVE,
-                                      true));
+                                      true,
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              mazeview.setShowUnseen(getShowUnseen());
+                                              mazeview.runActor(getSolver());
+                                          }
+                                      }));
         
         toolBar.addSeparator();
         
         toolBar.add(makeToolBarButton("pause.png",
                                       "Pause Animation",
-                                      ToolBarListener.PAUSE));
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              mazeview.pause();
+                                          }
+                                      }));
         
         toolBar.add(makeToolBarButton("start.png",
                                       "Resume Animation",
-                                      ToolBarListener.PLAY));
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              mazeview.resume();
+                                          }
+                                      }));
         
         toolBar.add(makeToolBarButton("stop.png",
-                                      "Stop",
-                                      ToolBarListener.STOP));
+                                      "Stop Animation",
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              mazeview.stop(true);
+                                          }
+                                      }));
         
         toolBar.add(makeToolBarButton("record.png",
                                       "Record to GIF",
-                                      ToolBarListener.RECORD));
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              mazeview.record();
+                                          }
+                                      }));
         
         toolBar.addSeparator();
         
         toolBar.add(makeToolBarButton("decrease.png",
                                       "Slow Down Animation",
-                                      ToolBarListener.SLOWER));
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              mazeview.slowDown();
+                                          }
+                                      }));
         
         toolBar.add(makeToolBarButton("increase.png",
                                       "Speed Up Animation",
-                                      ToolBarListener.FASTER));
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              mazeview.speedUp();
+                                          }
+                                      }));
         
         toolBar.addSeparator();
         
         toolBar.add(makeToolBarButton("clear.png",
                                       "Clear Maze",
-                                      ToolBarListener.CLEAR));
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              mazeview.cleanUp();
+                                          }
+                                      }));
         
         generatorComboBox.addItem(BACKSTEP);
         solverComboBox.addItem(RIGHTHAND);
@@ -182,171 +239,113 @@ public class MazeMaker extends JPanel {
     
     private JButton makeToolBarButton(String imageName,
                                       String toolTip,
-                                      String actionCommand) {
+                                      Action action) {
         return makeToolBarButton(imageName, 
                                  toolTip, 
-                                 actionCommand, 
-                                 false);
+                                 false,
+                                 action);
     }
     
     private JButton makeToolBarButton(String imageName,
                                       String toolTip,
-                                      String actionCommand,
-                                      boolean showBorder) {
+                                      boolean showBorder,
+                                      Action action) {
         URL imageURL = MazeMaker.class.getResource("resources/" + imageName);
-        JButton button = new JButton(new ImageIcon(imageURL));
-        button.setBorderPainted(showBorder);
+        JButton button = new JButton(action);
+        button.setIcon(new ImageIcon(imageURL));
         button.setToolTipText(toolTip);
-        button.addActionListener(toolBarListener);
-        button.setActionCommand(actionCommand);
+        button.setBorderPainted(showBorder);
         button.setFocusPainted(false);
         return button;
     }
-    
-    private class ToolBarListener implements ActionListener, Serializable {
-        private static final String SETTINGS = "settings";
-        private static final String NEW = "new";
-        private static final String GENERATE = "generate";
-        private static final String SOLVE = "solve";
-        private static final String PAUSE = "pause";
-        private static final String PLAY = "play";
-        private static final String STOP = "stop";
-        private static final String RECORD = "record";
-        private static final String FASTER = "faster";
-        private static final String SLOWER = "slower";
-        private static final String CLEAR = "clear";
         
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            switch (e.getActionCommand()) {
-                case SETTINGS: 
-                    buildAndShowSettingsDialog();
-                    break;
-                case NEW: 
-                    newMaze();
-                    break;
-                case GENERATE: 
-                    mazeview.getMaze().reset(true);
-                    mazeview.runActor(getGenerator());
-                    break;
-                case SOLVE: 
-                    mazeview.setShowUnseen(getShowUnseen());
-                    mazeview.runActor(getSolver());
-                    break;
-                case PAUSE: 
-                    mazeview.pause();
-                    break;
-                case PLAY: 
-                    mazeview.resume();
-                    break;
-                case STOP: 
-                    mazeview.stop(true);
-                    break;
-                case RECORD: 
-                    mazeview.record();
-                    break;
-                case FASTER: 
-                    mazeview.speedUp();
-                    break;
-                case SLOWER: 
-                    mazeview.slowDown();
-                    break;
-                case CLEAR: 
-                    mazeview.cleanUp();
-                    break;
-                default:
-                    break;
-            }
-        }
-        
-        private void buildAndShowSettingsDialog() {
-            JDialog dialog = new JDialog((JFrame)getTopLevelAncestor(),
-                                         "Settings", 
-                                         true);
-            dialog.setContentPane(settingsPanel);
-            dialog.pack();
-            dialog.setLocation(content.getLocationOnScreen());
-            dialog.setVisible(true);
-        }
-    
-        private void newMaze() {
-            mazeview = new MazeView(new Maze(getMazeWidth(),
-                                             getMazeHeight()),
-                                    getCellSize(),
-                                    getWallThickness(),
-                                    getFrameDelay(),
-                                    getShowUnseen());
-            mazeview.init();
-            content.setViewportView(wrap(mazeview));
-            content.revalidate();
-        }
-    
-        private JPanel wrap(JComponent component) {
-            JPanel wrapper = new JPanel();
-            wrapper.setLayout(new GridBagLayout());
-            wrapper.add(component);
-            return wrapper;
-        }
-        
-        private MazeActor getGenerator() {
-            switch ((String)generatorComboBox.getSelectedItem()) {
-                case BACKSTEP:
-                    return new BackstepGenerator(mazeview.getMaze(),
-                                                 getHWeight(),
-                                                 getVWeight(),
-                                                 getShowGeneration());
-                default:
-                    return null;
-            }
-        }
-        
-        private MazeActor getSolver() {
-            switch ((String)solverComboBox.getSelectedItem()) {
-                case RIGHTHAND:
-                    return new WallFollower(mazeview.getMaze(), true);
-                case LEFTHAND:
-                    return new WallFollower(mazeview.getMaze(), false);
-                case RANDOMTURNS:
-                    return new RandomTurns(mazeview.getMaze());
-                default:
-                    return null;
-            }
-        }
-    
-        private int getMazeHeight() {
-            return (int)rows.getValue();
-        }
+    private void buildAndShowSettingsDialog() {
+        JDialog dialog = new JDialog((JFrame)getTopLevelAncestor(),
+                                     "Settings", 
+                                     true);
+        dialog.setContentPane(settingsPanel);
+        dialog.pack();
+        dialog.setLocation(content.getLocationOnScreen());
+        dialog.setVisible(true);
+    }
 
-        private int getMazeWidth() {
-            return (int)cols.getValue();
-        }
+    private void newMaze() {
+        mazeview = new MazeView(new Maze(getMazeWidth(),
+                                         getMazeHeight()),
+                                getCellSize(),
+                                getWallThickness(),
+                                getFrameDelay(),
+                                getShowUnseen());
+        mazeview.init();
+        content.setViewportView(wrap(mazeview));
+        content.revalidate();
+    }
 
-        private int getCellSize() {
-            return (int)cellsize.getValue();
-        }
+    private JPanel wrap(JComponent component) {
+        JPanel wrapper = new JPanel();
+        wrapper.setLayout(new GridBagLayout());
+        wrapper.add(component);
+        return wrapper;
+    }
 
-        private int getWallThickness() {
-            return (int)wallsize.getValue();
+    private MazeActor getGenerator() {
+        switch ((String)generatorComboBox.getSelectedItem()) {
+            case BACKSTEP:
+                return new BackstepGenerator(mazeview.getMaze(),
+                                             getHWeight(),
+                                             getVWeight(),
+                                             getShowGeneration());
+            default:
+                return null;
         }
+    }
 
-        private int getFrameDelay() {
-            return (int)framedelay.getValue();
+    private MazeActor getSolver() {
+        switch ((String)solverComboBox.getSelectedItem()) {
+            case RIGHTHAND:
+                return new WallFollower(mazeview.getMaze(), true);
+            case LEFTHAND:
+                return new WallFollower(mazeview.getMaze(), false);
+            case RANDOMTURNS:
+                return new RandomTurns(mazeview.getMaze());
+            default:
+                return null;
         }
+    }
 
-        private int getHWeight() {
-            return slider.getValue();
-        }
+    private int getMazeHeight() {
+        return (int)rows.getValue();
+    }
 
-        private int getVWeight() {
-            return slider.getMaximum() + slider.getMinimum() - slider.getValue();
-        }
+    private int getMazeWidth() {
+        return (int)cols.getValue();
+    }
 
-        private boolean getShowUnseen() {
-            return seeAll.isSelected();
-        }
+    private int getCellSize() {
+        return (int)cellsize.getValue();
+    }
 
-        private boolean getShowGeneration() {
-            return makershow.isSelected();
-        }
+    private int getWallThickness() {
+        return (int)wallsize.getValue();
+    }
+
+    private int getFrameDelay() {
+        return (int)framedelay.getValue();
+    }
+
+    private int getHWeight() {
+        return slider.getValue();
+    }
+
+    private int getVWeight() {
+        return slider.getMaximum() + slider.getMinimum() - slider.getValue();
+    }
+
+    private boolean getShowUnseen() {
+        return seeAll.isSelected();
+    }
+
+    private boolean getShowGeneration() {
+        return makershow.isSelected();
     }
 }
