@@ -118,6 +118,10 @@ public class MazeMaker extends JPanel {
                                       "Toggle Settings Panel",
                                       ToolBarListener.SETTINGS));
         
+        toolBar.add(makeToolBarButton("new.png",
+                                      "New Blank Maze",
+                                      ToolBarListener.NEW));
+        
         toolBar.addSeparator();
         
         toolBar.add(generatorComboBox);
@@ -198,19 +202,10 @@ public class MazeMaker extends JPanel {
         button.setFocusPainted(false);
         return button;
     }
-        
-    private void buildAndShowSettingsDialog() {
-        JDialog dialog = new JDialog((JFrame)this.getTopLevelAncestor(),
-                                     "Settings", 
-                                     true);
-        dialog.setContentPane(settingsPanel);
-        dialog.pack();
-        dialog.setLocation(content.getLocationOnScreen());
-        dialog.setVisible(true);
-    }
     
     private class ToolBarListener implements ActionListener, Serializable {
         private static final String SETTINGS = "settings";
+        private static final String NEW = "new";
         private static final String GENERATE = "generate";
         private static final String SOLVE = "solve";
         private static final String PAUSE = "pause";
@@ -227,8 +222,12 @@ public class MazeMaker extends JPanel {
                 case SETTINGS: 
                     buildAndShowSettingsDialog();
                     break;
-                case GENERATE: 
+                case NEW: 
                     newMaze();
+                    break;
+                case GENERATE: 
+                    mazeview.getMaze().reset(true);
+                    mazeview.runActor(getGenerator());
                     break;
                 case SOLVE: 
                     mazeview.setShowUnseen(getShowUnseen());
@@ -241,9 +240,10 @@ public class MazeMaker extends JPanel {
                     mazeview.resume();
                     break;
                 case STOP: 
-                    mazeview.stop();
+                    mazeview.stop(true);
                     break;
                 case RECORD: 
+                    mazeview.record();
                     break;
                 case FASTER: 
                     mazeview.speedUp();
@@ -258,6 +258,16 @@ public class MazeMaker extends JPanel {
                     break;
             }
         }
+        
+        private void buildAndShowSettingsDialog() {
+            JDialog dialog = new JDialog((JFrame)getTopLevelAncestor(),
+                                         "Settings", 
+                                         true);
+            dialog.setContentPane(settingsPanel);
+            dialog.pack();
+            dialog.setLocation(content.getLocationOnScreen());
+            dialog.setVisible(true);
+        }
     
         private void newMaze() {
             mazeview = new MazeView(new Maze(getMazeWidth(),
@@ -269,7 +279,6 @@ public class MazeMaker extends JPanel {
             mazeview.init();
             content.setViewportView(wrap(mazeview));
             content.revalidate();
-            mazeview.runActor(getGenerator());
         }
     
         private JPanel wrap(JComponent component) {

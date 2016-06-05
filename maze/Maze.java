@@ -18,9 +18,11 @@ public class Maze implements Serializable{
                 cells[j][i] = new Cell(j, i);
     }
     
-    public void reset() {
+    public void reset(boolean hard) {
         for (Cell[] column : cells) {
             for (Cell cell : column) {
+                if (hard)
+                    cell.neighbors.clear();
                 cell.setVisited(false);
                 cell.setMaking(false);
                 cell.setSolving(false);

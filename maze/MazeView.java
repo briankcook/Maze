@@ -19,6 +19,7 @@ public class MazeView extends JPanel{
     private Timer timer;
     private int frameDelay;
     private boolean showUnseen;
+    private transient GifWriter gifWriter;
      
     public MazeView(Maze maze, int cellSize, int wallThickness, int frameDelay, boolean showUnseen) {
         super();
@@ -56,26 +57,27 @@ public class MazeView extends JPanel{
                 Cell source = actor.step();
                 toUpdate.repaint();
                 if (source == null) {
-                    timer.stop();
-                    timer = null;
-                    setShowUnseen(true);
-                    repaint();
+                    stop(false);
                 } else {
                     toUpdate = cells[source.getX()][source.getY()];
                     toUpdate.repaint();
                 }
+                if (gifWriter != null)
+                    gifWriter.snapshot();
             });
             
             timer.start();
         } else {
-            while (actor.step() != null);
+            while (actor.step() != null)
+                if (gifWriter != null)
+                    gifWriter.snapshot();
             repaint();
         }
     }
     
     public void cleanUp() {
-        stop();
-        getMaze().reset();
+        stop(true);
+        getMaze().reset(false);
         repaint();
     }
     
@@ -91,13 +93,18 @@ public class MazeView extends JPanel{
         }
     }
     
-    public void stop() {
+    public void stop(boolean hard) {
         if (timer != null) {
             pause();
             timer = null;
-            maze.reset();
+            if (hard)
+                maze.reset(false);
             setShowUnseen(true);
             repaint();
+        }
+        if (!hard && gifWriter != null) {
+            gifWriter.close();
+            gifWriter = null;
         }
     }
     
@@ -111,8 +118,16 @@ public class MazeView extends JPanel{
             timer.start();
     }
     
+    public void record() {
+        gifWriter = new GifWriter(this);
+    }
+    
     public boolean getShowUnseen() {
         return showUnseen;
+    }
+    
+    public int getFrameDelay() {
+        return frameDelay;
     }
 
     public void setShowUnseen(boolean showUnseen) {
