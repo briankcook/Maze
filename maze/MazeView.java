@@ -74,6 +74,7 @@ public class MazeView extends JPanel{
     }
     
     public void cleanUp() {
+        stop();
         getMaze().reset();
         repaint();
     }
@@ -95,6 +96,8 @@ public class MazeView extends JPanel{
             pause();
             timer = null;
             maze.reset();
+            setShowUnseen(true);
+            repaint();
         }
     }
     
