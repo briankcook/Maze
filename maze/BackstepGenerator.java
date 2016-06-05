@@ -52,18 +52,16 @@ public class BackstepGenerator implements MazeActor {
                 currentCell.setMaking(true);
             }
         } else {
-            Direction direction = choices.get(r.nextInt(choices.size()));
-            Cell nextCell = maze.look(currentCell, direction);
-
-            currentCell.neighbors.put(direction, nextCell);
-            nextCell.neighbors.put(Compass.turn(direction, Compass.AROUND), currentCell);
-
             history.push(currentCell);
-            currentCell = nextCell;
+            currentCell = maze.join(currentCell, pickDirection());
             currentCell.setMaking(true);
             currentCell.setVisited(true);
         }
         return currentCell;
+    }
+    
+    private Direction pickDirection() {
+        return choices.get(r.nextInt(choices.size()));
     }
     
     private void add(Direction direction) {

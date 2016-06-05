@@ -1,8 +1,6 @@
 package maze;
 
-import java.io.Serializable;
-
-public class Maze implements Serializable{
+public class Maze {
     
     public static final boolean HARD_RESET = true;
     public static final boolean SOFT_RESET = false;
@@ -40,6 +38,14 @@ public class Maze implements Serializable{
                y2 >= 0 && y2 < getHeight();
     }
     
+    public Cell join(Cell a, Direction direction) {
+        Cell b = look(a, direction);
+        Direction reverse = Compass.turn(direction, Compass.AROUND);
+        a.neighbors.put(direction, b);
+        b.neighbors.put(reverse, b);
+        return b;
+    }
+    
     public boolean visited(Cell cell, Direction direction) {
         return look(cell, direction).isVisited();
     }
@@ -50,6 +56,10 @@ public class Maze implements Serializable{
     
     public Cell getCell(int x, int y) {
         return cells[x][y];
+    }
+    
+    public Cell[][] getCells() {
+        return cells;
     }
     
     public Cell getLastCell() {

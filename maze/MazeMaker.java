@@ -54,7 +54,7 @@ public class MazeMaker extends JPanel {
     private final JCheckBox makershow;
     private final JCheckBox seeAll;
     
-    private MazeView mazeview;
+    private transient MazeView mazeview;
 
     public MazeMaker() {
         super();
@@ -161,6 +161,24 @@ public class MazeMaker extends JPanel {
                                           @Override
                                           public void actionPerformed(ActionEvent e) {
                                               newMaze();
+                                          }
+                                      }));
+        
+        toolBar.add(makeToolBarButton("save.png",
+                                      "Save Maze",
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              MazeIO.saveMaze(mazeview.getMaze());
+                                          }
+                                      }));
+        
+        toolBar.add(makeToolBarButton("open.png",
+                                      "Open Maze",
+                                      new AbstractAction(){
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              setMaze(MazeIO.openMaze());
                                           }
                                       }));
         
@@ -311,12 +329,15 @@ public class MazeMaker extends JPanel {
         dialog.setLocation(content.getLocationOnScreen());
         dialog.setVisible(true);
     }
-
+    
     private void newMaze() {
+        setMaze(new Maze(getMazeWidth(), getMazeHeight()));
+    }
+
+    private void setMaze(Maze maze) {
         if (mazeview != null)
             mazeview.stop();
-        mazeview = new MazeView(new Maze(getMazeWidth(),
-                                         getMazeHeight()),
+        mazeview = new MazeView(maze,
                                 getCellSize(),
                                 getWallThickness(),
                                 getFrameDelay(),

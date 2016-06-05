@@ -12,7 +12,7 @@ public class MazeView extends JPanel{
     
     private static final double SPEEDFACTOR = 0.7;
     
-    private final Maze maze;
+    private final transient Maze maze;
     private final CellView[][] cells;
     private final int cellSize;
     private final int wallThickness;
