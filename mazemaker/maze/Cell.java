@@ -29,6 +29,14 @@ public class Cell {
         neighbors = new HashMap();
     }
     
+    public boolean hasNeighbor(Cell check) {
+        return neighbors.containsValue(check);
+    }
+    
+    public void removeNeighbor(Direction direction) {
+        neighbors.remove(direction);
+    }
+    
     public Cell look(Direction direction) {
         return neighbors.get(direction);
     }

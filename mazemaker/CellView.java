@@ -9,11 +9,14 @@ import javax.swing.JComponent;
 
 public class CellView extends JComponent {
     
+    private static final Color ACTIVECOLOR = new Color(0.5f, 0.5f, 1.0f, 0.5f);
     private final MazeView mazeview;
     private final transient Cell cell;
     private final int wall;
     private final int pane;
     private final HashMap<Direction,Polygon> pointers;
+    
+    private boolean selected;
     
     public CellView(MazeView mazeview, Cell cell, int cellSize, int wallThickness) {
         super();
@@ -56,6 +59,10 @@ public class CellView extends JComponent {
             g.setColor(Color.RED);
             g.fillPolygon(pointers.get(cell.getFacing()));
         }
+        if (selected) {
+            g.setColor(ACTIVECOLOR);
+            g.fillRect(0, 0, pane, pane);
+        }
         if (mazeview.getShowUnseen() || cell.isVisited()) {
             g.setColor(Color.BLACK);
             
@@ -75,5 +82,13 @@ public class CellView extends JComponent {
             if (cell.look(Compass.WEST) == null)
                 g.fillRect(        0,        0, wall, pane);
         }
+    }
+    
+    public Cell getCell() {
+        return cell;
+    }
+    
+    public void setSelected(boolean value) {
+        selected = value;
     }
 }

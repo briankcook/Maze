@@ -46,6 +46,41 @@ public class Maze {
         return b;
     }
     
+    public void toggle(Cell a, Cell b) {
+        Direction direction = null;
+        for (Direction d : Compass.getDirections())
+            if (canGo(a,d) && look(a, d).equals(b))
+                direction = d;
+        if (direction != null) {
+            if (a.hasNeighbor(b)) {
+                Direction reverse = Compass.turn(direction, Compass.AROUND);
+                a.removeNeighbor(direction);
+                b.removeNeighbor(reverse);
+            } else {
+                join(a, direction);
+            }
+        }
+    }
+    
+    public void setGoal(Cell cell) {
+        clearGoal();
+        cell.setGoal(true);
+    }
+    
+    public void clearGoal() {
+        Cell goal = getGoal();
+        if (goal != null)
+            goal.setGoal(false);
+    }
+    
+    public Cell getGoal() {
+        for (Cell[] column : cells) 
+            for (Cell cell : column) 
+                if (cell.isGoal())
+                    return cell;
+        return null;
+    }
+    
     public boolean visited(Cell cell, Direction direction) {
         return look(cell, direction).isVisited();
     }

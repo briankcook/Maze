@@ -32,6 +32,7 @@ public class BackstepGenerator implements MazeActor {
         currentCell.setMaking(true);
         currentCell.setVisited(true);
         history.push(currentCell);
+        maze.clearGoal();
         maze.getLastCell().setGoal(true);
     }
     

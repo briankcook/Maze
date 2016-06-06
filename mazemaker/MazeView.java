@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -26,6 +28,7 @@ public class MazeView extends JPanel{
     private int frameDelay;
     private boolean showUnseen;
     private transient GifWriter gifWriter;
+    private CellView selectedCell;
      
     public MazeView(Maze maze, int cellSize, int wallThickness, int frameDelay, boolean showUnseen) {
         super();
@@ -38,6 +41,16 @@ public class MazeView extends JPanel{
     }
     
     public void init() {
+        addMouseListener(new MouseListener(){
+            @Override public void mouseClicked(MouseEvent e){}
+            @Override public void mouseEntered(MouseEvent e){}
+            @Override public void mouseExited(MouseEvent e){}
+            @Override public void mousePressed(MouseEvent e){
+                handleClick(e);
+            }
+            @Override public void mouseReleased(MouseEvent e){}
+        });
+        
         setBorder(BorderFactory.createLineBorder(Color.BLACK, wallThickness));
         setLayout(new GridLayout(maze.getHeight(), maze.getWidth()));
         Dimension size = new Dimension(cellSize, cellSize);
@@ -51,6 +64,24 @@ public class MazeView extends JPanel{
         }
         
         reveal();
+    }
+    
+    private void handleClick(MouseEvent e) {
+        CellView cell = (CellView)getComponentAt(e.getPoint());
+        if (selectedCell == null) {
+            selectedCell = cell;
+            selectedCell.setSelected(true);
+            selectedCell.repaint();
+        } else {
+            if (cell.equals(selectedCell)) {
+                maze.setGoal(selectedCell.getCell());
+            } else {
+                maze.toggle(cell.getCell(), selectedCell.getCell());
+            }
+            selectedCell.setSelected(false);
+            selectedCell = null;
+            cleanUp();
+        }
     }
     
     public void runActor(MazeActor actor, boolean animate) {
@@ -68,6 +99,7 @@ public class MazeView extends JPanel{
                 if (source == null) {
                     stop();
                     reveal();
+                    stopRecording();
                 } else {
                     toUpdate = cells[source.getX()][source.getY()];
                     toUpdate.repaint();
@@ -114,10 +146,6 @@ public class MazeView extends JPanel{
             reveal();
             timer = null;
         }
-        if (gifWriter != null) {
-            gifWriter.close();
-            gifWriter = null;
-        }
     }
     
     public void pause() {
@@ -132,6 +160,14 @@ public class MazeView extends JPanel{
     
     public void record() {
         gifWriter = new GifWriter(this);
+    }
+    
+    public void stopRecording() {
+        if (gifWriter != null) {
+            gifWriter.snapshot();
+            gifWriter.close();
+            gifWriter = null;
+        }
     }
     
     public boolean getShowUnseen() {

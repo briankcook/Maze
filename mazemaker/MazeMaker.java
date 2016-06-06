@@ -249,6 +249,7 @@ public class MazeMaker extends JPanel {
                                           @Override
                                           public void actionPerformed(ActionEvent e) {
                                               mazeview.stop();
+                                              mazeview.stopRecording();
                                           }
                                       }));
         

@@ -10,10 +10,11 @@ public abstract class MazeIO {
        
     private static final Logger LOGGER = Logger.getAnonymousLogger();
     
-    private static final int NORTH = 0b1000;
-    private static final int EAST  = 0b0100;
-    private static final int SOUTH = 0b0010;
-    private static final int WEST  = 0b0001;
+    private static final int GOAL  = 0b10000;
+    private static final int NORTH = 0b01000;
+    private static final int EAST  = 0b00100;
+    private static final int SOUTH = 0b00010;
+    private static final int WEST  = 0b00001;
     
     private MazeIO(){}
     
@@ -27,6 +28,7 @@ public abstract class MazeIO {
             for (Cell[] column : maze.getCells()) {
                 for (Cell cell : column) {
                     byte b = 0;
+                    b |= cell.isGoal()                           ? GOAL  : 0;
                     b |= cell.getNeighbor(Compass.NORTH) != null ? NORTH : 0;
                     b |= cell.getNeighbor(Compass.EAST)  != null ? EAST  : 0;
                     b |= cell.getNeighbor(Compass.SOUTH) != null ? SOUTH : 0;
@@ -45,10 +47,11 @@ public abstract class MazeIO {
             int width = in.read();
             int height = in.read();
             maze = new Maze(width, height);
-            maze.getCell(width-1, height-1).setGoal(true);
             for (Cell[] column : maze.getCells()) {
                 for (Cell cell : column) {
                     int b = in.read();
+                    if ((b & GOAL) > 0)
+                        cell.setGoal(true);
                     if ((b & NORTH) > 0)
                         maze.join(cell, Compass.NORTH);
                     if ((b & EAST) > 0)
