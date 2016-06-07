@@ -1,7 +1,6 @@
-package mazemaker.mazeactor;
+package mazemaker.maze;
 
 import java.awt.Point;
-import mazemaker.maze.Direction;
 
 public class MazeActorData extends Point{
     public final transient Direction facing;

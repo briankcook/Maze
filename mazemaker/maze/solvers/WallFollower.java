@@ -1,4 +1,4 @@
-package mazemaker.mazeactor;
+package mazemaker.maze.solvers;
 
 import mazemaker.maze.*;
 

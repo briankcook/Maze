@@ -1,9 +1,8 @@
 package mazemaker;
 
-import java.awt.Color;
 import mazemaker.io.GifWriter;
-import mazemaker.mazeactor.MazeActor;
-import mazemaker.maze.Maze;
+import mazemaker.maze.*;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
@@ -15,8 +14,6 @@ import java.util.HashMap;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.Timer;
-import mazemaker.maze.Direction;
-import mazemaker.mazeactor.MazeActorData;
 
 public class MazeView extends JLabel{
     

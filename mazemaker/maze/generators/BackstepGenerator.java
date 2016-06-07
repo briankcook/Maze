@@ -1,7 +1,7 @@
-package mazemaker.mazeactor;
+package mazemaker.maze.generators;
 
-import java.awt.Point;
 import mazemaker.maze.*;
+import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -43,7 +43,8 @@ public class BackstepGenerator implements MazeActor {
         choices.clear();
         
         for (Direction direction : Maze.getDIRECTIONS())
-            if (maze.canGo(x, y, direction) && !visited[x + direction.x][y + direction.y])
+            if (maze.isValid(x + direction.x, y + direction.y) && 
+                    !visited[x + direction.x][y + direction.y])
                 add(direction);
         
         if (choices.isEmpty()) {

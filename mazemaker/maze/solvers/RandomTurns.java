@@ -1,7 +1,7 @@
-package mazemaker.mazeactor;
+package mazemaker.maze.solvers;
 
-import java.awt.Point;
 import mazemaker.maze.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 

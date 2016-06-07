@@ -1,7 +1,7 @@
 package mazemaker.io;
 
-import java.awt.Point;
 import mazemaker.maze.*;
+import java.awt.Point;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.logging.Level;
