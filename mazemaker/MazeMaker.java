@@ -44,6 +44,7 @@ public class MazeMaker extends JPanel {
     private static final Insets INSETS = new Insets(3, 3, 3, 3);
         
     private static final String BACKSTEP = "Backtrace";
+    private static final String COINFLIP = "Random Binary Tree";
     
     private static final String RIGHTHAND = "Right Hand Rule";
     private static final String LEFTHAND = "Left hand Rule";
@@ -102,14 +103,14 @@ public class MazeMaker extends JPanel {
     private final Action _generate = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mazeview.runActor(getGenerator(), getShowGeneration(), getShowUnseen(), true);
+                mazeview.runActor(getGenerator(), getShowGeneration(), getShowUnseen(), true, getFrameDelay());
             }
         };
 
     private final Action _solve = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mazeview.runActor(getSolver(), true, getShowUnseen(), false);
+                mazeview.runActor(getSolver(), true, getShowUnseen(), false, getFrameDelay());
             }
         };
 
@@ -186,7 +187,7 @@ public class MazeMaker extends JPanel {
         toolBar = new JToolBar();
         sidebar = new JScrollPane();
         sidebarpanel = new JPanel(new BorderLayout());
-        generatorComboBox = new JComboBox(new String[]{BACKSTEP});
+        generatorComboBox = new JComboBox(new String[]{BACKSTEP, COINFLIP});
         solverComboBox = new JComboBox(new String[]{RIGHTHAND, LEFTHAND, RANDOMTURNS});
         content = new JScrollPane();
         settingsPanel = new JPanel(new GridBagLayout());
@@ -439,6 +440,8 @@ public class MazeMaker extends JPanel {
                 return new BackstepGenerator(mazeview.getMaze(),
                                              getHWeight(),
                                              getVWeight());
+            case COINFLIP:
+                return new RandomBinaryTreeGenerator(mazeview.getMaze());
             default:
                 return null;
         }

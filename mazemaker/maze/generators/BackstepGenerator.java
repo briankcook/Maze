@@ -40,6 +40,7 @@ public class BackstepGenerator implements MazeActor {
     
     @Override
     public MazeActorData step() {
+        Point update = new Point(x, y);
         choices.clear();
         
         for (Direction direction : Maze.getDIRECTIONS())
@@ -58,7 +59,7 @@ public class BackstepGenerator implements MazeActor {
             maze.toggleConnection(new Point(x,y), history.peek());
             visited[x][y] = true;
         }
-        return new MazeActorData(x, y, null);
+        return new MazeActorData(x, y, null, update);
     }
     
     private void moveTo(Point cell) {

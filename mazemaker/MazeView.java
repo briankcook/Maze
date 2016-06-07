@@ -33,7 +33,6 @@ public class MazeView extends JLabel{
     private boolean showUnseen;
     private boolean[][] visited;
     private transient GifWriter gifWriter;
-    private Point toUpdate;
     private Point selection;
     
     private Color cellColor;
@@ -124,10 +123,6 @@ public class MazeView extends JLabel{
         repaint();
     }
     
-    private void paintCell(Point location){
-        paintCell(location, true);
-    }
-    
     private void paintCell(Point location, boolean repaint){
         int x = cellSize * location.x;
         int y = cellSize * location.y;
@@ -177,7 +172,8 @@ public class MazeView extends JLabel{
         }
     }
     
-    public void runActor(MazeActor actor, boolean animate, boolean showUnseen, boolean resetMaze) {
+    public void runActor(MazeActor actor, boolean animate, boolean showUnseen, boolean resetMaze, int frameDelay) {
+        setFrameDelay(frameDelay);
         if (resetMaze)
             maze.reset();
         visited = new boolean[maze.width][maze.height];
@@ -187,18 +183,17 @@ public class MazeView extends JLabel{
         actor.init();
         
         if (animate) {
-            toUpdate = new Point(0, 0);
             visited[0][0] = true;
             
             timer = new Timer(frameDelay, (ActionEvent e) -> {  
                 MazeActorData source = actor.step();
-                paintCell(toUpdate);
                 if (source == null) {
                     cleanUp();
                 } else {
                     visited[source.x][source.y] = true;
-                    toUpdate = source;
-                    paintCell(source);
+                    for (Point p : source.update)
+                        paintCell(p, false);  // don't paintAll()
+                    paintCell(source, true);  //    do paintAll()
                     paintActor(source);
                 }
                 if (gifWriter != null)
