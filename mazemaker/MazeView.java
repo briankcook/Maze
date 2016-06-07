@@ -35,6 +35,13 @@ public class MazeView extends JLabel{
     private transient GifWriter gifWriter;
     private Point toUpdate;
     private Point selection;
+    
+    private Color cellColor;
+    private Color visitedColor;
+    private Color wallColor;
+    private Color genColor;
+    private Color solverColor;
+    private Color goalColor;
      
     public MazeView(Maze maze, int cellSize, int wallThickness, int frameDelay, boolean showUnseen) {
         super();
@@ -103,7 +110,7 @@ public class MazeView extends JLabel{
                 paintCell(new Point(i, j), false);
         
         Point goal = maze.getGoal();
-        graphics.setColor(Color.GRAY);
+        graphics.setColor(goalColor);
         graphics.fillOval(goal.x * cellSize + wallThickness * 2, 
                           goal.y * cellSize + wallThickness * 2,
                           cellSize - wallThickness * 4, 
@@ -125,10 +132,12 @@ public class MazeView extends JLabel{
         int x = cellSize * location.x;
         int y = cellSize * location.y;
         
-        graphics.setColor(Color.WHITE);
+        if (visited[location.x][location.y])
+            graphics.setColor(visitedColor);
+        graphics.setColor(cellColor);
         graphics.fillRect(x, y, cellSize, cellSize);
         
-        graphics.setColor(Color.BLACK);
+        graphics.setColor(wallColor);
         // corners
         if (showUnseen || visited[location.x][location.y]) {
             graphics.fillRect(                           x,                            y, wallThickness, wallThickness);
@@ -154,7 +163,7 @@ public class MazeView extends JLabel{
         int x = cellSize * actor.x;
         int y = cellSize * actor.y;
         if (actor.facing == null) {
-            graphics.setColor(Color.BLUE);
+            graphics.setColor(genColor);
             graphics.fillRect(x + wallThickness * 2, 
                               y + wallThickness * 2, 
                               cellSize - wallThickness * 4, 
@@ -163,7 +172,7 @@ public class MazeView extends JLabel{
             Polygon ref = pointers.get(actor.facing);
             Polygon pointer = new Polygon(ref.xpoints, ref.ypoints, ref.npoints);
             pointer.translate(x, y);
-            graphics.setColor(Color.RED);
+            graphics.setColor(solverColor);
             graphics.fillPolygon(pointer);
         }
     }
@@ -264,5 +273,30 @@ public class MazeView extends JLabel{
 
     public Maze getMaze() {
         return maze;
+    }
+
+    public void setCellColor(Color cellColor) {
+        this.cellColor = cellColor;
+    }
+
+    public void setVisitedColor(Color visitedColor) {
+        this.visitedColor = visitedColor;
+    }
+
+    public void setWallColor(Color wallColor) {
+        this.wallColor = wallColor;
+        setBorder(BorderFactory.createLineBorder(wallColor, wallThickness));
+    }
+
+    public void setGenColor(Color genColor) {
+        this.genColor = genColor;
+    }
+
+    public void setSolverColor(Color solverColor) {
+        this.solverColor = solverColor;
+    }
+
+    public void setGoalColor(Color goalColor) {
+        this.goalColor = goalColor;
     }
 }
