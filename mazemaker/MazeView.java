@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.Timer;
@@ -42,20 +43,24 @@ public class MazeView extends JLabel{
         this.wallThickness = wallThickness;
         this.frameDelay = frameDelay;
         this.showUnseen = showUnseen;
-        this.image = new BufferedImage(maze.width*cellSize, maze.height*cellSize, BufferedImage.TYPE_INT_RGB);
+        
+        image = new BufferedImage(maze.width*cellSize, maze.height*cellSize, BufferedImage.TYPE_INT_RGB);
         graphics = image.createGraphics();
         pointers = new HashMap();
         visited = new boolean[maze.width][maze.height];
         highlight = new Color(0.5f, 0.5f, 1.0f, 0.5f);
         
         // undocumented triangle magic, just go with it
-        int[] slm = new int[]{           wallThickness*2, cellSize - wallThickness*2,                 cellSize/2};
-        int[] ssl = new int[]{           wallThickness*2,            wallThickness*2, cellSize - wallThickness*2};
-        int[] lls = new int[]{cellSize - wallThickness*2, cellSize - wallThickness*2,            wallThickness*2};
-        pointers.put(Maze.NORTH, new Polygon(slm, lls, 3));
-        pointers.put(Maze.SOUTH, new Polygon(slm, ssl, 3));
-        pointers.put(Maze.EAST,  new Polygon(ssl, slm, 3));
-        pointers.put(Maze.WEST,  new Polygon(lls, slm, 3));
+        int near = wallThickness * 2;
+        int mid = cellSize / 2;
+        int far = cellSize - near;
+        int[] nearfarmid  = new int[]{near,  far,  mid};
+        int[] nearnearfar = new int[]{near, near,  far};
+        int[] farfarnear  = new int[]{ far,  far, near};
+        pointers.put(Maze.NORTH, new Polygon( nearfarmid,  farfarnear, 3));
+        pointers.put(Maze.SOUTH, new Polygon( nearfarmid, nearnearfar, 3));
+        pointers.put(Maze.EAST,  new Polygon(nearnearfar,  nearfarmid, 3));
+        pointers.put(Maze.WEST,  new Polygon( farfarnear,  nearfarmid, 3));
     }
     
     public void init() {
@@ -69,6 +74,8 @@ public class MazeView extends JLabel{
             }
             @Override public void mouseReleased(MouseEvent e){}
         });
+        
+        setBorder(BorderFactory.createLineBorder(Color.BLACK, wallThickness));
         
         setIcon(new ImageIcon(image));
         
@@ -162,15 +169,12 @@ public class MazeView extends JLabel{
     }
     
     public void runActor(MazeActor actor, boolean animate, boolean showUnseen, boolean resetMaze) {
-        this.showUnseen = showUnseen;
-        
-        visited = new boolean[maze.width][maze.height];
-        
         if (resetMaze)
             maze.reset();
-        
+        visited = new boolean[maze.width][maze.height];
+        cleanUp();
+        this.showUnseen = showUnseen;
         paintAll();
-        
         actor.init();
         
         if (animate) {
@@ -182,7 +186,6 @@ public class MazeView extends JLabel{
                 paintCell(toUpdate);
                 if (source == null) {
                     cleanUp();
-                    stopRecording();
                 } else {
                     visited[source.x][source.y] = true;
                     toUpdate = source;
@@ -217,6 +220,11 @@ public class MazeView extends JLabel{
             pause();
             timer = null;
         }
+        if (gifWriter != null) {
+            gifWriter.snapshot();
+            gifWriter.close();
+            gifWriter = null;
+        }
     }
     
     public void reveal() {
@@ -226,14 +234,6 @@ public class MazeView extends JLabel{
     
     public void record() {
         gifWriter = new GifWriter(image, frameDelay);
-    }
-    
-    public void stopRecording() {
-        if (gifWriter != null) {
-            gifWriter.snapshot();
-            gifWriter.close();
-            gifWriter = null;
-        }
     }
     
     public void speedUp() {
