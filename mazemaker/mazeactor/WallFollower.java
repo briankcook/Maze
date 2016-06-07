@@ -4,44 +4,42 @@ import mazemaker.maze.*;
 
 public class WallFollower implements MazeActor {
     
+    private final Maze maze;
     private final int preferredDirection;
     private final int alternateDirection;
-    private Cell currentCell;
+    
+    private Direction facing;
     private boolean moved;
+    private int x;
+    private int y;
 
     public WallFollower(Maze maze, boolean rightHanded) {
-        preferredDirection = rightHanded ? Compass.RIGHT : Compass.LEFT;
-        alternateDirection = rightHanded ? Compass.LEFT : Compass.RIGHT;
-        currentCell = maze.getCell(0, 0);
+        this.maze = maze;
+        preferredDirection = rightHanded ? Maze.RIGHT : Maze.LEFT;
+        alternateDirection = rightHanded ? Maze.LEFT : Maze.RIGHT;
     }
     
     @Override
     public void init() {
-        currentCell.setSolving(true);
-        currentCell.setVisited(true);
-        currentCell.setFacing(Compass.SOUTH);
+        facing = Maze.SOUTH;
         moved = true;
+        x = 0;
+        y = 0;
     }
     
     @Override
-    public Cell step() {
-        if (currentCell.isGoal()) 
+    public MazeActorData step() {
+        if (maze.isGoal(x, y)) 
             return null;
-        Direction direction = currentCell.getFacing();
-        Cell nextLocation = currentCell.getNeighbor(direction);
-        if (moved || nextLocation == null) {
+        if (moved || !maze.canGo(x, y, facing)) {
             int way = moved ? preferredDirection : alternateDirection;
-            currentCell.setFacing(Compass.turn(direction, way));
+            facing = Maze.turn(facing, way);
             moved = false;
         } else {
-            nextLocation.setFacing(direction);
-            nextLocation.setSolving(true);
-            nextLocation.setVisited(true);
-            currentCell.setFacing(null);
-            currentCell.setSolving(false);
-            currentCell = nextLocation;
+            x += facing.x;
+            y += facing.y;
             moved = true;
         }
-        return currentCell;
+        return new MazeActorData(x, y, facing);
     }
 }

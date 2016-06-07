@@ -197,9 +197,7 @@ public class MazeMaker extends JPanel {
                                       new AbstractAction(){
                                           @Override
                                           public void actionPerformed(ActionEvent e) {
-                                              mazeview.getMaze().reset(Maze.HARD_RESET);
-                                              mazeview.setShowUnseen(getShowUnseen());
-                                              mazeview.runActor(getGenerator(), getShowGeneration());
+                                              mazeview.runActor(getGenerator(), getShowGeneration(), getShowUnseen(), true);
                                           }
                                       }));
         
@@ -217,9 +215,7 @@ public class MazeMaker extends JPanel {
                                       new AbstractAction(){
                                           @Override
                                           public void actionPerformed(ActionEvent e) {
-                                              mazeview.stop();
-                                              mazeview.setShowUnseen(getShowUnseen());
-                                              mazeview.runActor(getSolver(), true);
+                                              mazeview.runActor(getSolver(), true, getShowUnseen(), false);
                                           }
                                       }));
         

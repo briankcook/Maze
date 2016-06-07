@@ -1,5 +1,6 @@
 package mazemaker.mazeactor;
 
+import java.awt.Point;
 import mazemaker.maze.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -12,10 +13,12 @@ public class BackstepGenerator implements MazeActor {
     private final int hWeight;
     private final int vWeight;
     private final Random r;
-    private final Deque<Cell> history;
-    private final ArrayList<Direction> choices;
+    private final Deque<Point> history;
+    private final ArrayList<Point> choices;
+    private final boolean[][] visited;
     
-    private Cell currentCell;
+    private int x;
+    private int y;
     
     public BackstepGenerator(Maze maze, int hWeight, int vWeight) {
         this.maze = maze;
@@ -24,55 +27,56 @@ public class BackstepGenerator implements MazeActor {
         r = new Random();
         history = new ArrayDeque();
         choices = new ArrayList();
+        visited = new boolean[maze.height][maze.width];
     }
     
     @Override
     public void init() {
-        currentCell = maze.getCell(0, 0);
-        currentCell.setMaking(true);
-        currentCell.setVisited(true);
-        history.push(currentCell);
-        maze.clearGoal();
-        maze.getLastCell().setGoal(true);
+        x = 0;
+        y = 0;
+        visited[x][y] = true;
+        history.push(new Point(x, y));
     }
     
     @Override
-    public Cell step() {
+    public MazeActorData step() {
         choices.clear();
         
-        currentCell.setMaking(false);
-        
-        for (Direction direction : Compass.getDirections())
-            if (maze.canGo(currentCell, direction) && !maze.visited(currentCell, direction))
+        for (Direction direction : Maze.getDIRECTIONS())
+            if (maze.canGo(x, y, direction) && !visited[x + direction.x][y + direction.y])
                 add(direction);
         
         if (choices.isEmpty()) {
-            if (history.isEmpty()){
+            if (history.isEmpty())
                 return null;
-            } else {
-                currentCell = history.pop();
-                currentCell.setMaking(true);
-            }
+            else 
+                moveTo(history.pop());
         } else {
-            history.push(currentCell);
-            currentCell = maze.join(currentCell, pickDirection());
-            currentCell.setMaking(true);
-            currentCell.setVisited(true);
+            history.push(new Point(x, y));
+            moveTo(pickDirection());
+            maze.toggleConnection(new Point(x,y), history.peek());
+            visited[x][y] = true;
         }
-        return currentCell;
+        return new MazeActorData(x, y, null);
     }
     
-    private Direction pickDirection() {
+    private void moveTo(Point cell) {
+        x = cell.x;
+        y = cell.y;
+    }
+    
+    private Point pickDirection() {
         return choices.get(r.nextInt(choices.size()));
     }
     
     private void add(Direction direction) {
         int numTimes;
-        if (direction.equals(Compass.NORTH) || direction.equals(Compass.SOUTH))
+        Point cell = maze.look(x, y, direction);
+        if (direction.equals(Maze.NORTH) || direction.equals(Maze.SOUTH))
             numTimes = vWeight;
         else
             numTimes = hWeight;
         for (int  i = 0 ; i < numTimes ; i++)
-            choices.add(direction);
+            choices.add(cell);
     }
 }

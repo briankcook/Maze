@@ -1,55 +1,56 @@
 package mazemaker.mazeactor;
 
+import java.awt.Point;
 import mazemaker.maze.*;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class RandomTurns implements MazeActor{
     
+    private final Maze maze;
     private final ArrayList<Direction> choices;
     private final Random r;
-    private Cell currentCell;
-    private Cell previousCell;
+    
+    private Direction facing;
+    private int x;
+    private int y;
+    private Point previousCell;
     
     public RandomTurns(Maze maze) {
+        this.maze = maze;
         choices = new ArrayList();
         r = new Random();
-        previousCell = maze.getCell(0, 0);
     }
     
     @Override
     public void init() {
-        currentCell = previousCell;
-        currentCell.setSolving(true);
-        currentCell.setVisited(true);
-        currentCell.setFacing(Compass.SOUTH);
+        facing = Maze.SOUTH;
+        x = 0;
+        y = 0;
+        previousCell = new Point(0, 0);
     }
     
     @Override
-    public Cell step() {
-        if (currentCell.isGoal()) 
+    public MazeActorData step() {
+        if (maze.isGoal(x, y)) 
             return null;
         
         choices.clear();
         
-        for (Direction direction : currentCell.getDirections())
-            if (!currentCell.getNeighbor(direction).equals(previousCell))
+        for (Direction direction : Maze.getDIRECTIONS())
+            if (maze.canGo(x, y, direction) && !previousCell.equals(maze.look(x, y, direction)))
                 choices.add(direction);
         
-        currentCell.setSolving(false);
+        previousCell = new Point(x, y);
+        
         if (choices.isEmpty()) {
-            currentCell.setFacing(Compass.turn(currentCell.getFacing(), Compass.AROUND));
-            previousCell = currentCell;
+            facing = Maze.turn(facing, Maze.AROUND);
         } else {
-            Direction direction = choices.get(r.nextInt(choices.size()));
-            previousCell = currentCell;
-            currentCell = currentCell.getNeighbor(direction);
-            currentCell.setFacing(direction);
-            currentCell.setVisited(true);
+            facing = choices.get(r.nextInt(choices.size()));
+            x += facing.x;
+            y += facing.y;
         }
-        if (!previousCell.equals(currentCell))
-            previousCell.setFacing(null);
-        currentCell.setSolving(true);
-        return currentCell;
+        
+        return new MazeActorData(x, y, facing);
     }
 }

@@ -1,115 +1,93 @@
 package mazemaker.maze;
 
+import java.awt.Point;
+
 public class Maze {
     
-    public static final boolean HARD_RESET = true;
-    public static final boolean SOFT_RESET = false;
+    public static final int RIGHT = 1;
+    public static final int AROUND = 2;
+    public static final int LEFT = 3;
     
-    private final Cell[][] cells;
-    private final int width;
-    private final int height;
+    public static final Direction NORTH = new Direction( 0, -1, 0b00000001);
+    public static final Direction SOUTH = new Direction( 0,  1, 0b00000010);
+    public static final Direction EAST  = new Direction( 1,  0, 0b00000100);
+    public static final Direction WEST  = new Direction(-1,  0, 0b00001000);
+    
+    private static final Direction[] DIRECTIONS = {NORTH, EAST, SOUTH, WEST};
+    
+    public final int width;
+    public final int height;
+    
+    private byte[][] cellData;
+    private Point goal;
     
     public Maze(int width, int height) {
         this.width = width;
         this.height = height;
-        cells = new Cell[width][height];
-        
-        for (int i = 0 ; i < height ; i++) 
-            for (int j = 0 ; j < width ; j++) 
-                cells[j][i] = new Cell(j, i);
+        cellData = new byte[width][height];
+        goal = new Point(width-1, height-1);
+    }
+
+    public static Direction[] getDIRECTIONS() {
+        return DIRECTIONS;
     }
     
-    public void reset(boolean type) {
-        for (Cell[] column : cells) {
-            for (Cell cell : column) {
-                if (type == HARD_RESET)
-                    cell.clearNeighbors();
-                cell.setVisited(false);
-                cell.setMaking(false);
-                cell.setSolving(false);
+    public static Direction turn(Direction facing, int way) {
+        int index = 0;
+        for (int i = 0 ; i < DIRECTIONS.length ; i++)
+            if (facing.equals(DIRECTIONS[i]))
+                index = (i+way) % DIRECTIONS.length;
+        return DIRECTIONS[index];
+    }
+    
+    public void reset() {
+        cellData = new byte[width][height];
+    }
+    
+    public byte[][] getCellData() {
+        return cellData;
+    }
+    
+    public byte getCellData(int x, int y) {
+        return cellData[x][y];
+    }
+    
+    public void setCell(int x, int y, byte data) {
+        cellData[x][y] = data;
+    }
+    
+    public void setGoal(Point cell) {
+        goal = cell;
+    }
+    
+    public Point getGoal() {
+        return goal;
+    }
+    
+    public boolean isGoal(int x, int y) {
+        return x == goal.x && y == goal.y;
+    }
+    
+    public boolean canGo(int x, int y, Direction direction) {
+        return isValid(x + direction.x, y + direction.y) &&
+               (cellData[x][y] & direction.mask) > 0;
+    }
+    
+    public boolean isValid(int x, int y) {
+        return x >= 0 && x < width &&
+               y >= 0 && y < height;
+    }
+    
+    public Point look(int x, int y, Direction direction) {
+        return new Point(x + direction.x, y + direction.y);
+    }
+    
+    public void toggleConnection(Point a, Point b) {
+        for (Direction direction : DIRECTIONS) {
+            if (look(a.x, a.y, direction).equals(b)) {
+                cellData[a.x][a.y] ^= direction.mask;
+                cellData[b.x][b.y] ^= turn(direction, AROUND).mask;
             }
         }
-    }
-    
-    public boolean canGo(Cell cell, Direction direction) {
-        int x2 = cell.getX() + direction.x;
-        int y2 = cell.getY() + direction.y;
-        return x2 >= 0 && x2 < getWidth() &&
-               y2 >= 0 && y2 < getHeight();
-    }
-    
-    public Cell join(Cell a, Direction direction) {
-        Cell b = look(a, direction);
-        Direction reverse = Compass.turn(direction, Compass.AROUND);
-        a.putNeighbor(direction, b);
-        b.putNeighbor(reverse, a);
-        return b;
-    }
-    
-    public void toggle(Cell a, Cell b) {
-        Direction direction = null;
-        for (Direction d : Compass.getDirections())
-            if (canGo(a,d) && look(a, d).equals(b))
-                direction = d;
-        if (direction != null) {
-            if (a.hasNeighbor(b)) {
-                Direction reverse = Compass.turn(direction, Compass.AROUND);
-                a.removeNeighbor(direction);
-                b.removeNeighbor(reverse);
-            } else {
-                join(a, direction);
-            }
-        }
-    }
-    
-    public void setGoal(Cell cell) {
-        clearGoal();
-        cell.setGoal(true);
-    }
-    
-    public void clearGoal() {
-        Cell goal = getGoal();
-        if (goal != null)
-            goal.setGoal(false);
-    }
-    
-    public Cell getGoal() {
-        for (Cell[] column : cells) 
-            for (Cell cell : column) 
-                if (cell.isGoal())
-                    return cell;
-        return null;
-    }
-    
-    public boolean visited(Cell cell, Direction direction) {
-        return look(cell, direction).isVisited();
-    }
-    
-    public Cell look(Cell cell, Direction direction) {
-        return cells[cell.getX()+direction.x][cell.getY()+direction.y];
-    }
-    
-    public Cell getCell(int x, int y) {
-        return cells[x][y];
-    }
-    
-    public Cell[][] getCells() {
-        return cells;
-    }
-    
-    public Cell getLastCell() {
-        return getCell(getWidth()-1, getHeight()-1);
-    }
-
-    public Cell[][] getMaze() {
-        return cells;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 }
