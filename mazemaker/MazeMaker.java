@@ -77,8 +77,6 @@ public class MazeMaker extends JPanel {
     private final ColorButton genColorButton;
     private final ColorButton solverColorButton;
     private final ColorButton goalColorButton;
-    
-    private int settingsRow;
 
     private final Action _new = new AbstractAction() {
             @Override
@@ -179,6 +177,8 @@ public class MazeMaker extends JPanel {
         };
     
     private transient MazeView mazeview;
+    
+    private int settingsRow;
 
     public MazeMaker(JMenuBar menuBar) {
         super();
@@ -221,7 +221,46 @@ public class MazeMaker extends JPanel {
                          + "Icons courtesy Tango Desktop Project <br />"
                          + "<a href='http://tango.freedesktop.org/'>"
                          + "http://tango.freedesktop.org/</a>");
-        help = new JLabel();
+        
+        help = new JLabel("<html><h2>How to use MazeMaker</h2>"
+                        + "<h3>Making mazes</h3>"
+                        + "A maze is a rectangular grid of square cells.  Specify the "
+                        + "number of rows and columns you would like in your maze, then "
+                        + "press the New Maze button to make a new blank maze of that "
+                        + "size. <br >"
+                        + "<h3>Generating and solving mazes</h3>"
+                        + "Maze generation and solving algorithms are executed by what "
+                        + "we call 'actors.'  These actors perform one action every 'n' "
+                        + "seconds, where 'n' is the specified frame delay.  "
+                        + "Select a generation algorithm and click the Generate button "
+                        + "to begin generating the maze.  Uncheck 'Show generation' if "
+                        + "you don't wish to view generation process, or want to create "
+                        + "mazes quickly.  "
+                        + "Once you are satisfied with your maze, you can apply a "
+                        + "solving algorithm to solve it.  Select a solving algorithm "
+                        + "and click the Solve button to begin solving. <br />"
+                        + "<h3>Editing </h3>"
+                        + "MazeMaker includes basic maze editing.  Double click any "
+                        + "cell to set it as the finish line.  Click any two adjacent "
+                        + "cells to toggle the wall between them."
+                        + "<h3>Playback </h3>"
+                        + "You can pause, resume, stop, slow down, and speed up actors "
+                        + "while there is an active actor.  The 'stop' and 'clean up' "
+                        + "buttons cancel the current actor.  The 'speed up' and 'slow "
+                        + "down' buttons won't affect the initial frame delay of the "
+                        + "next actor. <br />"
+                        + "<h3>Styling maze</h3>"
+                        + "Mazemaker includes some styling options for displaying your "
+                        + "maze.  The Cell Size and Walls options are purely for "
+                        + "presentation, and can be edited to your liking.  Every maze "
+                        + "element can also be given a color of your choice.<br />"
+                        + "<h3>Recording GIFs</h3>"
+                        + "If you wish the record an actor, simply press the 'record' "
+                        + "button immediately before pressing 'generate' or 'solve.' "
+                        + "When the actor finishes, or you stop the actor, your GIF "
+                        + "will be saved.  Recording will use the same frame delay "
+                        + "for every frame.  You can speed up or slow down actor "
+                        + "playback, but your GIF will play at constant speed.");
     }
     
     public void init() {
@@ -233,6 +272,7 @@ public class MazeMaker extends JPanel {
         add(sidebar, BorderLayout.WEST);
         add(content, BorderLayout.CENTER);
         content.setPreferredSize(DEFAULT_SCREEN_SIZE);
+        help.setPreferredSize(new Dimension(600,600));
         newMaze();
     }
     

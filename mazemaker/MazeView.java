@@ -181,7 +181,7 @@ public class MazeView extends JLabel{
         if (resetMaze)
             maze.reset();
         visited = new boolean[maze.width][maze.height];
-        cleanUp();
+        pause();
         this.showUnseen = showUnseen;
         paintAll();
         actor.init();
