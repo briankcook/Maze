@@ -2,8 +2,10 @@ package mazemaker.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Scanner;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import mazemaker.Main;
 
 public interface IO {
     
@@ -21,5 +23,9 @@ public interface IO {
             return file;
         }
         throw new IOException();
+    }
+    
+    public static String readFile(String name) {
+        return new Scanner(Main.class.getResourceAsStream("resources/" + name), "UTF-8").useDelimiter("\\A").next();
     }
 }

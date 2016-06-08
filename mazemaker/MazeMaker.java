@@ -8,7 +8,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -22,7 +21,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -176,6 +174,15 @@ public class MazeMaker extends JPanel {
                 JOptionPane.showMessageDialog(null, help);
             }
         };
+        
+    private final Action _color = new AbstractAction(){
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ColorButton source = (ColorButton)e.getSource();
+            source.pickColor();
+            updateColors();
+        }
+    };
     
     private transient MazeView mazeview;
     
@@ -202,60 +209,15 @@ public class MazeMaker extends JPanel {
         makershow = new JCheckBox("Show generation");
         seeAll = new JCheckBox("Show unvisited cells");
         
-        cellColorButton = new ColorButton("Cell Background Color", Color.WHITE);
-        visitedColorButton = new ColorButton("Visited Cell Color", Color.PINK);
-        wallColorButton = new ColorButton("Cell Wall Color", Color.BLACK);
-        genColorButton = new ColorButton("Generator Sprite Color", Color.BLUE);
-        solverColorButton = new ColorButton("Solver Sprite Color", Color.RED);
-        goalColorButton = new ColorButton("Goal Marker Color", Color.GRAY);
+        cellColorButton =    ColorButton.create(_color, "Cell Background Color",  Color.WHITE);
+        visitedColorButton = ColorButton.create(_color, "Visited Cell Color",     Color.PINK);
+        wallColorButton =    ColorButton.create(_color, "Cell Wall Color",        Color.BLACK);
+        genColorButton =     ColorButton.create(_color, "Generator Sprite Color", Color.BLUE);
+        solverColorButton =  ColorButton.create(_color, "Solver Sprite Color",    Color.RED);
+        goalColorButton =    ColorButton.create(_color, "Goal Marker Color",      Color.GRAY);
         
-        about = new JLabel("<html>MazeMaker v0.3 by briankcook<br />"
-                         + "<a href='https://github.com/briankcook/Maze'>"
-                         + "https://github.com/briankcook/Maze </a> <br />"
-                         + "<br />"
-                         + "Icons courtesy Tango Desktop Project <br />"
-                         + "<a href='http://tango.freedesktop.org/'>"
-                         + "http://tango.freedesktop.org/</a>");
-        
-        help = new JLabel("<html><h2>How to use MazeMaker</h2>"
-                        + "<h3>Making mazes</h3>"
-                        + "A maze is a rectangular grid of square cells.  Specify the "
-                        + "number of rows and columns you would like in your maze, then "
-                        + "press the New Maze button to make a new blank maze of that "
-                        + "size. <br >"
-                        + "<h3>Generating and solving mazes</h3>"
-                        + "Maze generation and solving algorithms are executed by what "
-                        + "we call 'actors.'  These actors perform one action every 'n' "
-                        + "seconds, where 'n' is the specified frame delay.  "
-                        + "Select a generation algorithm and click the Generate button "
-                        + "to begin generating the maze.  Uncheck 'Show generation' if "
-                        + "you don't wish to view generation process, or want to create "
-                        + "mazes quickly.  "
-                        + "Once you are satisfied with your maze, you can apply a "
-                        + "solving algorithm to solve it.  Select a solving algorithm "
-                        + "and click the Solve button to begin solving. <br />"
-                        + "<h3>Editing </h3>"
-                        + "MazeMaker includes basic maze editing.  Double click any "
-                        + "cell to set it as the finish line.  Click any two adjacent "
-                        + "cells to toggle the wall between them."
-                        + "<h3>Playback </h3>"
-                        + "You can pause, resume, stop, slow down, and speed up actors "
-                        + "while there is an active actor.  The 'stop' and 'clean up' "
-                        + "buttons cancel the current actor.  The 'speed up' and 'slow "
-                        + "down' buttons won't affect the initial frame delay of the "
-                        + "next actor. <br />"
-                        + "<h3>Styling maze</h3>"
-                        + "Mazemaker includes some styling options for displaying your "
-                        + "maze.  The Cell Size and Walls options are purely for "
-                        + "presentation, and can be edited to your liking.  Every maze "
-                        + "element can also be given a color of your choice.<br />"
-                        + "<h3>Recording GIFs</h3>"
-                        + "If you wish the record an actor, simply press the 'record' "
-                        + "button immediately before pressing 'generate' or 'solve.' "
-                        + "When the actor finishes, or you stop the actor, your GIF "
-                        + "will be saved.  Recording will use the same frame delay "
-                        + "for every frame.  You can speed up or slow down actor "
-                        + "playback, but your GIF will play at constant speed.");
+        about = new JLabel(IO.readFile("about.html"));
+        help = new JLabel(IO.readFile("help.html"));
     }
     
     public void init() {
@@ -267,7 +229,6 @@ public class MazeMaker extends JPanel {
         add(sidebar, BorderLayout.WEST);
         add(content, BorderLayout.CENTER);
         content.setPreferredSize(DEFAULT_SCREEN_SIZE);
-        help.setPreferredSize(new Dimension(600,600));
         newMaze();
     }
     
@@ -301,14 +262,6 @@ public class MazeMaker extends JPanel {
         addMenuItem(helpmenu, "About",    0,                  _about);
     }
     
-    private void addMenuItem(JMenu menu, String label, int key, Action action) {
-        JMenuItem item = new JMenuItem(action);
-        item.setText(label);
-        if (key != 0)
-            item.setAccelerator(KeyStroke.getKeyStroke(key, KeyEvent.CTRL_DOWN_MASK));
-        menu.add(item);
-    }
-    
     private void initSidebar() {
         
         slider.setPaintTicks(true);
@@ -323,6 +276,13 @@ public class MazeMaker extends JPanel {
         
         makershow.setSelected(true);
         seeAll.setSelected(true);
+        
+        settingsPanel.setBorder(BorderFactory.createTitledBorder("Settings"));
+        sidebarpanel.add(settingsPanel, BorderLayout.NORTH);
+        sidebarpanel.add(new JPanel(), BorderLayout.CENTER);
+        sidebar.setViewportView(sidebarpanel);
+        sidebar.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sidebar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
         addSettingsRow(new JLabel("Maze Rows:"),        rows);
         addSettingsRow(new JLabel("Maze Columns:"),     cols);
@@ -345,40 +305,6 @@ public class MazeMaker extends JPanel {
         addSettingsRow(genColorButton);
         addSettingsRow(solverColorButton);
         addSettingsRow(goalColorButton);
-        
-        settingsPanel.setBorder(BorderFactory.createTitledBorder("Settings"));
-        sidebarpanel.add(settingsPanel, BorderLayout.NORTH);
-        sidebarpanel.add(new JPanel(), BorderLayout.CENTER);
-        sidebar.setViewportView(sidebarpanel);
-        sidebar.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        sidebar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    }
-    
-    private NumberFormatter makeValidator(int min, int max) {
-        NumberFormatter validator = new NumberFormatter(NumberFormat.getIntegerInstance());
-        validator.setMinimum(min);
-        validator.setMaximum(max);
-        validator.setValueClass(Integer.class);
-        return validator;
-    }
-    
-    private void addSettingsRow(JComponent a, JComponent b) {
-        addSettingsItem(a, 1, settingsRow, 0);
-        addSettingsItem(b, 1, settingsRow++, 1);
-    }
-    
-    private void addSettingsRow(JComponent component) {
-        addSettingsItem(component, 2, settingsRow++, 0);
-    }
-    
-    private void addSettingsItem(JComponent component, int span, int row, int col) {
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridwidth = span;
-        constraints.gridx = col;
-        constraints.gridy = row;
-        constraints.fill = GridBagConstraints.BOTH;
-        constraints.insets = INSETS;
-        settingsPanel.add(component, constraints);
     }
     
     private void initToolBar() {
@@ -398,6 +324,41 @@ public class MazeMaker extends JPanel {
         toolBar.addSeparator();
         addToolBarButton(toolBar, "decrease.png", "Slow Down Animation", _slower);
         addToolBarButton(toolBar, "increase.png", "Speed Up Animation",  _faster);
+    }
+    
+    private NumberFormatter makeValidator(int min, int max) {
+        NumberFormatter validator = new NumberFormatter(NumberFormat.getIntegerInstance());
+        validator.setMinimum(min);
+        validator.setMaximum(max);
+        validator.setValueClass(Integer.class);
+        return validator;
+    }
+    
+    private void addMenuItem(JMenu menu, String label, int key, Action action) {
+        JMenuItem item = new JMenuItem(action);
+        item.setText(label);
+        if (key != 0)
+            item.setAccelerator(KeyStroke.getKeyStroke(key, KeyEvent.CTRL_DOWN_MASK));
+        menu.add(item);
+    }
+    
+    private void addSettingsRow(JComponent a, JComponent b) {
+        addSettingsItem(a, 1, settingsRow, 0);
+        addSettingsItem(b, 1, settingsRow++, 1);
+    }
+    
+    private void addSettingsRow(JComponent component) {
+        addSettingsItem(component, 2, settingsRow++, 0);
+    }
+    
+    private void addSettingsItem(JComponent component, int span, int row, int col) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridwidth = span;
+        constraints.gridx = col;
+        constraints.gridy = row;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.insets = INSETS;
+        settingsPanel.add(component, constraints);
     }
     
     private void addToolBarButton(Container container, String imageName, String toolTip, Action action) {
@@ -424,15 +385,11 @@ public class MazeMaker extends JPanel {
                                 getShowUnseen());
         mazeview.init();
         updateColors();
-        content.setViewportView(wrap(mazeview));
-        content.revalidate();
-    }
-
-    private JPanel wrap(JComponent component) {
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new GridBagLayout());
-        wrapper.add(component);
-        return wrapper;
+        wrapper.add(mazeview);
+        content.setViewportView(wrapper);
+        content.revalidate();
     }
 
     private MazeActor getGenerator() {
@@ -506,47 +463,6 @@ public class MazeMaker extends JPanel {
         mazeview.setGenColor(genColorButton.getColor());
         mazeview.setSolverColor(solverColorButton.getColor());
         mazeview.setGoalColor(goalColorButton.getColor());
-        mazeview.cleanUp();
-    }
-    
-    private class ColorButton extends JButton {
-        private Color color;
-        private String label;
-        
-        private final Action action = new AbstractAction(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    Color chosen = JColorChooser.showDialog(null, label, color);
-                    if (chosen != null)
-                        color = chosen;
-                    updateColors();
-                }
-            };
-        
-        public ColorButton(String label, Color color) {
-            super();
-            this.color = color;
-            this.label = label;
-            setAction(action);
-            setText(label);
-            setHorizontalAlignment(JButton.LEFT);
-        }
-        
-        @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Dimension size = getSize();
-            int x = size.width - size.height + size.height / 10;
-            int y = size.height / 10;
-            int s = size.height - size.height / 5;
-            g.setColor(color);
-            g.fillRect(x, y, s, s);
-            g.setColor(Color.BLACK);
-            g.drawRect(x, y, s, s);
-        }
-        
-        public Color getColor() {
-            return color;
-        }
+        mazeview.repaint();
     }
 }

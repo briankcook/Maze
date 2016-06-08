@@ -87,6 +87,11 @@ public class MazeView extends JLabel{
         
         reveal();
     }
+    @Override
+    public void repaint() {
+        paintAll();
+        super.repaint();
+    }
     
     private void handleClick(Point clicked) {
         if (selection == null) {
@@ -100,10 +105,12 @@ public class MazeView extends JLabel{
             selection = null;
             cleanUp();
         }
-        paintAll();
+        repaint();
     }
     
     private void paintAll() {
+        if (maze == null)
+            return;
         for (int i = 0 ; i < maze.width ; i++)
             for (int j = 0 ; j < maze.height ; j++)
                 paintCell(i, j, false);
@@ -119,8 +126,6 @@ public class MazeView extends JLabel{
             graphics.setColor(highlight);
             graphics.fillRect(selection.x* cellSize, selection.y* cellSize, cellSize, cellSize);
         }
-        
-        repaint();
     }
     
     private void paintCell(int x, int y, boolean repaint){
