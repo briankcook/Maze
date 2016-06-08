@@ -106,7 +106,7 @@ public class MazeView extends JLabel{
     private void paintAll() {
         for (int i = 0 ; i < maze.width ; i++)
             for (int j = 0 ; j < maze.height ; j++)
-                paintCell(new Point(i, j), false);
+                paintCell(i, j, false);
         
         Point goal = maze.getGoal();
         graphics.setColor(goalColor);
@@ -123,31 +123,32 @@ public class MazeView extends JLabel{
         repaint();
     }
     
-    private void paintCell(Point location, boolean repaint){
-        int x = cellSize * location.x;
-        int y = cellSize * location.y;
+    private void paintCell(int x, int y, boolean repaint){
+        int gx = cellSize * x;
+        int gy = cellSize * y;
         
-        if (visited[location.x][location.y])
+        if (visited[x][y])
             graphics.setColor(visitedColor);
-        graphics.setColor(cellColor);
-        graphics.fillRect(x, y, cellSize, cellSize);
+        else
+            graphics.setColor(cellColor);
+        graphics.fillRect(gx, gy, cellSize, cellSize);
         
         graphics.setColor(wallColor);
         // corners
-        if (showUnseen || visited[location.x][location.y]) {
-            graphics.fillRect(                           x,                            y, wallThickness, wallThickness);
-            graphics.fillRect(                           x, y + cellSize - wallThickness, wallThickness, wallThickness);
-            graphics.fillRect(x + cellSize - wallThickness,                            y, wallThickness, wallThickness);
-            graphics.fillRect(x + cellSize - wallThickness, y + cellSize - wallThickness, wallThickness, wallThickness);
+        if (showUnseen || visited[x][y]) {
+            graphics.fillRect(                           gx,                            gy, wallThickness, wallThickness);
+            graphics.fillRect(                           gx, gy + cellSize - wallThickness, wallThickness, wallThickness);
+            graphics.fillRect(gx + cellSize - wallThickness,                            gy, wallThickness, wallThickness);
+            graphics.fillRect(gx + cellSize - wallThickness, gy + cellSize - wallThickness, wallThickness, wallThickness);
             // walls
-            if (!maze.canGo(location.x, location.y, Maze.NORTH))
-                graphics.fillRect(x, y, cellSize, wallThickness);
-            if (!maze.canGo(location.x, location.y, Maze.SOUTH))
-                graphics.fillRect(x, y + cellSize - wallThickness, cellSize, wallThickness);
-            if (!maze.canGo(location.x, location.y, Maze.EAST))
-                graphics.fillRect(x + cellSize - wallThickness, y, wallThickness, cellSize);
-            if (!maze.canGo(location.x, location.y, Maze.WEST))
-                graphics.fillRect(x, y, wallThickness, cellSize);
+            if (!maze.canGo(x, y, Maze.NORTH))
+                graphics.fillRect(gx, gy, cellSize, wallThickness);
+            if (!maze.canGo(x, y, Maze.SOUTH))
+                graphics.fillRect(gx, gy + cellSize - wallThickness, cellSize, wallThickness);
+            if (!maze.canGo(x, y, Maze.EAST))
+                graphics.fillRect(gx + cellSize - wallThickness, gy, wallThickness, cellSize);
+            if (!maze.canGo(x, y, Maze.WEST))
+                graphics.fillRect(gx, gy, wallThickness, cellSize);
         }
         
         if (repaint)
@@ -188,12 +189,12 @@ public class MazeView extends JLabel{
             timer = new Timer(frameDelay, (ActionEvent e) -> {  
                 MazeActorData source = actor.step();
                 if (source == null) {
-                    cleanUp();
+                    stop();
                 } else {
                     visited[source.x][source.y] = true;
                     for (Point p : source.update)
-                        paintCell(p, false);  // don't paintAll()
-                    paintCell(source, true);  //    do paintAll()
+                        paintCell(p.x, p.y, false);  // don't paintAll()
+                    paintCell(source.x, source.y, true);  //    do paintAll()
                     paintActor(source);
                 }
                 if (gifWriter != null)

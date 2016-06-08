@@ -192,17 +192,11 @@ public class MazeMaker extends JPanel {
         content = new JScrollPane();
         settingsPanel = new JPanel(new GridBagLayout());
         
-        NumberFormatter validator = new NumberFormatter(NumberFormat.getIntegerInstance());
-        validator.setMinimum(0);
-        validator.setMaximum(1000);
-        validator.setAllowsInvalid(false);
-        validator.setValueClass(Integer.class);
-        
-        rows = new JFormattedTextField(validator);
-        cols = new JFormattedTextField(validator);
-        cellsize = new JFormattedTextField(validator);
-        wallsize = new JFormattedTextField(validator);
-        framedelay = new JFormattedTextField(validator);
+        rows = new JFormattedTextField(makeValidator(1, 1000));
+        cols = new JFormattedTextField(makeValidator(1, 1000));
+        cellsize = new JFormattedTextField(makeValidator(1, 1000));
+        wallsize = new JFormattedTextField(makeValidator(1, 250));
+        framedelay = new JFormattedTextField(makeValidator(0, 5000));
         
         slider = new JSlider(1, 5, 3);
         makershow = new JCheckBox("Show generation");
@@ -360,6 +354,14 @@ public class MazeMaker extends JPanel {
         sidebar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     }
     
+    private NumberFormatter makeValidator(int min, int max) {
+        NumberFormatter validator = new NumberFormatter(NumberFormat.getIntegerInstance());
+        validator.setMinimum(min);
+        validator.setMaximum(max);
+        validator.setValueClass(Integer.class);
+        return validator;
+    }
+    
     private void addSettingsRow(JComponent a, JComponent b) {
         addSettingsItem(a, 1, settingsRow, 0);
         addSettingsItem(b, 1, settingsRow++, 1);
@@ -387,6 +389,7 @@ public class MazeMaker extends JPanel {
         toolBar.addSeparator();
         addToolBarButton(toolBar, "generate.png", "Generate Maze",       _generate);
         addToolBarButton(toolBar, "solve.png",    "Start Solver",        _solve);
+        addToolBarButton(toolBar, "clear.png",    "Clear Maze",          _clear);
         toolBar.addSeparator();
         addToolBarButton(toolBar, "pause.png",    "Pause Animation",     _pause);
         addToolBarButton(toolBar, "start.png",    "Resume Animation",    _play);
@@ -395,8 +398,6 @@ public class MazeMaker extends JPanel {
         toolBar.addSeparator();
         addToolBarButton(toolBar, "decrease.png", "Slow Down Animation", _slower);
         addToolBarButton(toolBar, "increase.png", "Speed Up Animation",  _faster);
-        toolBar.addSeparator();
-        addToolBarButton(toolBar, "clear.png",    "Clear Maze",          _clear);
     }
     
     private void addToolBarButton(Container container, String imageName, String toolTip, Action action) {
