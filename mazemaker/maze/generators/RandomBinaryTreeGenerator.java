@@ -7,13 +7,17 @@ import mazemaker.maze.*;
 public class RandomBinaryTreeGenerator implements MazeActor{
     
     private final Maze maze;
+    private final int hWeight;
+    private final int vWeight;
     private final Random r;
     
     private int x;
     private int y;
     
-    public RandomBinaryTreeGenerator(Maze maze) {
+    public RandomBinaryTreeGenerator(Maze maze, int hWeight, int vWeight) {
         this.maze = maze;
+        this.hWeight = hWeight;
+        this.vWeight = vWeight;
         r = new Random();
     }
 
@@ -29,7 +33,7 @@ public class RandomBinaryTreeGenerator implements MazeActor{
         Point current = new Point(x, y);
         Point update = new Point(x, y);
         if (maze.isValid(x-1, y-1))
-            if (r.nextBoolean())
+            if (r.nextInt(hWeight+vWeight) + 1 > vWeight)
                 update.x -= 1; 
             else
                 update.y -= 1; 

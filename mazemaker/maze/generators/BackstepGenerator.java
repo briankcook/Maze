@@ -27,7 +27,7 @@ public class BackstepGenerator implements MazeActor {
         r = new Random();
         history = new ArrayDeque();
         choices = new ArrayList();
-        visited = new boolean[maze.height][maze.width];
+        visited = new boolean[maze.width][maze.height];
     }
     
     @Override

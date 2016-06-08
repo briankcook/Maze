@@ -441,7 +441,9 @@ public class MazeMaker extends JPanel {
                                              getHWeight(),
                                              getVWeight());
             case COINFLIP:
-                return new RandomBinaryTreeGenerator(mazeview.getMaze());
+                return new RandomBinaryTreeGenerator(mazeview.getMaze(),
+                                                     getHWeight(),
+                                                     getVWeight());
             default:
                 return null;
         }
