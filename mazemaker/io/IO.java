@@ -2,10 +2,12 @@ package mazemaker.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import mazemaker.Main;
+import mazemaker.MazeMaker;
 
 public interface IO {
     
@@ -25,7 +27,12 @@ public interface IO {
         throw new IOException();
     }
     
-    public static String readFile(String name) {
-        return new Scanner(Main.class.getResourceAsStream("resources/" + name), "UTF-8").useDelimiter("\\A").next();
+    public static List<String> readFile(String name) {
+        Scanner scanner = new Scanner(MazeMaker.class.getResourceAsStream("resources/" + name), "UTF-8");
+        List<String> lines = new ArrayList();
+        while (scanner.hasNextLine()) {
+          lines.add(scanner.nextLine());
+        }
+        return lines;
     }
 }
