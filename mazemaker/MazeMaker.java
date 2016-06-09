@@ -75,7 +75,7 @@ public class MazeMaker extends Application implements Initializable{
         initNumField(rowsField, 1, 20, 500);
         initNumField(colsField, 1, 20, 500);
         initNumField(cellField, 1, 20, 100);
-        initNumField(wallField, 1, 1, 25);
+        initNumField(wallField, 1, 2, 25);
         initNumField(rateField, 1, 100, 10000);
         
         initComboBox(genCombo, new String[]{

@@ -44,22 +44,31 @@ public class MazeView extends Canvas{
         for (int x = 0 ; x < maze.height ; x++)
             for (int y = 0 ; y < maze.width ; y++)
                 drawCell(x, y);
+        Point goal = maze.getGoal();
+        GraphicsContext gc = getGraphicsContext2D();
+        gc.setFill(palette.getGoalColor());
+        gc.fillOval(goal.x * cellSize + wallThickness * 2, 
+                    goal.y * cellSize + wallThickness * 2, 
+                    cellSize - wallThickness * 2,
+                    cellSize - wallThickness * 2);
     }
     
     private void drawCell(int x, int y) {
         int gx = x * cellSize + wallThickness;
         int gy = y * cellSize + wallThickness;
         GraphicsContext gc = getGraphicsContext2D();
+        
         if (visited[x][y])
-            gc.setFill(getPalette().getVisitedColor());
+            gc.setFill(palette.getVisitedColor());
         else
-            gc.setFill(getPalette().getCellColor());
-        gc.setStroke(getPalette().getWallColor());
-        gc.setLineWidth(wallThickness);
+            gc.setFill(palette.getCellColor());
         gc.fillRect(gx, gy, cellSize, cellSize);
+        
+        gc.setStroke(palette.getWallColor());
+        gc.setLineWidth(wallThickness);
         if (showUnvisited || visited[x][y]) {
             if (!maze.canGo(x, y, Maze.NORTH))
-                gc.strokeLine(         gx,          gy, gx+cellSize, gy);
+                gc.strokeLine(         gx,          gy, gx+cellSize,          gy);
             if (!maze.canGo(x, y, Maze.WEST))
                 gc.strokeLine(         gx,          gy,          gx, gy+cellSize);
             if (!maze.canGo(x, y, Maze.SOUTH))
@@ -74,9 +83,9 @@ public class MazeView extends Canvas{
         int gy = data.y * cellSize + wallThickness;
         GraphicsContext gc = getGraphicsContext2D();
         if (data.facing == null)
-            gc.setFill(getPalette().getGenColor());
+            gc.setFill(palette.getGenColor());
         else
-            gc.setFill(getPalette().getSolverColor());
+            gc.setFill(palette.getSolverColor());
         gc.fillOval(gx, gy, cellSize, cellSize);
     }
     
@@ -119,10 +128,8 @@ public class MazeView extends Canvas{
     }
     
     public void cleanUp() {
-        stop();
         visited = new boolean[maze.width][maze.height];
-        showUnvisited = true;
-        redraw();
+        stop();
     }
     
     public void pause() {
@@ -136,8 +143,10 @@ public class MazeView extends Canvas{
     }
     
     public void stop() {
+        showUnvisited = true;
         pause();
         timeline = null;
+        redraw();
     }
     
     public void record() {
@@ -146,12 +155,12 @@ public class MazeView extends Canvas{
     
     public void speedUp() {
         if (timeline != null)
-            timeline.setDelay(timeline.getDelay().divide(SPEEDFACTOR));
+            timeline.setRate(timeline.getRate() / SPEEDFACTOR);
     }
     
     public void slowDown() {
         if (timeline != null)
-            timeline.setDelay(timeline.getDelay().multiply(SPEEDFACTOR));
+            timeline.setRate(timeline.getRate() * SPEEDFACTOR);
     }
     
     /*
