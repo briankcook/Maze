@@ -37,7 +37,7 @@ public class RandomTurns implements MazeActor{
         
         choices.clear();
         
-        for (Direction direction : Maze.getDIRECTIONS())
+        for (Direction direction : Maze.getDirections())
             if (maze.canGo(x, y, direction) && !previousCell.equals(maze.look(x, y, direction)))
                 choices.add(direction);
         

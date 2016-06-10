@@ -28,7 +28,7 @@ public class Maze {
         goal = new Point(width-1, height-1);
     }
 
-    public static Direction[] getDIRECTIONS() {
+    public static Direction[] getDirections() {
         return DIRECTIONS;
     }
     

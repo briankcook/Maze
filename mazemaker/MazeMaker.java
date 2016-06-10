@@ -25,6 +25,11 @@ import javafx.stage.Stage;
 import mazemaker.io.IO;
 import mazemaker.io.MazeIO;
 import mazemaker.maze.Maze;
+import mazemaker.maze.MazeActor;
+import mazemaker.maze.generators.BackstepGenerator;
+import mazemaker.maze.generators.RandomBinaryTreeGenerator;
+import mazemaker.maze.solvers.RandomTurns;
+import mazemaker.maze.solvers.WallFollower;
 
 public class MazeMaker extends Application implements Initializable{
         
@@ -42,18 +47,18 @@ public class MazeMaker extends Application implements Initializable{
     @FXML private TextField colsField;
     @FXML private TextField cellField;
     @FXML private TextField wallField;
-    @FXML private TextField rateField;
     @FXML private ComboBox genCombo;
     @FXML private CheckBox instantBox;
-    @FXML private Slider slider;
+    @FXML private Slider biasSlider;
     @FXML private ComboBox solverCombo;
+    @FXML private Slider speedSlider;
     @FXML private CheckBox showUnvisitedBox;
     @FXML private ColorPicker cellColor;
     @FXML private ColorPicker visitedColor;
     @FXML private ColorPicker wallColor;
-    @FXML private ColorPicker genColor;
-    @FXML private ColorPicker solverColor;
+    @FXML private ColorPicker spriteColor;
     @FXML private ColorPicker goalColor;
+    @FXML private ComboBox spriteCombo;
     @FXML private ScrollPane scrollPane;
     
     private MazeView mazeview;
@@ -75,7 +80,6 @@ public class MazeMaker extends Application implements Initializable{
         initNumField(colsField, 1, 20, 500);
         initNumField(cellField, 1, 20, 100);
         initNumField(wallField, 1, 2, 25);
-        initNumField(rateField, 1, 100, 10000);
         
         initComboBox(genCombo, new String[]{
             BACKSTEP,
@@ -86,11 +90,12 @@ public class MazeMaker extends Application implements Initializable{
             LEFTHAND,
             RANDOMTURNS});
         
+        initComboBox(spriteCombo, MazeView.getSpriteTypes());
+        
         cellColor.setValue(Color.WHITE);
         visitedColor.setValue(Color.PINK);
         wallColor.setValue(Color.BLACK);
-        genColor.setValue(Color.BLUE);
-        solverColor.setValue(Color.RED);
+        spriteColor.setValue(Color.BLUE);
         goalColor.setValue(Color.GRAY);
         
         newMaze();
@@ -126,16 +131,15 @@ public class MazeMaker extends Application implements Initializable{
     private void initNumField(TextField field, int min, int initial, int max) {
         field.setText(Integer.toString(initial));
         field.textProperty().addListener((observable, oldValue, newValue) -> {
-            boolean ok = true;
             try {
-                int value = Integer.parseInt(newValue);
-                if (!(min <= value && value <= max))
-                    ok = false;
+                int newVal = Integer.parseInt(newValue);
+                if (!(min <= newVal))
+                    field.setText(Integer.toString(min));
+                else if (!(newVal <= max))
+                    field.setText(Integer.toString(max));
             } catch (NumberFormatException e) {
-                ok = false;
-            }
-            if (!ok)
                 field.setText(oldValue);
+            }
         });
     }
     
@@ -151,8 +155,9 @@ public class MazeMaker extends Application implements Initializable{
     /*
     GUI ACTIONS
     */
+    
     public void newMaze() {
-        setMaze(new Maze(getMazeWidth(), getMazeHeight()));
+        setMaze(new Maze(getMazeHeight(), getMazeWidth()));
     }
     
     public void openMaze() {
@@ -164,11 +169,13 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void generate() {
-        mazeview.runActor((String)genCombo.getValue(), getHBias(), getVBias(), getFrameDelay(), getInstant(), getShowUnvisited());
+        mazeview.runActor(makeActor(getGenerator(), getHBias(), getVBias()),
+                          getSprite(), getFrameDelay(), getInstant(), getShowUnvisited());
     }
     
     public void solve() {
-        mazeview.runActor((String)solverCombo.getValue(), getHBias(), getVBias(), getFrameDelay(), false, getShowUnvisited());
+        mazeview.runActor(makeActor(getSolver(), getHBias(), getVBias()),
+                          getSprite(), getFrameDelay(), false, getShowUnvisited());
     }
     
     public void cleanUp() {
@@ -212,50 +219,56 @@ public class MazeMaker extends Application implements Initializable{
     */
     
     public void setCellColor() {
-        mazeview.getPalette().setCellColor(cellColor.getValue());
-        mazeview.redraw();
+        mazeview.setCellColor(cellColor.getValue());
     }
     
     public void setVisitedColor() {
-        mazeview.getPalette().setVisitedColor(visitedColor.getValue());
-        mazeview.redraw();
+        mazeview.setVisitedColor(visitedColor.getValue());
     }
     
     public void setWallColor() {
-        mazeview.getPalette().setWallColor(wallColor.getValue());
-        mazeview.redraw();
+        mazeview.setWallColor(wallColor.getValue());
     }
     
-    public void setGenColor() {
-        mazeview.getPalette().setGenColor(genColor.getValue());
-        mazeview.redraw();
-    }
-    
-    public void setSolverColor() {
-        mazeview.getPalette().setSolverColor(solverColor.getValue());
-        mazeview.redraw();
+    public void setSpriteColor() {
+        mazeview.setSpriteColor(spriteColor.getValue());
     }
     
     public void setGoalColor() {
-        mazeview.getPalette().setGoalColor(goalColor.getValue());
-        mazeview.redraw();
-    }
-    
-    private Palette getPalette() {
-        return new Palette(cellColor.getValue(),
-                           visitedColor.getValue(),
-                           wallColor.getValue(),
-                           genColor.getValue(),
-                           solverColor.getValue(),
-                           goalColor.getValue());
+        mazeview.setGoalColor(goalColor.getValue());
     }
     
     /*
     HELPERS, GUI READERS
     */
     
+    private MazeActor makeActor(String name, int hBias, int vBias) {
+        Maze maze = mazeview.getMaze();
+        switch (name) {
+            case MazeMaker.BACKSTEP:
+                maze.reset();
+                return new BackstepGenerator(maze, hBias, vBias);
+            case MazeMaker.COINFLIP:
+                maze.reset();
+                return new RandomBinaryTreeGenerator(maze, hBias, vBias);
+            case MazeMaker.RIGHTHAND:
+                return new WallFollower(maze, true);
+            case MazeMaker.LEFTHAND:
+                return new WallFollower(maze, false);
+            case MazeMaker.RANDOMTURNS:
+                return new RandomTurns(maze);
+            default:
+                return null;
+        }
+    }
+    
     private void setMaze(Maze maze) {
-        mazeview = new MazeView(maze, getPalette(), getCellSize(), getWallThickness());
+        mazeview = new MazeView(maze, getCellSize(), getWallThickness());
+        setCellColor();
+        setVisitedColor();
+        setWallColor();
+        setSpriteColor();
+        setGoalColor();
         scrollPane.setContent(mazeview);
     }
     
@@ -276,23 +289,35 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     private int getFrameDelay() {
-        return Integer.parseInt(rateField.getText());
+        return (int)Math.pow(10, speedSlider.getMax() - speedSlider.getValue());
     }
     
     private int getHBias() {
-        return (int)slider.getValue();
+        return (int)biasSlider.getValue();
     }
     
     private int getVBias() {
-        return (int)(slider.getMax() + slider.getMin() - slider.getValue());
+        return (int)(biasSlider.getMax() + biasSlider.getMin() - biasSlider.getValue());
+    }
+    
+    private String getGenerator() {
+        return (String)genCombo.getValue();
     }
     
     private boolean getInstant() {
         return instantBox.isSelected();
     }
     
+    private String getSolver() {
+        return (String)solverCombo.getValue();
+    }
+    
     private boolean getShowUnvisited() {
         return showUnvisitedBox.isSelected();
+    }
+    
+    private String getSprite() {
+        return (String)spriteCombo.getValue();
     }
     
 }

@@ -43,7 +43,7 @@ public class BackstepGenerator implements MazeActor {
         Point update = new Point(x, y);
         choices.clear();
         
-        for (Direction direction : Maze.getDIRECTIONS())
+        for (Direction direction : Maze.getDirections())
             if (maze.isValid(x + direction.x, y + direction.y) && 
                     !visited[x + direction.x][y + direction.y])
                 add(direction);

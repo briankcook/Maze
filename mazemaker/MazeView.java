@@ -6,29 +6,45 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import mazemaker.maze.*;
-import mazemaker.maze.generators.*;
-import mazemaker.maze.solvers.*;
 
 public class MazeView extends Canvas{
+    
+    public static final String CIRCLE = "Circle";
+    public static final String SQUARE = "Square";
+    public static final String TRIANGLE = "Triangle";
+    public static final String POINTER = "Pointer";
+    
+    private static final double[][] TRIANGLESPRITE = new double[][]
+        {{0.5, 0.0, 1.0},
+         {0.0, 1.0, 1.0}};
+    
+    private static final double[][] POINTERSPRITE = new double[][]
+        {{0.5, 0.2, 0.5, 0.8},
+         {0.0, 1.0, 0.7, 1.0}};
     
     private static final double SPEEDFACTOR = 0.7;
     
     private final Maze maze;
-    private final Palette palette;
     
     private int cellSize;
     private int wallThickness;
     private boolean showUnvisited;
     private boolean[][] visited;
     private Timeline timeline;
+
+    private Color cellColor;
+    private Color visitedColor;
+    private Color wallColor;
+    private Color spriteColor;
+    private Color goalColor;
     
-    public MazeView(Maze maze, Palette palette, int cellSize, int wallThickness) {
+    public MazeView(Maze maze, int cellSize, int wallThickness) {
         super(maze.width  * cellSize + wallThickness * 2, 
               maze.height * cellSize + wallThickness * 2);
         this.maze = maze;
-        this.palette = palette;
         this.cellSize = cellSize;
         this.wallThickness = wallThickness;
         visited = new boolean[maze.width][maze.height];
@@ -40,13 +56,13 @@ public class MazeView extends Canvas{
     PAINTING
     */
     
-    public void redraw() {
-        for (int x = 0 ; x < maze.height ; x++)
-            for (int y = 0 ; y < maze.width ; y++)
+    private void redraw() {
+        for (int x = 0 ; x < maze.width ; x++)
+            for (int y = 0 ; y < maze.height ; y++)
                 drawCell(x, y);
         Point goal = maze.getGoal();
         GraphicsContext gc = getGraphicsContext2D();
-        gc.setFill(palette.getGoalColor());
+        gc.setFill(goalColor);
         gc.fillOval(goal.x * cellSize + wallThickness * 2, 
                     goal.y * cellSize + wallThickness * 2, 
                     cellSize - wallThickness * 2,
@@ -59,12 +75,12 @@ public class MazeView extends Canvas{
         GraphicsContext gc = getGraphicsContext2D();
         
         if (visited[x][y])
-            gc.setFill(palette.getVisitedColor());
+            gc.setFill(visitedColor);
         else
-            gc.setFill(palette.getCellColor());
+            gc.setFill(cellColor);
         gc.fillRect(gx, gy, cellSize, cellSize);
         
-        gc.setStroke(palette.getWallColor());
+        gc.setStroke(wallColor);
         gc.setLineWidth(wallThickness);
         if (showUnvisited || visited[x][y]) {
             if (!maze.canGo(x, y, Maze.NORTH))
@@ -78,23 +94,61 @@ public class MazeView extends Canvas{
         }
     }
     
-    private void drawActor(MazeActorData data) {
-        int gx = data.x * cellSize + wallThickness;
-        int gy = data.y * cellSize + wallThickness;
+    private void drawActor(MazeActorData data, String spriteName) {
+        int gx = data.x * cellSize + wallThickness * 2;
+        int gy = data.y * cellSize + wallThickness * 2;
+        int scale = cellSize - wallThickness * 2;
         GraphicsContext gc = getGraphicsContext2D();
+        gc.setFill(spriteColor);
         if (data.facing == null)
-            gc.setFill(palette.getGenColor());
-        else
-            gc.setFill(palette.getSolverColor());
-        gc.fillOval(gx, gy, cellSize, cellSize);
+            spriteName = SQUARE;
+        switch (spriteName) {
+            case CIRCLE:
+                gc.fillOval(gx, gy, scale, scale);
+                break;
+            case SQUARE:
+                gc.fillRect(gx, gy, scale, scale);
+                break;
+            case TRIANGLE:
+                drawSprite(TRIANGLESPRITE, gx, gy, scale, data.facing);
+                break;
+            case POINTER:
+                drawSprite(POINTERSPRITE, gx, gy, scale, data.facing);
+                break;
+        }
+    }
+    
+    private void drawSprite(double[][] sprite, int x, int y, int scale, Direction facing) {
+        GraphicsContext gc = getGraphicsContext2D();
+        double[] xs = sprite[0].clone();
+        double[] ys = sprite[1].clone();
+        
+        // flip
+        if (facing.equals(Maze.SOUTH) || facing.equals(Maze.EAST))
+            for (int i = 0 ; i < xs.length ; i++)
+                ys[i] = 1.0 - ys[i];
+        
+        // rotate
+        if (facing.equals(Maze.EAST) || facing.equals(Maze.WEST)) {
+            double[] temp = xs;
+            xs = ys;
+            ys = temp;
+        }
+        
+        // scale and move
+        for (int i = 0 ; i < xs.length ; i++) {
+            xs[i] = xs[i] * scale + x;
+            ys[i] = ys[i] * scale + y;
+        }
+        
+        gc.fillPolygon(xs, ys, xs.length);
     }
     
     /*
     ACTIONS
     */
     
-    public void runActor(String name, int hBias, int vBias, int frameDelay, boolean instant, boolean showUnvisited) {
-        MazeActor actor = makeActor(name, hBias, vBias);
+    public void runActor(MazeActor actor, String sprite, int frameDelay, boolean instant, boolean showUnvisited) {
         cleanUp();
         this.showUnvisited = showUnvisited;
         redraw();
@@ -108,6 +162,7 @@ public class MazeView extends Canvas{
             cleanUp();
         } else {
             visited[0][0] = true;
+            drawCell(0,0);
             timeline = new Timeline(new KeyFrame(Duration.millis(frameDelay),
                 ae -> {
                     MazeActorData source = actor.step();
@@ -118,7 +173,7 @@ public class MazeView extends Canvas{
                         for (Point p : source.update)
                             drawCell(p.x, p.y); 
                         drawCell(source.x, source.y);
-                        drawActor(source);
+                        drawActor(source, sprite);
                     }
                 }
             ));
@@ -179,30 +234,32 @@ public class MazeView extends Canvas{
         return maze;
     }
 
-    public Palette getPalette() {
-        return palette;
+    public void setCellColor(Color cellColor) {
+        this.cellColor = cellColor;
+        redraw();
+    }
+
+    public void setVisitedColor(Color visitedColor) {
+        this.visitedColor = visitedColor;
+        redraw();
+    }
+
+    public void setWallColor(Color wallColor) {
+        this.wallColor = wallColor;
+        redraw();
+    }
+
+    public void setSpriteColor(Color spriteColor) {
+        this.spriteColor = spriteColor;
+        redraw();
+    }
+
+    public void setGoalColor(Color goalColor) {
+        this.goalColor = goalColor;
+        redraw();
     }
     
-    /*
-    HELPERS
-    */
-    
-    private MazeActor makeActor(String name, int hBias, int vBias) {
-        switch (name) {
-            case MazeMaker.BACKSTEP:
-                maze.reset();
-                return new BackstepGenerator(maze, hBias, vBias);
-            case MazeMaker.COINFLIP:
-                maze.reset();
-                return new RandomBinaryTreeGenerator(maze, hBias, vBias);
-            case MazeMaker.RIGHTHAND:
-                return new WallFollower(maze, true);
-            case MazeMaker.LEFTHAND:
-                return new WallFollower(maze, false);
-            case MazeMaker.RANDOMTURNS:
-                return new RandomTurns(maze);
-            default:
-                return null;
-        }
+    public static String[] getSpriteTypes() {
+        return new String[] {CIRCLE, SQUARE, TRIANGLE, POINTER};
     }
 }

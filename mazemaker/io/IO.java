@@ -31,7 +31,7 @@ public interface IO {
         Scanner scanner = new Scanner(MazeMaker.class.getResourceAsStream("resources/" + name), "UTF-8");
         List<String> lines = new ArrayList();
         while (scanner.hasNextLine()) {
-          lines.add(scanner.nextLine());
+            lines.add(scanner.nextLine());
         }
         return lines;
     }
