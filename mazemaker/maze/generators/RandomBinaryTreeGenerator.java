@@ -1,6 +1,5 @@
 package mazemaker.maze.generators;
 
-import java.awt.Point;
 import java.util.Random;
 import mazemaker.maze.*;
 
@@ -29,9 +28,9 @@ public class RandomBinaryTreeGenerator implements MazeActor{
     }
     
     @Override
-    public MazeActorData step() {
-        Point current = new Point(x, y);
-        Point update = new Point(x, y);
+    public MazeActorData[] step() {
+        MazeActorData current = new MazeActorData(x, y, null);
+        MazeActorData update = new MazeActorData(x, y, null);
         if (maze.isValid(x-1, y-1))
             if (r.nextInt(hWeight+vWeight) + 1 > vWeight)
                 update.x -= 1; 
@@ -48,6 +47,6 @@ public class RandomBinaryTreeGenerator implements MazeActor{
         }
         if (y == maze.height)
             return null;
-        return new MazeActorData(x, y, null, current, update);
+        return new MazeActorData[]{new MazeActorData(x, y, Maze.NORTH), current, update};
     }
 }

@@ -192,17 +192,16 @@ public class MazeView extends Canvas{
             drawCell(0,0);
             timeline = new Timeline(new KeyFrame(Duration.millis(frameDelay),
                 ae -> {
-                    MazeActorData source = actor.step();
-                    if (source == null) {
+                    MazeActorData[] data = actor.step();
+                    if (data == null) {
                         stop();
                     } else {
-                        visited[source.x][source.y] = true;
-                        for (Point p : source.update) {
-                            visited[p.x][p.y] = true;
-                            drawCell(p.x, p.y); 
+                        for (MazeActorData datum : data) {
+                            visited[datum.x][datum.y] = true;
+                            drawCell(datum.x, datum.y); 
+                            if (datum.facing != null)
+                                drawActor(datum, sprite);
                         }
-                        drawCell(source.x, source.y);
-                        drawActor(source, sprite);
                     }
                 }
             ));

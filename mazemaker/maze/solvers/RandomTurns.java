@@ -1,7 +1,6 @@
 package mazemaker.maze.solvers;
 
 import mazemaker.maze.*;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,7 +13,7 @@ public class RandomTurns implements MazeActor{
     private Direction facing;
     private int x;
     private int y;
-    private Point previousCell;
+    private MazeActorData previousCell;
     
     public RandomTurns(Maze maze) {
         this.maze = maze;
@@ -27,11 +26,11 @@ public class RandomTurns implements MazeActor{
         facing = Maze.SOUTH;
         x = 0;
         y = 0;
-        previousCell = new Point(0, 0);
+        previousCell = new MazeActorData(0, 0, null);
     }
     
     @Override
-    public MazeActorData step() {
+    public MazeActorData[] step() {
         if (maze.isGoal(x, y)) 
             return null;
         
@@ -41,7 +40,7 @@ public class RandomTurns implements MazeActor{
             if (maze.canGo(x, y, direction) && !previousCell.equals(maze.look(x, y, direction)))
                 choices.add(direction);
         
-        previousCell = new Point(x, y);
+        previousCell = new MazeActorData(x, y, null);
         
         if (choices.isEmpty()) {
             facing = Maze.turn(facing, Maze.AROUND);
@@ -51,6 +50,6 @@ public class RandomTurns implements MazeActor{
             y += facing.y;
         }
         
-        return new MazeActorData(x, y, facing, previousCell);
+        return new MazeActorData[]{new MazeActorData(x, y, facing), previousCell};
     }
 }

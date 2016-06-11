@@ -1,6 +1,5 @@
 package mazemaker.maze.generators;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import mazemaker.maze.*;
@@ -11,8 +10,8 @@ public class Kruskal implements MazeActor{
     
     private int[][] setTags;
     private ArrayList<Edge> edges;
-    private Point prev1;
-    private Point prev2;
+    private MazeActorData prev1;
+    private MazeActorData prev2;
     
     public Kruskal(Maze maze) {
         this.maze = maze;
@@ -32,21 +31,24 @@ public class Kruskal implements MazeActor{
             }
         }
         Collections.shuffle(edges);
-        prev1 = new Point(0,0);
-        prev2 = new Point(0,0);
+        prev1 = new MazeActorData(0, 0, null);
+        prev2 = new MazeActorData(0, 0, null);
     }
     
     @Override
-    public MazeActorData step() {
+    public MazeActorData[] step() {
         if (edges.isEmpty())
             return null;
         Edge edge = edges.remove(0);
         
-        Point update1 = prev1;
-        Point update2 = prev2;
+        MazeActorData update1 = prev1;
+        MazeActorData update2 = prev2;
         
-        prev1 = new Point(edge.x1, edge.y1);
-        prev2 = new Point(edge.x2, edge.y2);
+        update1.facing = null;
+        update2.facing = null;
+        
+        prev1 = new MazeActorData(edge.x1, edge.y1, null);
+        prev2 = new MazeActorData(edge.x2, edge.y2, null);
         
         int set1 = setTags[edge.x1][edge.y1];
         int set2 = setTags[edge.x2][edge.y2];
@@ -60,11 +62,14 @@ public class Kruskal implements MazeActor{
         }
         
         Direction facing = new Direction(edge.x2-edge.x1, edge.y2-edge.y1, 0);
-        for (Direction direction : Maze.getDirections())
-            if (facing.x == direction.x && facing.y == direction.y)
-                facing = direction;
+        for (Direction direction : Maze.getDirections()) {
+            if (facing.x == direction.x && facing.y == direction.y) {
+                prev1.facing = direction;
+                prev2.facing = Maze.turn(direction, Maze.AROUND);
+            }
+        }
         
-        return new MazeActorData(prev1.x, prev1.y, facing, prev2, update1, update2);
+        return new MazeActorData[]{prev1, prev2, update1, update2};
     }
 
     private class Edge {
