@@ -42,6 +42,6 @@ public class WallFollower implements MazeActor {
             y += facing.y;
             moved = true;
         }
-        return new MazeActorData[]{new MazeActorData(x, y, facing), update};
+        return new MazeActorData[]{update, new MazeActorData(x, y, facing)};
     }
 }

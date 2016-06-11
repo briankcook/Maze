@@ -50,6 +50,6 @@ public class RandomTurns implements MazeActor{
             y += facing.y;
         }
         
-        return new MazeActorData[]{new MazeActorData(x, y, facing), previousCell};
+        return new MazeActorData[]{previousCell, new MazeActorData(x, y, facing)};
     }
 }

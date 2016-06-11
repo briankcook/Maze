@@ -59,7 +59,7 @@ public class BackstepGenerator implements MazeActor {
             maze.toggleConnection(new Point(x,y), history.peek());
             visited[x][y] = true;
         }
-        return new MazeActorData[]{new MazeActorData(x, y, Maze.NORTH), update};
+        return new MazeActorData[]{update, new MazeActorData(x, y, Maze.NORTH)};
     }
     
     private void moveTo(Point cell) {
