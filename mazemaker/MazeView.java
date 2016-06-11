@@ -6,6 +6,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import mazemaker.maze.*;
@@ -25,6 +26,8 @@ public class MazeView extends Canvas{
         {{0.5, 0.2, 0.5, 0.8},
          {0.0, 1.0, 0.7, 1.0}};
     
+    private static final Color SELECTIONCOLOR = new Color(0.5, 0.5, 1.0, 0.5);
+    
     private static final double SPEEDFACTOR = 0.7;
     
     private final Maze maze;
@@ -34,6 +37,7 @@ public class MazeView extends Canvas{
     private boolean showUnvisited;
     private boolean[][] visited;
     private Timeline timeline;
+    private Point selection;
 
     private Color cellColor;
     private Color visitedColor;
@@ -49,6 +53,23 @@ public class MazeView extends Canvas{
         this.wallThickness = wallThickness;
         visited = new boolean[maze.width][maze.height];
         showUnvisited = true;
+        selection = null;
+        redraw();
+        setOnMousePressed(this::handleClick);
+    }
+    
+    private void handleClick(MouseEvent e) {
+        Point clicked = new Point(Math.min((int)((e.getX() - wallThickness) / cellSize), maze.width - 1),
+                                  Math.min((int)((e.getY() - wallThickness) / cellSize), maze.height - 1));
+        if (selection == null) {
+            selection = clicked;
+        } else {
+            if (selection.equals(clicked)) 
+                maze.setGoal(clicked);
+            else 
+                maze.toggleConnection(clicked, selection);
+            selection = null;
+        }
         redraw();
     }
     
@@ -67,6 +88,13 @@ public class MazeView extends Canvas{
                     goal.y * cellSize + wallThickness * 2, 
                     cellSize - wallThickness * 2,
                     cellSize - wallThickness * 2);
+        if (selection != null) {
+            gc.setFill(SELECTIONCOLOR);
+            gc.fillRect(selection.x * cellSize + wallThickness,
+                        selection.y * cellSize + wallThickness,
+                        cellSize,
+                        cellSize);
+        }
     }
     
     private void drawCell(int x, int y) {
@@ -100,20 +128,19 @@ public class MazeView extends Canvas{
         int scale = cellSize - wallThickness * 2;
         GraphicsContext gc = getGraphicsContext2D();
         gc.setFill(spriteColor);
-        if (data.facing == null)
-            spriteName = SQUARE;
         switch (spriteName) {
             case CIRCLE:
                 gc.fillOval(gx, gy, scale, scale);
-                break;
-            case SQUARE:
-                gc.fillRect(gx, gy, scale, scale);
                 break;
             case TRIANGLE:
                 drawSprite(TRIANGLESPRITE, gx, gy, scale, data.facing);
                 break;
             case POINTER:
                 drawSprite(POINTERSPRITE, gx, gy, scale, data.facing);
+                break;
+            case SQUARE:
+            default:
+                gc.fillRect(gx, gy, scale, scale);
                 break;
         }
     }

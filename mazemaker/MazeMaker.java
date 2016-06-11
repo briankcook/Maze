@@ -112,7 +112,7 @@ public class MazeMaker extends Application implements Initializable{
                 case '$':
                     parsedSegments[i].setStyle("-fx-font-size: 16px;");
                     break;
-                case '%':
+                default:
                     parsedSegments[i].setStyle("-fx-font-size: 12px;");
                     break;
             }
