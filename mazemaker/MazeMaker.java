@@ -26,15 +26,14 @@ import mazemaker.io.IO;
 import mazemaker.io.MazeIO;
 import mazemaker.maze.Maze;
 import mazemaker.maze.MazeActor;
-import mazemaker.maze.generators.BackstepGenerator;
-import mazemaker.maze.generators.RandomBinaryTreeGenerator;
-import mazemaker.maze.solvers.RandomTurns;
-import mazemaker.maze.solvers.WallFollower;
+import mazemaker.maze.generators.*;
+import mazemaker.maze.solvers.*;
 
 public class MazeMaker extends Application implements Initializable{
         
     public static final String BACKSTEP = "Backtrace";
     public static final String COINFLIP = "Random Binary Tree";
+    public static final String KRUSKAL = "Randomized Kruskal's";
     
     public static final String RIGHTHAND = "Right Hand Rule";
     public static final String LEFTHAND = "Left hand Rule";
@@ -83,7 +82,8 @@ public class MazeMaker extends Application implements Initializable{
         
         initComboBox(genCombo, new String[]{
             BACKSTEP,
-            COINFLIP});
+            COINFLIP,
+            KRUSKAL});
         
         initComboBox(solverCombo, new String[]{
             RIGHTHAND,
@@ -251,6 +251,9 @@ public class MazeMaker extends Application implements Initializable{
             case MazeMaker.COINFLIP:
                 maze.reset();
                 return new RandomBinaryTreeGenerator(maze, hBias, vBias);
+            case MazeMaker.KRUSKAL:
+                maze.reset();
+                return new Kruskal(maze);
             case MazeMaker.RIGHTHAND:
                 return new WallFollower(maze, true);
             case MazeMaker.LEFTHAND:

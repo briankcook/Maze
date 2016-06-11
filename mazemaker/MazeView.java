@@ -197,8 +197,10 @@ public class MazeView extends Canvas{
                         stop();
                     } else {
                         visited[source.x][source.y] = true;
-                        for (Point p : source.update)
+                        for (Point p : source.update) {
+                            visited[p.x][p.y] = true;
                             drawCell(p.x, p.y); 
+                        }
                         drawCell(source.x, source.y);
                         drawActor(source, sprite);
                     }
