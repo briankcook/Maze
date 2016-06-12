@@ -122,9 +122,9 @@ public class MazeView extends Canvas{
         }
     }
     
-    private void drawActor(MazeActorData data, String spriteName) {
-        int gx = data.x * cellSize + wallThickness * 2;
-        int gy = data.y * cellSize + wallThickness * 2;
+    private void drawActor(Datum datum, String spriteName) {
+        int gx = datum.x * cellSize + wallThickness * 2;
+        int gy = datum.y * cellSize + wallThickness * 2;
         int scale = cellSize - wallThickness * 2;
         GraphicsContext gc = getGraphicsContext2D();
         gc.setFill(spriteColor);
@@ -133,10 +133,10 @@ public class MazeView extends Canvas{
                 gc.fillOval(gx, gy, scale, scale);
                 break;
             case TRIANGLE:
-                drawSprite(TRIANGLESPRITE, gx, gy, scale, data.facing);
+                drawSprite(TRIANGLESPRITE, gx, gy, scale, datum.facing);
                 break;
             case POINTER:
-                drawSprite(POINTERSPRITE, gx, gy, scale, data.facing);
+                drawSprite(POINTERSPRITE, gx, gy, scale, datum.facing);
                 break;
             case SQUARE:
             default:
@@ -192,11 +192,11 @@ public class MazeView extends Canvas{
             drawCell(0,0);
             timeline = new Timeline(new KeyFrame(Duration.millis(frameDelay),
                 ae -> {
-                    MazeActorData[] data = actor.step();
+                    Datum[] data = actor.step();
                     if (data == null) {
                         stop();
                     } else {
-                        for (MazeActorData datum : data) {
+                        for (Datum datum : data) {
                             visited[datum.x][datum.y] = true;
                             drawCell(datum.x, datum.y); 
                             if (datum.facing != null)

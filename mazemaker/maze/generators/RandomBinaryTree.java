@@ -3,7 +3,7 @@ package mazemaker.maze.generators;
 import java.util.Random;
 import mazemaker.maze.*;
 
-public class RandomBinaryTreeGenerator implements MazeActor{
+public class RandomBinaryTree implements MazeActor{
     
     private final Maze maze;
     private final int hWeight;
@@ -13,7 +13,7 @@ public class RandomBinaryTreeGenerator implements MazeActor{
     private int x;
     private int y;
     
-    public RandomBinaryTreeGenerator(Maze maze, int hWeight, int vWeight) {
+    public RandomBinaryTree(Maze maze, int hWeight, int vWeight) {
         this.maze = maze;
         this.hWeight = hWeight;
         this.vWeight = vWeight;
@@ -28,9 +28,9 @@ public class RandomBinaryTreeGenerator implements MazeActor{
     }
     
     @Override
-    public MazeActorData[] step() {
-        MazeActorData current = new MazeActorData(x, y, null);
-        MazeActorData update = new MazeActorData(x, y, null);
+    public Datum[] step() {
+        Datum current = new Datum(x, y, null);
+        Datum update = new Datum(x, y, null);
         if (maze.isValid(x-1, y-1))
             if (r.nextInt(hWeight+vWeight) + 1 > vWeight)
                 update.x -= 1; 
@@ -47,6 +47,6 @@ public class RandomBinaryTreeGenerator implements MazeActor{
         }
         if (y == maze.height)
             return null;
-        return new MazeActorData[]{new MazeActorData(x, y, Maze.NORTH), current, update};
+        return new Datum[]{new Datum(x, y, Maze.NORTH), current, update};
     }
 }

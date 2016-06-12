@@ -248,10 +248,10 @@ public class MazeMaker extends Application implements Initializable{
         switch (name) {
             case MazeMaker.BACKSTEP:
                 maze.reset();
-                return new BackstepGenerator(maze, hBias, vBias);
+                return new Backstep(maze, hBias, vBias);
             case MazeMaker.COINFLIP:
                 maze.reset();
-                return new RandomBinaryTreeGenerator(maze, hBias, vBias);
+                return new RandomBinaryTree(maze, hBias, vBias);
             case MazeMaker.KRUSKAL:
                 maze.reset();
                 return new Kruskal(maze);

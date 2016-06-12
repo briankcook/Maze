@@ -29,8 +29,8 @@ public class WallFollower implements MazeActor {
     }
     
     @Override
-    public MazeActorData[] step() {
-        MazeActorData update = new MazeActorData(x, y, null);
+    public Datum[] step() {
+        Datum update = new Datum(x, y, null);
         if (maze.isGoal(x, y)) 
             return null;
         if (moved || !maze.canGo(x, y, facing)) {
@@ -42,6 +42,6 @@ public class WallFollower implements MazeActor {
             y += facing.y;
             moved = true;
         }
-        return new MazeActorData[]{update, new MazeActorData(x, y, facing)};
+        return new Datum[]{update, new Datum(x, y, facing)};
     }
 }

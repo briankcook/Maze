@@ -10,8 +10,8 @@ public class Kruskal implements MazeActor{
     
     private int[][] setTags;
     private ArrayList<Edge> edges;
-    private MazeActorData prev1;
-    private MazeActorData prev2;
+    private Datum prev1;
+    private Datum prev2;
     
     public Kruskal(Maze maze) {
         this.maze = maze;
@@ -31,24 +31,24 @@ public class Kruskal implements MazeActor{
             }
         }
         Collections.shuffle(edges);
-        prev1 = new MazeActorData(0, 0, null);
-        prev2 = new MazeActorData(0, 0, null);
+        prev1 = new Datum(0, 0, null);
+        prev2 = new Datum(0, 0, null);
     }
     
     @Override
-    public MazeActorData[] step() {
+    public Datum[] step() {
         if (edges.isEmpty())
             return null;
         Edge edge = edges.remove(0);
         
-        MazeActorData update1 = prev1;
-        MazeActorData update2 = prev2;
+        Datum update1 = prev1;
+        Datum update2 = prev2;
         
         update1.facing = null;
         update2.facing = null;
         
-        prev1 = new MazeActorData(edge.x1, edge.y1, null);
-        prev2 = new MazeActorData(edge.x2, edge.y2, null);
+        prev1 = new Datum(edge.x1, edge.y1, null);
+        prev2 = new Datum(edge.x2, edge.y2, null);
         
         int set1 = setTags[edge.x1][edge.y1];
         int set2 = setTags[edge.x2][edge.y2];
@@ -69,7 +69,7 @@ public class Kruskal implements MazeActor{
             }
         }
         
-        return new MazeActorData[]{prev1, prev2, update1, update2};
+        return new Datum[]{prev1, prev2, update1, update2};
     }
 
     private class Edge {

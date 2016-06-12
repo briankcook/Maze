@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Random;
 
-public class BackstepGenerator implements MazeActor {
+public class Backstep implements MazeActor {
     
     private final Maze maze;
     private final int hWeight;
@@ -20,7 +20,7 @@ public class BackstepGenerator implements MazeActor {
     private int x;
     private int y;
     
-    public BackstepGenerator(Maze maze, int hWeight, int vWeight) {
+    public Backstep(Maze maze, int hWeight, int vWeight) {
         this.maze = maze;
         this.hWeight = hWeight;
         this.vWeight = vWeight;
@@ -39,8 +39,8 @@ public class BackstepGenerator implements MazeActor {
     }
     
     @Override
-    public MazeActorData[] step() {
-        MazeActorData update = new MazeActorData(x, y, null);
+    public Datum[] step() {
+        Datum update = new Datum(x, y, null);
         choices.clear();
         
         for (Direction direction : Maze.getDirections())
@@ -59,7 +59,7 @@ public class BackstepGenerator implements MazeActor {
             maze.toggleConnection(new Point(x,y), history.peek());
             visited[x][y] = true;
         }
-        return new MazeActorData[]{update, new MazeActorData(x, y, Maze.NORTH)};
+        return new Datum[]{update, new Datum(x, y, Maze.NORTH)};
     }
     
     private void moveTo(Point cell) {

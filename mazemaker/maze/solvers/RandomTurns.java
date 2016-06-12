@@ -13,7 +13,7 @@ public class RandomTurns implements MazeActor{
     private Direction facing;
     private int x;
     private int y;
-    private MazeActorData previousCell;
+    private Datum previousCell;
     
     public RandomTurns(Maze maze) {
         this.maze = maze;
@@ -26,11 +26,11 @@ public class RandomTurns implements MazeActor{
         facing = Maze.SOUTH;
         x = 0;
         y = 0;
-        previousCell = new MazeActorData(0, 0, null);
+        previousCell = new Datum(0, 0, null);
     }
     
     @Override
-    public MazeActorData[] step() {
+    public Datum[] step() {
         if (maze.isGoal(x, y)) 
             return null;
         
@@ -40,7 +40,7 @@ public class RandomTurns implements MazeActor{
             if (maze.canGo(x, y, direction) && !previousCell.equals(maze.look(x, y, direction)))
                 choices.add(direction);
         
-        previousCell = new MazeActorData(x, y, null);
+        previousCell = new Datum(x, y, null);
         
         if (choices.isEmpty()) {
             facing = Maze.turn(facing, Maze.AROUND);
@@ -50,6 +50,6 @@ public class RandomTurns implements MazeActor{
             y += facing.y;
         }
         
-        return new MazeActorData[]{previousCell, new MazeActorData(x, y, facing)};
+        return new Datum[]{previousCell, new Datum(x, y, facing)};
     }
 }
