@@ -236,13 +236,17 @@ public class MazeView extends Canvas{
         pause();
         timeline = null;
         redraw();
-        if (gifWriter != null)
+        if (gifWriter != null) {
             gifWriter.close();
+            gifWriter = null;
+        }
     }
     
     public void record(int frameDelay) {
         cleanUp();
         gifWriter = new GifWriter(this, frameDelay);
+        if (!gifWriter.init())
+            gifWriter = null;
     }
     
     public void speedUp() {
