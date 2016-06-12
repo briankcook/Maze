@@ -211,6 +211,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="New Blank Maze" />
+                     </tooltip>
                   </Button>
                 <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#saveMaze">
                      <graphic>
@@ -220,6 +223,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Save Maze" />
+                     </tooltip>
                   </Button>
                 <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#openMaze">
                      <graphic>
@@ -229,6 +235,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Load Maze" />
+                     </tooltip>
                   </Button>
                   <Separator orientation="VERTICAL">
                      <opaqueInsets>
@@ -245,6 +254,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Generate Maze" />
+                     </tooltip>
                   </Button>
                 <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#solve">
                      <graphic>
@@ -254,6 +266,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Solve Maze" />
+                     </tooltip>
                   </Button>
                 <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#cleanUp">
                      <graphic>
@@ -263,6 +278,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Clean Up" />
+                     </tooltip>
                   </Button>
                   <Separator orientation="VERTICAL">
                      <padding>
@@ -276,6 +294,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Pause Playback" />
+                     </tooltip>
                   </Button>
                 <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#playPlayback">
                      <graphic>
@@ -285,6 +306,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Resume Playback" />
+                     </tooltip>
                   </Button>
                 <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#stopPlayback">
                      <graphic>
@@ -294,6 +318,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Stop Playback" />
+                     </tooltip>
                   </Button>
                 <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#record">
                      <graphic>
@@ -303,6 +330,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Record Next Action" />
+                     </tooltip>
                   </Button>
                   <Separator orientation="VERTICAL">
                      <padding>
@@ -316,6 +346,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Slow Down" />
+                     </tooltip>
                   </Button>
                 <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#speedUp">
                      <graphic>
@@ -325,6 +358,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Speed Up" />
+                     </tooltip>
                   </Button>
               </items>
             </ToolBar>

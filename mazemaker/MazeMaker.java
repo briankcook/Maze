@@ -67,6 +67,7 @@ public class MazeMaker extends Application implements Initializable{
         Parent root = FXMLLoader.load(getClass().getResource("MazeMaker.fxml"));
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        stage.setTitle("MazeMaker");
         stage.show();
     }
     
@@ -157,7 +158,7 @@ public class MazeMaker extends Application implements Initializable{
     */
     
     public void newMaze() {
-        setMaze(new Maze(getMazeHeight(), getMazeWidth()));
+        setMaze(new Maze(getMazeWidth(), getMazeHeight()));
     }
     
     public void openMaze() {

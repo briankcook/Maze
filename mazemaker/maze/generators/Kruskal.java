@@ -22,11 +22,11 @@ public class Kruskal implements MazeActor{
         setTags = new int[maze.width][maze.height];
         edges = new ArrayList();
         for (int i = 0 ; i < maze.width ; i++) {
-            for (int j = 0 ; j < maze.width ; j++) {
+            for (int j = 0 ; j < maze.height ; j++) {
                 setTags[i][j] = j + i * maze.width;
                 if (i + 1 < maze.width)
                     edges.add(new Edge(i, j, i+1, j));
-                if (j + 1 < maze.width)
+                if (j + 1 < maze.height)
                     edges.add(new Edge(i, j, i, j+1));
             }
         }
@@ -56,7 +56,7 @@ public class Kruskal implements MazeActor{
         if (set1 != set2) {
             maze.toggleConnection(prev1, prev2);
             for (int i = 0 ; i < maze.width ; i++) 
-                for (int j = 0 ; j < maze.width ; j++) 
+                for (int j = 0 ; j < maze.height ; j++) 
                     if (setTags[i][j] == set2)
                         setTags[i][j] = set1;
         }
