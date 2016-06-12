@@ -11,4 +11,4 @@ $Playback
 $Styling maze
  Mazemaker includes some styling options for displaying your maze.  The Cell Size and Walls options are purely for presentation, and can be edited to your liking.  Every maze element can also be given a color of your choice.
 $Recording GIFs
- Not yet implemented in this version, sorry.
+ To record either generation or solving, press the record button, select a location to save to, and press either Generate or Solve.  You will get an alert if your GIF saved successfully.

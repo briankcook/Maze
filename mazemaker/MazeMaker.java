@@ -198,7 +198,7 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void record() {
-        mazeview.record();
+        mazeview.record(getFrameDelay());
     }
     
     public void speedUp() {

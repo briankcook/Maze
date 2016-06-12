@@ -9,6 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import mazemaker.io.GifWriter;
 import mazemaker.maze.*;
 
 public class MazeView extends Canvas{
@@ -44,6 +45,8 @@ public class MazeView extends Canvas{
     private Color wallColor;
     private Color spriteColor;
     private Color goalColor;
+    
+    private GifWriter gifWriter;
     
     public MazeView(Maze maze, int cellSize, int wallThickness) {
         super(maze.width  * cellSize + wallThickness * 2, 
@@ -176,22 +179,25 @@ public class MazeView extends Canvas{
     */
     
     public void runActor(MazeActor actor, String sprite, int frameDelay, boolean instant, boolean showUnvisited) {
-        cleanUp();
+        if (gifWriter == null)
+            cleanUp();
         this.showUnvisited = showUnvisited;
         redraw();
         if (actor == null)
             return;
         actor.init();
         if (instant) {
-            while (actor.step() != null);
-                /*if (gifWriter != null)
-                    gifWriter.snapshot();*/
+            while (actor.step() != null)
+                if (gifWriter != null)
+                    gifWriter.snapshot();
             cleanUp();
         } else {
             visited[0][0] = true;
             drawCell(0,0);
             timeline = new Timeline(new KeyFrame(Duration.millis(frameDelay),
                 ae -> {
+                    if (gifWriter != null)
+                        gifWriter.snapshot();
                     Datum[] data = actor.step();
                     if (data == null) {
                         stop();
@@ -230,10 +236,13 @@ public class MazeView extends Canvas{
         pause();
         timeline = null;
         redraw();
+        if (gifWriter != null)
+            gifWriter.close();
     }
     
-    public void record() {
-        
+    public void record(int frameDelay) {
+        cleanUp();
+        gifWriter = new GifWriter(this, frameDelay);
     }
     
     public void speedUp() {

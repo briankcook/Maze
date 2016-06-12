@@ -1,10 +1,13 @@
 package mazemaker.io;
 
-import net.kroo.elliot.gifsequencewriter.GifSequenceWriter;
 import java.awt.image.BufferedImage;
+import net.kroo.elliot.gifsequencewriter.GifSequenceWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.image.WritableImage;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JOptionPane;
@@ -12,15 +15,17 @@ import javax.swing.JOptionPane;
 public class GifWriter {
        
     private static final Logger LOGGER = Logger.getAnonymousLogger();
-    private BufferedImage image;
+    private Canvas canvas;
+    private WritableImage fximage;
     private ImageOutputStream output;
     private GifSequenceWriter writer;
     
-    public GifWriter(BufferedImage image, int frameDelay) {
-        this.image = image;
+    public GifWriter(Canvas canvas, int frameDelay) {
+        this.canvas = canvas;
         try {
+            fximage = new WritableImage((int)canvas.getWidth(), (int)canvas.getHeight());
             output = new FileImageOutputStream(IO.pickFile("gif", true));
-            writer = new GifSequenceWriter(output, image.getType(), frameDelay, false);
+            writer = new GifSequenceWriter(output, BufferedImage.TYPE_INT_RGB, frameDelay, false);
             LOGGER.log(Level.INFO, "GifWriter construction successful");
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "GifWriter construction failed", e);
@@ -30,7 +35,8 @@ public class GifWriter {
         
     public void snapshot() {
         try {
-            writer.writeToSequence(image);
+            canvas.snapshot(null, fximage);
+            writer.writeToSequence(SwingFXUtils.fromFXImage(fximage, null));
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "GifWriter snapshot failed", e);
             failed();
