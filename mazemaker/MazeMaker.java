@@ -32,6 +32,7 @@ import mazemaker.maze.solvers.*;
 public class MazeMaker extends Application implements Initializable{
         
     public static final String BACKSTEP = "Backtrace";
+    public static final String BRANCHINGBS = "Branching Backtrace";
     public static final String COINFLIP = "Random Binary Tree";
     public static final String KRUSKAL = "Randomized Kruskal's";
     
@@ -83,6 +84,7 @@ public class MazeMaker extends Application implements Initializable{
         
         initComboBox(genCombo, new String[]{
             BACKSTEP,
+            BRANCHINGBS,
             COINFLIP,
             KRUSKAL});
         
@@ -249,6 +251,9 @@ public class MazeMaker extends Application implements Initializable{
             case MazeMaker.BACKSTEP:
                 maze.reset();
                 return new Backstep(maze, hBias, vBias);
+            case MazeMaker.BRANCHINGBS:
+                maze.reset();
+                return new BranchingBackstep(maze, hBias, vBias, 10);
             case MazeMaker.COINFLIP:
                 maze.reset();
                 return new RandomBinaryTree(maze, hBias, vBias);
