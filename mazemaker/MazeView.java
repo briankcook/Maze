@@ -4,8 +4,11 @@ import java.awt.Point;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.scene.Cursor;
+import javafx.scene.ImageCursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -19,6 +22,9 @@ public class MazeView extends Canvas{
     public static final String TRIANGLE = "Triangle";
     public static final String POINTER = "Pointer";
     
+    public static final int SELECT_MODE = 0;
+    public static final int PENCIL_MODE = 1;
+    
     private static final double[][] TRIANGLESPRITE = new double[][]
         {{0.5, 0.0, 1.0},
          {0.0, 1.0, 1.0}};
@@ -31,6 +37,9 @@ public class MazeView extends Canvas{
     
     private static final double SPEEDFACTOR = 0.7;
     
+    private static final ImageCursor PENCIL_CURSOR = new ImageCursor(new Image(
+            MazeView.class.getResourceAsStream("resources/pencil.png")), 0, 32);
+    
     private final Maze maze;
     
     private int cellSize;
@@ -39,6 +48,7 @@ public class MazeView extends Canvas{
     private boolean[][] visited;
     private Timeline timeline;
     private Point selection;
+    private int editMode;
 
     private Color cellColor;
     private Color visitedColor;
@@ -57,16 +67,22 @@ public class MazeView extends Canvas{
         visited = new boolean[maze.width][maze.height];
         showUnvisited = true;
         selection = null;
+        editMode = SELECT_MODE;
         redraw();
-        setOnMousePressed(this::handleClick);
+        setOnMousePressed(this::handlePress);
+        setOnMouseReleased(this::handleRelease);
+        setOnMouseDragged(this::handleDrag);
+        setOnMouseEntered(this::mouseIn);
+        setOnMouseExited(this::mouseOut);
     }
     
-    private void handleClick(MouseEvent e) {
-        Point clicked = new Point(Math.min((int)((e.getX() - wallThickness) / cellSize), maze.width - 1),
-                                  Math.min((int)((e.getY() - wallThickness) / cellSize), maze.height - 1));
+    private void handlePress(MouseEvent e) {
+        Point clicked = getCell(e);
         if (selection == null) {
             selection = clicked;
-        } else {
+            if (editMode == PENCIL_MODE)
+                visited[clicked.x][clicked.y] = true;
+        } else if (editMode == SELECT_MODE) {
             if (selection.equals(clicked)) 
                 maze.setGoal(clicked);
             else 
@@ -74,6 +90,39 @@ public class MazeView extends Canvas{
             selection = null;
         }
         redraw();
+    }
+    
+    private void handleRelease(MouseEvent e) {
+        if (editMode != SELECT_MODE)
+            selection = null;
+        redraw();
+    }
+    
+    private void handleDrag(MouseEvent e) {
+        Point current = getCell(e);
+        if (!selection.equals(current)) {
+            maze.toggleConnection(current, selection);
+            visited[current.x][current.y] = true;
+            drawCell(current.x, current.y);
+            drawCell(selection.x, selection.y);
+            selection = current;
+        }
+    }
+    
+    private void mouseIn(MouseEvent e) {
+        if (editMode == PENCIL_MODE)
+            setCursor(PENCIL_CURSOR);
+        else
+            setCursor(Cursor.HAND);
+    }
+    
+    private void mouseOut(MouseEvent e) {
+        setCursor(Cursor.DEFAULT);
+    }
+    
+    private Point getCell(MouseEvent e) {
+        return new Point(Math.min((int)((e.getX() - wallThickness) / cellSize), maze.width - 1),
+                         Math.min((int)((e.getY() - wallThickness) / cellSize), maze.height - 1));
     }
     
     /*
@@ -257,6 +306,14 @@ public class MazeView extends Canvas{
     public void slowDown() {
         if (timeline != null)
             timeline.setRate(timeline.getRate() * SPEEDFACTOR);
+    }
+    
+    public void pointer() {
+        editMode = SELECT_MODE;
+    }
+    
+    public void pencil() {
+        editMode = PENCIL_MODE;
     }
     
     /*

@@ -5,7 +5,9 @@ $Generating and solving mazes
  To generate a maze, select a generation algorithm and click the Generate button.  Check 'Instant Generation' if you don't wish to view generation process, or want to create mazes quickly.  
  Once you are satisfied with your maze, you can apply a solving algorithm to solve it.  Select a solving algorithm and click the Solve button to begin solving. 
 $Editing
- MazeMaker includes basic maze editing.  Double click any cell to set it as the finish line.  Click any two adjacent cells to toggle the wall between them.
+ MazeMaker includes basic maze editing.  
+ Cursor Mode: Double click any cell to set it as the finish line.  Click any two adjacent cells to toggle the wall between them.
+ Pencil Mode: Click and drag to toggle walls that your cross with the cursor.  Start with a blank maze to draw a totally custom maze.
 $Playback
  You can pause, resume, stop, slow down, and speed up playback.  The 'stop' and 'clean up' buttons cancel the current action, disabling the resume function.
 $Styling maze

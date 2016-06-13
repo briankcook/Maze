@@ -217,6 +217,14 @@ public class MazeMaker extends Application implements Initializable{
         about.showAndWait();
     }
     
+    public void pointer() {
+        mazeview.pointer();
+    }
+    
+    public void pencil() {
+        mazeview.pencil();
+    }
+    
     /*
     COLOR HANDLING
     */
