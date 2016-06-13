@@ -105,18 +105,12 @@
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
                               <Label text="Maze Rows" />
                               <Label text="Maze Columns" GridPane.columnIndex="1" />
-                              <Label text="Cell Size (px)" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" />
-                              <Label text="Walls (px)" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <TextField fx:id="rowsField" GridPane.rowIndex="1" />
                               <TextField fx:id="colsField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <TextField fx:id="cellField" GridPane.rowIndex="3" />
-                              <TextField fx:id="wallField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                            </children>
                            <VBox.margin>
                               <Insets />
@@ -159,12 +153,19 @@
                               <Insets top="5.0" />
                            </padding>
                         </Separator>
+                        <Label text="Appearance">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
                         <GridPane hgap="4.0">
                           <columnConstraints>
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="99.0" />
                             <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" prefWidth="99.0" />
                           </columnConstraints>
                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="20.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
@@ -173,18 +174,22 @@
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Label text="Unvisited Cells" />
-                              <Label text="Visited Cells" GridPane.columnIndex="1" />
-                              <Label text="Walls" GridPane.rowIndex="2" />
-                              <Label text="Goal" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <Label text="Sprite" GridPane.rowIndex="4" />
-                              <Label text="Sprite Color" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                              <ColorPicker fx:id="cellColor" onAction="#setCellColor" GridPane.rowIndex="1" />
-                              <ColorPicker fx:id="visitedColor" onAction="#setVisitedColor" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <ColorPicker fx:id="wallColor" onAction="#setWallColor" GridPane.rowIndex="3" />
-                              <ColorPicker fx:id="goalColor" onAction="#setGoalColor" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <ColorPicker fx:id="spriteColor" onAction="#setSpriteColor" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <ComboBox fx:id="spriteCombo" prefWidth="80.0" GridPane.rowIndex="5" />
+                              <Label text="Unvisited Cells" GridPane.rowIndex="2" />
+                              <Label text="Visited Cells" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="Walls" GridPane.rowIndex="4" />
+                              <Label text="Goal" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <Label text="Sprite" GridPane.rowIndex="6" />
+                              <Label text="Sprite Color" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <ColorPicker fx:id="cellColor" onAction="#setCellColor" GridPane.rowIndex="3" />
+                              <ColorPicker fx:id="visitedColor" onAction="#setVisitedColor" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <ColorPicker fx:id="wallColor" onAction="#setWallColor" GridPane.rowIndex="5" />
+                              <ColorPicker fx:id="goalColor" onAction="#setGoalColor" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <ColorPicker fx:id="spriteColor" onAction="#setSpriteColor" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <ComboBox fx:id="spriteCombo" prefWidth="80.0" GridPane.rowIndex="7" />
+                              <TextField fx:id="cellField" GridPane.rowIndex="1" />
+                              <TextField fx:id="wallField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="Walls (px)" GridPane.columnIndex="1" />
+                              <Label text="Cell Size (px)" GridPane.valignment="BOTTOM" />
                            </children>
                            <VBox.margin>
                               <Insets />
@@ -286,6 +291,34 @@
                      <padding>
                         <Insets left="3.0" />
                      </padding></Separator>
+                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#pointer">
+                     <graphic>
+                        <ImageView pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@resources/pointer.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Select Mode" />
+                     </tooltip>
+                  </Button>
+                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#pencil">
+                     <graphic>
+                        <ImageView pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@resources/pencil.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Draw Mode (toggle walls)" />
+                     </tooltip>
+                  </Button>
+                  <Separator orientation="VERTICAL">
+                     <padding>
+                        <Insets left="3.0" />
+                     </padding></Separator>
                 <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#pausePlayback">
                      <graphic>
                         <ImageView pickOnBounds="true" preserveRatio="true">
@@ -360,34 +393,6 @@
                      </graphic>
                      <tooltip>
                         <Tooltip text="Speed Up" />
-                     </tooltip>
-                  </Button>
-                  <Separator orientation="VERTICAL">
-                     <padding>
-                        <Insets left="3.0" />
-                     </padding></Separator>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#pointer">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/pointer.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Select Mode" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#pencil">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/pencil.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Draw Paths (erase walls)" />
                      </tooltip>
                   </Button>
               </items>

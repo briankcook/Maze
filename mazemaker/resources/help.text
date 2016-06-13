@@ -7,7 +7,7 @@ $Generating and solving mazes
 $Editing
  MazeMaker includes basic maze editing.  
  Cursor Mode: Double click any cell to set it as the finish line.  Click any two adjacent cells to toggle the wall between them.
- Pencil Mode: Click and drag to toggle walls that your cross with the cursor.  Start with a blank maze to draw a totally custom maze.
+ Draw Mode: Click and drag to toggle walls that your cross with the cursor.  Start with a blank maze to draw a totally custom maze.
 $Playback
  You can pause, resume, stop, slow down, and speed up playback.  The 'stop' and 'clean up' buttons cancel the current action, disabling the resume function.
 $Styling maze

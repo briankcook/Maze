@@ -99,13 +99,15 @@ public class MazeView extends Canvas{
     }
     
     private void handleDrag(MouseEvent e) {
-        Point current = getCell(e);
-        if (!selection.equals(current)) {
-            maze.toggleConnection(current, selection);
-            visited[current.x][current.y] = true;
-            drawCell(current.x, current.y);
-            drawCell(selection.x, selection.y);
-            selection = current;
+        if (editMode == PENCIL_MODE) {
+            Point current = getCell(e);
+            if (!selection.equals(current)) {
+                maze.toggleConnection(current, selection);
+                visited[current.x][current.y] = true;
+                drawCell(current.x, current.y);
+                drawCell(selection.x, selection.y);
+                selection = current;
+            }
         }
     }
     
