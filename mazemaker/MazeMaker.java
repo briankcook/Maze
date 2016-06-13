@@ -249,6 +249,10 @@ public class MazeMaker extends Application implements Initializable{
         mazeview.setGoalColor(goalColor.getValue());
     }
     
+    public void resize() {
+        mazeview.setSize(getCellSize(), getWallThickness());
+    }
+    
     /*
     HELPERS, GUI READERS
     */

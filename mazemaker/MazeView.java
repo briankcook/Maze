@@ -164,15 +164,16 @@ public class MazeView extends Canvas{
         
         gc.setStroke(wallColor);
         gc.setLineWidth(wallThickness);
+        double mod = (wallThickness % 2 == 1) ? -0.5 : 0;
         if (showUnvisited || visited[x][y]) {
             if (!maze.canGo(x, y, Maze.NORTH))
-                gc.strokeLine(         gx,          gy, gx+cellSize,          gy);
+                gc.strokeLine(           gx + mod,            gy + mod, gx + cellSize + mod,            gy + mod);
             if (!maze.canGo(x, y, Maze.WEST))
-                gc.strokeLine(         gx,          gy,          gx, gy+cellSize);
+                gc.strokeLine(           gx + mod,            gy + mod,            gx + mod, gy + cellSize + mod);
             if (!maze.canGo(x, y, Maze.SOUTH))
-                gc.strokeLine(         gx, gy+cellSize, gx+cellSize, gy+cellSize);
+                gc.strokeLine(           gx + mod, gy + cellSize + mod, gx + cellSize + mod, gy + cellSize + mod);
             if (!maze.canGo(x, y, Maze.EAST))
-                gc.strokeLine(gx+cellSize,          gy, gx+cellSize, gy+cellSize);
+                gc.strokeLine(gx + cellSize + mod,            gy + mod, gx + cellSize + mod, gy + cellSize + mod);
         }
     }
     
@@ -327,6 +328,7 @@ public class MazeView extends Canvas{
         this.wallThickness = wallThickness;
         setWidth(maze.width  * cellSize + wallThickness * 2);
         setHeight(maze.height  * cellSize + wallThickness * 2);
+        getGraphicsContext2D().clearRect(0, 0, getWidth(), getHeight());
         redraw();
     }
     

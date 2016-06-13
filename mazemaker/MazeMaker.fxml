@@ -186,8 +186,8 @@
                               <ColorPicker fx:id="goalColor" onAction="#setGoalColor" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                               <ColorPicker fx:id="spriteColor" onAction="#setSpriteColor" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                               <ComboBox fx:id="spriteCombo" prefWidth="80.0" GridPane.rowIndex="7" />
-                              <TextField fx:id="cellField" GridPane.rowIndex="1" />
-                              <TextField fx:id="wallField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField fx:id="cellField" onAction="#resize" GridPane.rowIndex="1" />
+                              <TextField fx:id="wallField" onAction="#resize" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <Label text="Walls (px)" GridPane.columnIndex="1" />
                               <Label text="Cell Size (px)" GridPane.valignment="BOTTOM" />
                            </children>
