@@ -12,6 +12,7 @@ public class Kruskal implements MazeActor{
     private ArrayList<Edge> edges;
     private Datum prev1;
     private Datum prev2;
+    private int sets;
     
     public Kruskal(Maze maze) {
         this.maze = maze;
@@ -30,6 +31,7 @@ public class Kruskal implements MazeActor{
                     edges.add(new Edge(i, j, i, j+1));
             }
         }
+        sets = maze.width * maze.height;
         Collections.shuffle(edges);
         prev1 = new Datum(0, 0, null);
         prev2 = new Datum(0, 0, null);
@@ -37,7 +39,7 @@ public class Kruskal implements MazeActor{
     
     @Override
     public Datum[] step() {
-        if (edges.isEmpty())
+        if (sets == 1)
             return null;
         Edge edge = edges.remove(0);
         
@@ -54,6 +56,7 @@ public class Kruskal implements MazeActor{
         int set2 = setTags[edge.x2][edge.y2];
         
         if (set1 != set2) {
+            sets--;
             maze.toggleConnection(prev1, prev2);
             for (int i = 0 ; i < maze.width ; i++) 
                 for (int j = 0 ; j < maze.height ; j++) 
