@@ -187,7 +187,7 @@ public class MazeView extends Canvas{
         gc.setStroke(wallColor.get());
         gc.setLineWidth(wallThickness);
         double mod = (wallThickness % 2 == 1) ? -0.5 : 0;
-        if (timeline == null || visited[x][y]) {
+        if (timeline == null || showUnvisited.get() || visited[x][y]) {
             if (!maze.canGo(x, y, Maze.NORTH))
                 gc.strokeLine(           gx + mod,            gy + mod, gx + cellSize + mod,            gy + mod);
             if (!maze.canGo(x, y, Maze.WEST))
