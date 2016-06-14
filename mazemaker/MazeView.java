@@ -2,8 +2,10 @@ package mazemaker;
 
 import java.awt.Point;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Cursor;
@@ -40,12 +42,12 @@ public class MazeView extends Canvas{
             MazeView.class.getResourceAsStream("resources/pencil.png")), 0, 32);
     
     private Maze maze;
-    private int cellSize;
-    private int wallThickness;
     private Point selection;
     private int editMode;
 
     final BooleanProperty showUnvisited;
+    final IntegerProperty cellSize;
+    final IntegerProperty wallThickness;
     final ObjectProperty<Paint> cellColor;
     final ObjectProperty<Paint> wallColor;
     final ObjectProperty<Paint> goalColor;
@@ -56,17 +58,20 @@ public class MazeView extends Canvas{
     public boolean[][] visited;
     
     
-    public MazeView(Maze maze, int cellSize, int wallThickness) {
-        super(maze.width  * cellSize + wallThickness * 2, 
-              maze.height * cellSize + wallThickness * 2);
-        this.maze = maze;
-        this.cellSize = cellSize;
-        this.wallThickness = wallThickness;
-        visited = new boolean[maze.width][maze.height];
+    public MazeView() {
+        super();
         selection = null;
         editMode = SELECT_MODE;
         
         showUnvisited = new SimpleBooleanProperty();
+        
+        ChangeListener resize = (ChangeListener) (a, b, c) -> resize();
+        
+        cellSize = new SimpleIntegerProperty();
+        wallThickness = new SimpleIntegerProperty();
+        
+        cellSize.addListener(resize);
+        wallThickness.addListener(resize);
         
         ChangeListener redraw = (ChangeListener) (a, b, c) -> redraw();
         
@@ -88,6 +93,10 @@ public class MazeView extends Canvas{
         setOnMouseEntered(this::mouseIn);
         setOnMouseExited(this::mouseOut);
     }
+    
+    /*
+    MOUSE EVENTS
+    */
     
     private void handlePress(MouseEvent e) {
         Point clicked = getCell(e);
@@ -136,8 +145,10 @@ public class MazeView extends Canvas{
     }
     
     private Point getCell(MouseEvent e) {
-        return new Point(Math.min((int)((e.getX() - wallThickness) / cellSize), maze.width - 1),
-                         Math.min((int)((e.getY() - wallThickness) / cellSize), maze.height - 1));
+        int cell = cellSize.get();
+        int wall = wallThickness.get();
+        return new Point(Math.min((int)((e.getX() - wall) / cell), maze.width - 1),
+                         Math.min((int)((e.getY() - wall) / cell), maze.height - 1));
     }
     
     /*
@@ -145,55 +156,63 @@ public class MazeView extends Canvas{
     */
     
     public void redraw() {
+        if (maze == null)
+            return;
+        int cell = cellSize.get();
+        int wall = wallThickness.get();
         for (int x = 0 ; x < maze.width ; x++)
             for (int y = 0 ; y < maze.height ; y++)
                 drawCell(x, y);
         Point goal = maze.getGoal();
         GraphicsContext gc = getGraphicsContext2D();
         gc.setFill(goalColor.get());
-        gc.fillOval(goal.x * cellSize + wallThickness * 2, 
-                    goal.y * cellSize + wallThickness * 2, 
-                    cellSize - wallThickness * 2,
-                    cellSize - wallThickness * 2);
+        gc.fillOval(goal.x * cell + wall * 2, 
+                    goal.y * cell + wall * 2, 
+                    cell - wall * 2,
+                    cell - wall * 2);
         if (selection != null) {
             gc.setFill(SELECTIONCOLOR);
-            gc.fillRect(selection.x * cellSize + wallThickness,
-                        selection.y * cellSize + wallThickness,
-                        cellSize,
-                        cellSize);
+            gc.fillRect(selection.x * cell + wall,
+                        selection.y * cell + wall,
+                        cell,
+                        cell);
         }
     }
     
     public void drawCell(int x, int y) {
-        int gx = x * cellSize + wallThickness;
-        int gy = y * cellSize + wallThickness;
+        int cell = cellSize.get();
+        int wall = wallThickness.get();
+        int gx = x * cell + wall;
+        int gy = y * cell + wall;
         GraphicsContext gc = getGraphicsContext2D();
         
         if (visited[x][y])
             gc.setFill(visitedColor.get());
         else
             gc.setFill(cellColor.get());
-        gc.fillRect(gx, gy, cellSize, cellSize);
+        gc.fillRect(gx, gy, cell, cell);
         
         gc.setStroke(wallColor.get());
-        gc.setLineWidth(wallThickness);
-        double mod = (wallThickness % 2 == 1) ? -0.5 : 0;
+        gc.setLineWidth(wall);
+        double mod = (wall % 2 == 1) ? -0.5 : 0;
         if (!playing || showUnvisited.get() || visited[x][y]) {
             if (!maze.canGo(x, y, Maze.NORTH))
-                gc.strokeLine(           gx + mod,            gy + mod, gx + cellSize + mod,            gy + mod);
+                gc.strokeLine(           gx + mod,            gy + mod, gx + cell + mod,            gy + mod);
             if (!maze.canGo(x, y, Maze.WEST))
-                gc.strokeLine(           gx + mod,            gy + mod,            gx + mod, gy + cellSize + mod);
+                gc.strokeLine(           gx + mod,            gy + mod,            gx + mod, gy + cell + mod);
             if (!maze.canGo(x, y, Maze.SOUTH))
-                gc.strokeLine(           gx + mod, gy + cellSize + mod, gx + cellSize + mod, gy + cellSize + mod);
+                gc.strokeLine(           gx + mod, gy + cell + mod, gx + cell + mod, gy + cell + mod);
             if (!maze.canGo(x, y, Maze.EAST))
-                gc.strokeLine(gx + cellSize + mod,            gy + mod, gx + cellSize + mod, gy + cellSize + mod);
+                gc.strokeLine(gx + cell + mod,            gy + mod, gx + cell + mod, gy + cell + mod);
         }
     }
     
     public void drawActor(Datum datum, String spriteName) {
-        int gx = datum.x * cellSize + wallThickness * 2;
-        int gy = datum.y * cellSize + wallThickness * 2;
-        int scale = cellSize - wallThickness * 2;
+        int cell = cellSize.get();
+        int wall = wallThickness.get();
+        int gx = datum.x * cell + wall * 2;
+        int gy = datum.y * cell + wall * 2;
+        int scale = cell - wall * 2;
         GraphicsContext gc = getGraphicsContext2D();
         gc.setFill(spriteColor.get());
         switch (spriteName) {
@@ -247,11 +266,13 @@ public class MazeView extends Canvas{
         visited = new boolean[maze.width][maze.height];
     }
     
-    public void setSize(int cellSize, int wallThickness) {
-        this.cellSize = cellSize;
-        this.wallThickness = wallThickness;
-        setWidth(maze.width  * cellSize + wallThickness * 2);
-        setHeight(maze.height  * cellSize + wallThickness * 2);
+    public void resize() {
+        if (maze == null)
+            return;
+        int cell = cellSize.get();
+        int wall = wallThickness.get();
+        setWidth(maze.width  * cell + wall * 2);
+        setHeight(maze.height  * cell + wall * 2);
         getGraphicsContext2D().clearRect(0, 0, getWidth(), getHeight());
         redraw();
     }
@@ -263,7 +284,7 @@ public class MazeView extends Canvas{
     public void setMaze(Maze maze) {
         this.maze = maze;
         visited = new boolean[maze.width][maze.height];
-        setSize(cellSize, wallThickness);
+        resize();
     }
     
     public void setMode(int mode) {

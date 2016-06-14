@@ -7,6 +7,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.property.IntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,14 +34,14 @@ import mazemaker.maze.solvers.*;
 
 public class MazeMaker extends Application implements Initializable{
         
-    public static final String BACKSTEP = "Backtrace";
-    public static final String BRANCHINGBS = "Branching Backtrace";
-    public static final String COINFLIP = "Random Binary Tree";
-    public static final String KRUSKAL = "Randomized Kruskal's";
+    private static final String BACKSTEP = "Backtrace";
+    private static final String BRANCHINGBS = "Branching Backtrace";
+    private static final String COINFLIP = "Random Binary Tree";
+    private static final String KRUSKAL = "Randomized Kruskal's";
     
-    public static final String RIGHTHAND = "Right Hand Rule";
-    public static final String LEFTHAND = "Left hand Rule";
-    public static final String RANDOMTURNS = "Random Turns";
+    private static final String RIGHTHAND = "Right Hand Rule";
+    private static final String LEFTHAND = "Left hand Rule";
+    private static final String RANDOMTURNS = "Random Turns";
     
     private static final double SPEEDFACTOR = 0.7;
     
@@ -83,10 +84,8 @@ public class MazeMaker extends Application implements Initializable{
         initDialog(help, "Help", parse(IO.readFile("help.text")));
         initDialog(about, "About", parse(IO.readFile("about.text")));
         
-        initNumField(rowsField, 1, 20, 500);
-        initNumField(colsField, 1, 20, 500);
-        initNumField(cellField, 1, 20, 100);
-        initNumField(wallField, 1, 2, 25);
+        initNumField(rowsField, 1, 20, 500, null);
+        initNumField(colsField, 1, 20, 500, null);
         
         initComboBox(genCombo, new String[]{
             BACKSTEP,
@@ -101,9 +100,10 @@ public class MazeMaker extends Application implements Initializable{
         
         initComboBox(spriteCombo, MazeView.getSpriteTypes());
         
-        mazeview = new MazeView(new Maze(getMazeWidth(), getMazeHeight()),
-                                getCellSize(),
-                                getWallThickness());
+        mazeview = new MazeView();
+        
+        initNumField(cellField, 1, 20, 100, mazeview.cellSize);
+        initNumField(wallField, 1,  2,  25, mazeview.wallThickness);
         
         cellColor.setValue(Color.WHITE);
         wallColor.setValue(Color.BLACK);
@@ -120,8 +120,6 @@ public class MazeMaker extends Application implements Initializable{
         mazeview.showUnvisited.bind(showUnvisitedBox.selectedProperty());
         
         scrollPane.setContent(mazeview);
-        
-        mazeview.redraw();
     }
     
     private TextFlow parse(List<String> lines) {
@@ -151,7 +149,7 @@ public class MazeMaker extends Application implements Initializable{
         dialog.getDialogPane().setContent(content);
     }
     
-    private void initNumField(TextField field, int min, int initial, int max) {
+    private void initNumField(TextField field, int min, int initial, int max, IntegerProperty tie) {
         field.setText(Integer.toString(initial));
         field.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
@@ -163,7 +161,11 @@ public class MazeMaker extends Application implements Initializable{
             } catch (NumberFormatException e) {
                 field.setText(oldValue);
             }
+            if (tie != null) 
+                tie.set(Integer.parseInt(field.getText()));
         });
+        if (tie != null) 
+            tie.set(initial);
     }
     
     private void initComboBox(ComboBox comboBox, String... values) {
@@ -259,7 +261,7 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void resize() {
-        mazeview.setSize(getCellSize(), getWallThickness());
+        mazeview.resize();
     }
     
     /*
@@ -341,14 +343,6 @@ public class MazeMaker extends Application implements Initializable{
     
     private int getMazeHeight() {
         return Integer.parseInt(rowsField.getText());
-    }
-    
-    private int getCellSize() {
-        return Integer.parseInt(cellField.getText());
-    }
-    
-    private int getWallThickness() {
-        return Integer.parseInt(wallField.getText());
     }
     
     private int getFrameDelay() {
