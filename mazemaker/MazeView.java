@@ -1,9 +1,6 @@
 package mazemaker;
 
 import java.awt.Point;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,8 +14,6 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.util.Duration;
-import mazemaker.io.GifWriter;
 import mazemaker.maze.*;
 
 public class MazeView extends Canvas{
@@ -41,16 +36,12 @@ public class MazeView extends Canvas{
     
     private static final Color SELECTIONCOLOR = new Color(0.5, 0.5, 1.0, 0.5);
     
-    private static final double SPEEDFACTOR = 0.7;
-    
     private static final ImageCursor PENCIL_CURSOR = new ImageCursor(new Image(
             MazeView.class.getResourceAsStream("resources/pencil.png")), 0, 32);
     
     private Maze maze;
     private int cellSize;
     private int wallThickness;
-    private boolean[][] visited;
-    private Timeline timeline;
     private Point selection;
     private int editMode;
 
@@ -61,7 +52,9 @@ public class MazeView extends Canvas{
     final ObjectProperty<Paint> spriteColor;
     final ObjectProperty<Paint> visitedColor;
     
-    private GifWriter gifWriter;
+    public boolean playing;
+    public boolean[][] visited;
+    
     
     public MazeView(Maze maze, int cellSize, int wallThickness) {
         super(maze.width  * cellSize + wallThickness * 2, 
@@ -88,8 +81,6 @@ public class MazeView extends Canvas{
         goalColor.addListener(redraw);
         spriteColor.addListener(redraw);
         visitedColor.addListener(redraw);
-        
-        redraw();
         
         setOnMousePressed(this::handlePress);
         setOnMouseReleased(this::handleRelease);
@@ -153,7 +144,7 @@ public class MazeView extends Canvas{
     PAINTING
     */
     
-    private void redraw() {
+    public void redraw() {
         for (int x = 0 ; x < maze.width ; x++)
             for (int y = 0 ; y < maze.height ; y++)
                 drawCell(x, y);
@@ -173,7 +164,7 @@ public class MazeView extends Canvas{
         }
     }
     
-    private void drawCell(int x, int y) {
+    public void drawCell(int x, int y) {
         int gx = x * cellSize + wallThickness;
         int gy = y * cellSize + wallThickness;
         GraphicsContext gc = getGraphicsContext2D();
@@ -187,7 +178,7 @@ public class MazeView extends Canvas{
         gc.setStroke(wallColor.get());
         gc.setLineWidth(wallThickness);
         double mod = (wallThickness % 2 == 1) ? -0.5 : 0;
-        if (timeline == null || showUnvisited.get() || visited[x][y]) {
+        if (!playing || showUnvisited.get() || visited[x][y]) {
             if (!maze.canGo(x, y, Maze.NORTH))
                 gc.strokeLine(           gx + mod,            gy + mod, gx + cellSize + mod,            gy + mod);
             if (!maze.canGo(x, y, Maze.WEST))
@@ -199,7 +190,7 @@ public class MazeView extends Canvas{
         }
     }
     
-    private void drawActor(Datum datum, String spriteName) {
+    public void drawActor(Datum datum, String spriteName) {
         int gx = datum.x * cellSize + wallThickness * 2;
         int gy = datum.y * cellSize + wallThickness * 2;
         int scale = cellSize - wallThickness * 2;
@@ -222,7 +213,7 @@ public class MazeView extends Canvas{
         }
     }
     
-    private void drawSprite(double[][] sprite, int x, int y, int scale, Direction facing) {
+    public void drawSprite(double[][] sprite, int x, int y, int scale, Direction facing) {
         GraphicsContext gc = getGraphicsContext2D();
         double[] xs = sprite[0].clone();
         double[] ys = sprite[1].clone();
@@ -249,100 +240,12 @@ public class MazeView extends Canvas{
     }
     
     /*
-    ACTIONS
+    ACTIONS, SETTERS, GETTERS
     */
     
-    public void runActor(MazeActor actor, String sprite, int frameDelay, boolean instant) {
-        if (gifWriter == null)
-            cleanUp();
-        redraw();
-        if (actor == null)
-            return;
-        actor.init();
-        if (instant) {
-            while (actor.step() != null)
-                if (gifWriter != null)
-                    gifWriter.snapshot();
-            cleanUp();
-        } else {
-            visited[0][0] = true;
-            drawCell(0,0);
-            timeline = new Timeline(new KeyFrame(Duration.millis(frameDelay),
-                ae -> {
-                    if (gifWriter != null)
-                        gifWriter.snapshot();
-                    Datum[] data = actor.step();
-                    if (data == null) {
-                        stop();
-                    } else {
-                        for (Datum datum : data) {
-                            visited[datum.x][datum.y] = true;
-                            drawCell(datum.x, datum.y); 
-                            if (datum.facing != null)
-                                drawActor(datum, sprite);
-                        }
-                    }
-                }
-            ));
-            timeline.setCycleCount(Animation.INDEFINITE);
-            timeline.play();
-        }
-        redraw();
-    }
-    
-    public void cleanUp() {
+    public void clear() {
         visited = new boolean[maze.width][maze.height];
-        stop();
     }
-    
-    public void pause() {
-        if (timeline != null)
-            timeline.stop();
-    }
-    
-    public void play() {
-        if (timeline != null)
-            timeline.play();
-    }
-    
-    public void stop() {
-        pause();
-        timeline = null;
-        redraw();
-        if (gifWriter != null) {
-            gifWriter.close();
-            gifWriter = null;
-        }
-    }
-    
-    public void record(int frameDelay) {
-        cleanUp();
-        gifWriter = new GifWriter(this, frameDelay);
-        if (!gifWriter.init())
-            gifWriter = null;
-    }
-    
-    public void speedUp() {
-        if (timeline != null)
-            timeline.setRate(timeline.getRate() / SPEEDFACTOR);
-    }
-    
-    public void slowDown() {
-        if (timeline != null)
-            timeline.setRate(timeline.getRate() * SPEEDFACTOR);
-    }
-    
-    public void pointer() {
-        editMode = SELECT_MODE;
-    }
-    
-    public void pencil() {
-        editMode = PENCIL_MODE;
-    }
-    
-    /*
-    SETTERS, GETTERS
-    */
     
     public void setSize(int cellSize, int wallThickness) {
         this.cellSize = cellSize;
@@ -361,6 +264,10 @@ public class MazeView extends Canvas{
         this.maze = maze;
         visited = new boolean[maze.width][maze.height];
         setSize(cellSize, wallThickness);
+    }
+    
+    public void setMode(int mode) {
+        editMode = mode;
     }
     
     public static String[] getSpriteTypes() {

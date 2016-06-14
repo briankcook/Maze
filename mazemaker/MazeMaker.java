@@ -3,6 +3,9 @@ package mazemaker;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -22,10 +25,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import mazemaker.io.IO;
-import mazemaker.io.MazeIO;
-import mazemaker.maze.Maze;
-import mazemaker.maze.MazeActor;
+import javafx.util.Duration;
+import mazemaker.io.*;
+import mazemaker.maze.*;
 import mazemaker.maze.generators.*;
 import mazemaker.maze.solvers.*;
 
@@ -39,6 +41,8 @@ public class MazeMaker extends Application implements Initializable{
     public static final String RIGHTHAND = "Right Hand Rule";
     public static final String LEFTHAND = "Left hand Rule";
     public static final String RANDOMTURNS = "Random Turns";
+    
+    private static final double SPEEDFACTOR = 0.7;
     
     private final Alert help = new Alert(AlertType.INFORMATION);
     private final Alert about = new Alert(AlertType.INFORMATION);
@@ -62,6 +66,8 @@ public class MazeMaker extends Application implements Initializable{
     @FXML private ScrollPane scrollPane;
     
     private MazeView mazeview;
+    private Timeline timeline;
+    private GifWriter gifWriter;
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -114,6 +120,8 @@ public class MazeMaker extends Application implements Initializable{
         mazeview.showUnvisited.bind(showUnvisitedBox.selectedProperty());
         
         scrollPane.setContent(mazeview);
+        
+        mazeview.redraw();
     }
     
     private TextFlow parse(List<String> lines) {
@@ -184,41 +192,54 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void generate() {
-        mazeview.runActor(makeActor(getGenerator(), getHBias(), getVBias()),
-                          getSprite(), getFrameDelay(), getInstant());
+        runActor(makeActor(getGenerator()), getInstant());
     }
     
     public void solve() {
-        mazeview.runActor(makeActor(getSolver(), getHBias(), getVBias()),
-                          getSprite(), getFrameDelay(), false);
+        runActor(makeActor(getSolver()), false);
     }
     
     public void cleanUp() {
-        mazeview.cleanUp();
+        mazeview.clear();
+        stopPlayback();
     }
     
     public void pausePlayback() {
-        mazeview.pause();
+        if (timeline != null)
+            timeline.stop();
     }
     
     public void playPlayback() {
-        mazeview.play();
+        if (timeline != null)
+            timeline.play();
     }
     
     public void stopPlayback() {
-        mazeview.stop();
+        pausePlayback();
+        timeline = null;
+        mazeview.playing = false;
+        mazeview.redraw();
+        if (gifWriter != null) {
+            gifWriter.close();
+            gifWriter = null;
+        }
     }
     
     public void record() {
-        mazeview.record(getFrameDelay());
+        cleanUp();
+        gifWriter = new GifWriter(mazeview, getFrameDelay());
+        if (!gifWriter.init())
+            gifWriter = null;
     }
     
     public void speedUp() {
-        mazeview.speedUp();
+        if (timeline != null)
+            timeline.setRate(timeline.getRate() / SPEEDFACTOR);
     }
     
     public void slowDown() {
-        mazeview.slowDown();
+        if (timeline != null)
+            timeline.setRate(timeline.getRate() * SPEEDFACTOR);
     }
     
     public void help() {
@@ -230,11 +251,11 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void pointer() {
-        mazeview.pointer();
+        mazeview.setMode(MazeView.SELECT_MODE);
     }
     
     public void pencil() {
-        mazeview.pencil();
+        mazeview.setMode(MazeView.PENCIL_MODE);
     }
     
     public void resize() {
@@ -245,18 +266,57 @@ public class MazeMaker extends Application implements Initializable{
     HELPERS, GUI READERS
     */
     
-    private MazeActor makeActor(String name, int hBias, int vBias) {
+    public void runActor(MazeActor actor, boolean instant) {
+        if (gifWriter == null)
+            cleanUp();
+        mazeview.redraw();
+        if (actor == null)
+            return;
+        actor.init();
+        if (instant) {
+            while (actor.step() != null)
+                if (gifWriter != null)
+                    gifWriter.snapshot();
+            cleanUp();
+        } else {
+            mazeview.playing = true;
+            mazeview.visited[0][0] = true;
+            mazeview.drawCell(0,0);
+            timeline = new Timeline(new KeyFrame(Duration.millis(getFrameDelay()),
+                ae -> {
+                    if (gifWriter != null)
+                        gifWriter.snapshot();
+                    Datum[] data = actor.step();
+                    if (data == null) {
+                        stopPlayback();
+                    } else {
+                        for (Datum datum : data) {
+                            mazeview.visited[datum.x][datum.y] = true;
+                            mazeview.drawCell(datum.x, datum.y); 
+                            if (datum.facing != null)
+                                mazeview.drawActor(datum, getSprite());
+                        }
+                    }
+                }
+            ));
+            timeline.setCycleCount(Animation.INDEFINITE);
+            timeline.play();
+        }
+        mazeview.redraw();
+    }
+    
+    private MazeActor makeActor(String name) {
         Maze maze = mazeview.getMaze();
         switch (name) {
             case MazeMaker.BACKSTEP:
                 maze.reset();
-                return new Backstep(maze, hBias, vBias);
+                return new Backstep(maze, getHBias(), getVBias());
             case MazeMaker.BRANCHINGBS:
                 maze.reset();
-                return new BranchingBackstep(maze, hBias, vBias, 10);
+                return new BranchingBackstep(maze, getHBias(), getVBias(), 10);
             case MazeMaker.COINFLIP:
                 maze.reset();
-                return new RandomBinaryTree(maze, hBias, vBias);
+                return new RandomBinaryTree(maze, getHBias(), getVBias());
             case MazeMaker.KRUSKAL:
                 maze.reset();
                 return new Kruskal(maze);
