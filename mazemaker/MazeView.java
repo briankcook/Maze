@@ -68,7 +68,7 @@ public class MazeView extends Canvas{
         
         showUnvisited = new SimpleBooleanProperty();
         
-        ChangeListener redraw = (ChangeListener) (a, b, c) -> { redraw(); };
+        ChangeListener redraw = (ChangeListener) (a, b, c) -> redraw();
         
         cellColor = new SimpleObjectProperty();
         wallColor = new SimpleObjectProperty();

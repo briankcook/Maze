@@ -263,7 +263,7 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     /*
-    HELPERS, GUI READERS
+    ACTOR LOGIC
     */
     
     public void runActor(MazeActor actor, boolean instant) {
@@ -330,6 +330,10 @@ public class MazeMaker extends Application implements Initializable{
                 return null;
         }
     }
+    
+    /*
+    GUI GETTERS
+    */
     
     private int getMazeWidth() {
         return Integer.parseInt(colsField.getText());

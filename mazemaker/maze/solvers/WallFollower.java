@@ -1,6 +1,5 @@
 package mazemaker.maze.solvers;
 
-import java.awt.Point;
 import mazemaker.maze.*;
 
 public class WallFollower implements MazeActor {

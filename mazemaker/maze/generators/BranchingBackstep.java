@@ -48,8 +48,7 @@ public class BranchingBackstep implements MazeActor {
             return null;
         if (steps == branchFactor) 
             makeBranch();
-        Datum[] data = subStep();
-        return data;
+        return subStep();
     }
     
     private Datum[] subStep() {
