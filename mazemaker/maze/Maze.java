@@ -20,11 +20,13 @@ public class Maze {
     
     private byte[][] cellData;
     private Point goal;
+    private Point start;
     
     public Maze(int width, int height) {
         this.width = width;
         this.height = height;
         cellData = new byte[width][height];
+        start = new Point(0, 0);
         goal = new Point(width-1, height-1);
     }
 
@@ -66,6 +68,18 @@ public class Maze {
     
     public boolean isGoal(int x, int y) {
         return x == goal.x && y == goal.y;
+    }
+    
+    public void setStart(Point cell) {
+        start = cell;
+    }
+    
+    public Point getStart() {
+        return start;
+    }
+    
+    public boolean isStart(int x, int y) {
+        return x == start.x && y == start.y;
     }
     
     public boolean canGo(int x, int y, Direction direction) {

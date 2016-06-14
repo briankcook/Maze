@@ -15,11 +15,14 @@ public interface MazeIO {
             int width = maze.width;
             int height = maze.height;
             Point goal = maze.getGoal();
+            Point start = maze.getStart();
             
             out.write(width);
             out.write(height);
             out.write(goal.x);
             out.write(goal.y);
+            out.write(start.x);
+            out.write(start.y);
             
             for (byte[] row : maze.getCellData()) 
                 for (byte cell : row) 
@@ -37,9 +40,12 @@ public interface MazeIO {
             int height = in.read();
             int goalX = in.read();
             int goalY = in.read();
+            int startX = in.read();
+            int startY = in.read();
             
             maze = new Maze(width, height);
             maze.setGoal(new Point(goalX, goalY));
+            maze.setStart(new Point(startX, startY));
             
             for (int i = 0 ; i < width ; i ++) 
                 for (int j = 0 ; j < height ; j++) 

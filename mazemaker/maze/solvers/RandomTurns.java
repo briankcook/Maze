@@ -1,5 +1,6 @@
 package mazemaker.maze.solvers;
 
+import java.awt.Point;
 import mazemaker.maze.*;
 import java.util.ArrayList;
 import java.util.Random;
@@ -23,16 +24,17 @@ public class RandomTurns implements MazeActor{
     
     @Override
     public void init() {
+        Point start = maze.getStart();
+        x = start.x;
+        y = start.y;
         facing = Maze.SOUTH;
-        x = 0;
-        y = 0;
-        previousCell = new Datum(0, 0, null);
+        previousCell = new Datum(x, y, null);
     }
     
     @Override
     public Datum[] step() {
         if (maze.isGoal(x, y)) 
-            return null;
+            return new Datum[]{};
         
         choices.clear();
         

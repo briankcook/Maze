@@ -134,7 +134,7 @@ public class MazeMaker extends Application implements Initializable{
                     parsedSegments[i].setStyle("-fx-font-size: 16px;");
                     break;
                 default:
-                    parsedSegments[i].setStyle("-fx-font-size: 12px;");
+                    parsedSegments[i].setStyle("-fx-font-size: 12px; -fx-line-spacing: 4px;");
                     break;
             }
         }
@@ -280,20 +280,18 @@ public class MazeMaker extends Application implements Initializable{
             return;
         actor.init();
         if (instant) {
-            while (actor.step() != null)
+            while (actor.step().length > 0)
                 if (gifWriter != null)
                     gifWriter.snapshot();
             cleanUp();
         } else {
             mazeview.showAll = false;
-            mazeview.visited[0][0] = true;
-            mazeview.drawCell(0,0);
             timeline = new Timeline(new KeyFrame(Duration.millis(getFrameDelay()),
                 ae -> {
                     if (gifWriter != null)
                         gifWriter.snapshot();
                     Datum[] data = actor.step();
-                    if (data == null) {
+                    if (data.length == 0) {
                         stopPlayback();
                     } else {
                         for (Datum datum : data) {

@@ -1,16 +1,16 @@
 #How to use MazeMaker
 $Making mazes
- A maze is a rectangular grid of square cells.  Specify the number of rows and columns you would like in your maze, then press the New Maze button to make a new blank maze of that size.
+     A maze is a rectangular grid of square cells.  Specify the number of rows and columns you would like in your maze, then press the New Maze button to make a new blank maze of that size.
 $Generating and solving mazes
- To generate a maze, select a generation algorithm and click the Generate button.  Check 'Instant Generation' if you don't wish to view generation process, or want to create mazes quickly.  
- Once you are satisfied with your maze, you can apply a solving algorithm to solve it.  Select a solving algorithm and click the Solve button to begin solving. 
+     To generate a maze, select a generation algorithm and click the Generate button.  Check 'Instant Generation' if you don't wish to view generation process, or want to create mazes quickly.  
+     Once you are satisfied with your maze, you can apply a solving algorithm to solve it.  Select a solving algorithm and click the Solve button to begin solving. 
 $Editing
- MazeMaker includes basic maze editing.  
- Cursor Mode: Double click any cell to set it as the finish line.  Click any two adjacent cells to toggle the wall between them.
- Draw Mode: Click and drag to toggle walls that your cross with the cursor.  Start with a blank maze to draw a totally custom maze.
+     MazeMaker includes basic maze editing.  
+     Cursor Mode: Click and drag the start or end points to move them.  Left click and drag anywhere to mark a visited path (for solving your own mazes).  Right click and drag to erase the marked path.
+     Draw Mode: Click and drag to toggle walls that you cross with the cursor.  Start with a blank maze to draw a totally custom maze.
 $Playback
- You can pause, resume, stop, slow down, and speed up playback.  The 'stop' and 'clean up' buttons cancel the current action, disabling the resume function.
-$Styling maze
- Mazemaker includes some styling options for displaying your maze.  The Cell Size and Walls options are purely for presentation, and can be edited to your liking.  Every maze element can also be given a color of your choice.
+     You can pause, resume, stop, slow down, and speed up playback.  The 'stop' and 'clean up' buttons cancel the current action, disabling the resume function.
+$Styling mazes
+     Mazemaker includes some styling options for displaying your maze.  The Cell Size and Walls options are purely for presentation, and can be edited to your liking.  Every maze element can also be given a color of your choice.
 $Recording GIFs
- To record either generation or solving, press the record button, select a location to save to, and press either Generate or Solve.  You will get an alert if your GIF saved successfully.
+     To record either generation or solving, press the record button, select a location to save to, and press either Generate or Solve.  You will get an alert if your GIF saved successfully.

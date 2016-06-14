@@ -32,8 +32,9 @@ public class Backstep implements MazeActor {
     
     @Override
     public void init() {
-        x = 0;
-        y = 0;
+        Point start = maze.getStart();
+        x = start.x;
+        y = start.y;
         visited[x][y] = true;
         history.push(new Point(x, y));
     }
@@ -50,7 +51,7 @@ public class Backstep implements MazeActor {
         
         if (choices.isEmpty()) {
             if (history.isEmpty())
-                return null;
+                return new Datum[]{};
             else 
                 moveTo(history.pop());
         } else {

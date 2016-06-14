@@ -40,7 +40,7 @@ public class Kruskal implements MazeActor{
     @Override
     public Datum[] step() {
         if (sets == 1)
-            return null;
+            return new Datum[]{};
         Edge edge = edges.remove(0);
         
         Datum update1 = prev1;

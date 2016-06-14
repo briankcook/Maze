@@ -36,8 +36,9 @@ public class BranchingBackstep implements MazeActor {
     
     @Override
     public void init() {
-        x = 0;
-        y = 0;
+        Point start = maze.getStart();
+        x = start.x;
+        y = start.y;
         visited[x][y] = true;
         makeBranch();
     }
@@ -45,7 +46,7 @@ public class BranchingBackstep implements MazeActor {
     @Override
     public Datum[] step() {
         if (!nextBranch())
-            return null;
+            return new Datum[]{};
         if (steps == branchFactor) 
             makeBranch();
         return subStep();

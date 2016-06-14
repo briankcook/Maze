@@ -36,8 +36,6 @@ public class MazeView extends Canvas{
         {{0.5, 0.2, 0.5, 0.8},
          {0.0, 1.0, 0.7, 1.0}};
     
-    private static final Color SELECTIONCOLOR = new Color(0.5, 0.5, 1.0, 0.5);
-    
     private static final ImageCursor PENCIL_CURSOR = new ImageCursor(new Image(
             MazeView.class.getResourceAsStream("resources/pencil.png")), 0, 32);
     
@@ -100,37 +98,38 @@ public class MazeView extends Canvas{
     */
     
     private void handlePress(MouseEvent e) {
-        Point clicked = getCell(e);
-        if (selection == null) {
-            selection = clicked;
-            if (editMode == PENCIL_MODE)
-                visited[clicked.x][clicked.y] = true;
-        } else if (editMode == SELECT_MODE) {
-            if (selection.equals(clicked)) 
-                maze.setGoal(clicked);
-            else 
-                maze.toggleConnection(clicked, selection);
-            selection = null;
-        }
+        selection = getCell(e);
+        if (editMode == PENCIL_MODE || e.isPrimaryButtonDown())
+            visited[selection.x][selection.y] = true;
+        else if (e.isSecondaryButtonDown())
+            visited[selection.x][selection.y] = false;
         redraw();
     }
     
     private void handleRelease(MouseEvent e) {
-        if (editMode != SELECT_MODE)
-            selection = null;
+        selection = null;
         redraw();
     }
     
     private void handleDrag(MouseEvent e) {
-        if (editMode == PENCIL_MODE) {
-            Point current = getCell(e);
-            if (!selection.equals(current)) {
+        Point current = getCell(e);
+        if (!selection.equals(current)) {
+            if (editMode == PENCIL_MODE) {
                 maze.toggleConnection(current, selection);
                 visited[current.x][current.y] = true;
-                drawCell(current.x, current.y);
-                drawCell(selection.x, selection.y);
-                selection = current;
+            } else if (editMode == SELECT_MODE) {
+                if (maze.isGoal(selection.x, selection.y))
+                    maze.setGoal(current);
+                else if (maze.isStart(selection.x, selection.y))
+                    maze.setStart(current);
+                else if (e.isPrimaryButtonDown())
+                    visited[current.x][current.y] = true;
+                else if (e.isSecondaryButtonDown())
+                    visited[current.x][current.y] = false;
             }
+            drawCell(current.x, current.y);
+            drawCell(selection.x, selection.y);
+            selection = current;
         }
     }
     
@@ -164,20 +163,19 @@ public class MazeView extends Canvas{
         for (int x = 0 ; x < maze.width ; x++)
             for (int y = 0 ; y < maze.height ; y++)
                 drawCell(x, y);
-        Point goal = maze.getGoal();
         GraphicsContext gc = getGraphicsContext2D();
+        Point goal = maze.getGoal();
         gc.setFill(goalColor.get());
         gc.fillOval(goal.x * cell + wall * 2, 
                     goal.y * cell + wall * 2, 
                     cell - wall * 2,
                     cell - wall * 2);
-        if (selection != null) {
-            gc.setFill(SELECTIONCOLOR);
-            gc.fillRect(selection.x * cell + wall,
-                        selection.y * cell + wall,
-                        cell,
-                        cell);
-        }
+        Point start = maze.getStart();
+        gc.setFill(spriteColor.get());
+        gc.fillOval(start.x * cell + wall * 2, 
+                    start.y * cell + wall * 2, 
+                    cell - wall * 2,
+                    cell - wall * 2);
     }
     
     public void drawCell(int x, int y) {

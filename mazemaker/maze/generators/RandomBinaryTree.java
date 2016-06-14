@@ -46,7 +46,7 @@ public class RandomBinaryTree implements MazeActor{
             y++;
         }
         if (y == maze.height)
-            return null;
+            return new Datum[]{};
         return new Datum[]{new Datum(x, y, Maze.NORTH), current, update};
     }
 }
