@@ -14,7 +14,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import mazemaker.maze.*;
 
@@ -38,10 +37,6 @@ public class MazeView extends Canvas{
     
     private static final ImageCursor PENCIL_CURSOR = new ImageCursor(new Image(
             MazeView.class.getResourceAsStream("resources/pencil.png")), 0, 32);
-    
-    private Maze maze;
-    private Point selection;
-    private int editMode;
 
     final BooleanProperty showUnvisited;
     final IntegerProperty cellSize;
@@ -52,8 +47,12 @@ public class MazeView extends Canvas{
     final ObjectProperty<Paint> spriteColor;
     final ObjectProperty<Paint> visitedColor;
     
-    public boolean showAll;
-    public boolean[][] visited;
+    private Maze maze;
+    private Point selection;
+    private int editMode;
+    private boolean showAll;
+    private boolean[][] visited;
+    
     
     
     public MazeView() {
@@ -305,5 +304,13 @@ public class MazeView extends Canvas{
     
     public static String[] getSpriteTypes() {
         return new String[] {CIRCLE, SQUARE, TRIANGLE, POINTER};
+    }
+
+    public void setShowAll(boolean showAll) {
+        this.showAll = showAll;
+    }
+    
+    public void visit(int x, int y) {
+        visited[x][y] = true;
     }
 }

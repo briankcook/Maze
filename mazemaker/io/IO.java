@@ -40,7 +40,7 @@ public interface IO {
         return lines;
     }
     
-    public static void SaveToPNG(Canvas canvas) {
+    public static void saveToPNG(Canvas canvas) {
         try {
             WritableImage fximage = new WritableImage((int)canvas.getWidth(), (int)canvas.getHeight());
             canvas.snapshot(null, fximage);

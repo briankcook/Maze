@@ -194,7 +194,7 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void export() {
-        IO.SaveToPNG(mazeview);
+        IO.saveToPNG(mazeview);
     }
     
     public void generate() {
@@ -223,7 +223,7 @@ public class MazeMaker extends Application implements Initializable{
     public void stopPlayback() {
         pausePlayback();
         timeline = null;
-        mazeview.showAll = true;
+        mazeview.setShowAll(true);
         mazeview.redraw();
         if (gifWriter != null) {
             gifWriter.close();
@@ -264,10 +264,6 @@ public class MazeMaker extends Application implements Initializable{
         mazeview.setMode(MazeView.PENCIL_MODE);
     }
     
-    public void resize() {
-        mazeview.resize();
-    }
-    
     /*
     ACTOR LOGIC
     */
@@ -285,7 +281,7 @@ public class MazeMaker extends Application implements Initializable{
                     gifWriter.snapshot();
             cleanUp();
         } else {
-            mazeview.showAll = false;
+            mazeview.setShowAll(false);
             timeline = new Timeline(new KeyFrame(Duration.millis(getFrameDelay()),
                 ae -> {
                     if (gifWriter != null)
@@ -295,7 +291,7 @@ public class MazeMaker extends Application implements Initializable{
                         stopPlayback();
                     } else {
                         for (Datum datum : data) {
-                            mazeview.visited[datum.x][datum.y] = true;
+                            mazeview.visit(datum.x, datum.y);
                             mazeview.drawCell(datum.x, datum.y); 
                             if (datum.facing != null)
                                 mazeview.drawActor(datum, getSprite());
