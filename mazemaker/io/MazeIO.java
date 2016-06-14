@@ -13,7 +13,7 @@ public interface MazeIO {
         
         try (FileOutputStream out = new FileOutputStream(IO.pickFile("maze", true))) {
             int width = maze.width;
-            int height = maze.width;
+            int height = maze.height;
             Point goal = maze.getGoal();
             
             out.write(width);

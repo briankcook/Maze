@@ -54,18 +54,19 @@ public class MazeView extends Canvas{
     final ObjectProperty<Paint> spriteColor;
     final ObjectProperty<Paint> visitedColor;
     
-    public boolean playing;
+    public boolean showAll;
     public boolean[][] visited;
     
     
     public MazeView() {
         super();
+        showAll = true;
         selection = null;
         editMode = SELECT_MODE;
         
         showUnvisited = new SimpleBooleanProperty();
         
-        ChangeListener resize = (ChangeListener) (a, b, c) -> resize();
+        ChangeListener resize = (a, b, c) -> resize();
         
         cellSize = new SimpleIntegerProperty();
         wallThickness = new SimpleIntegerProperty();
@@ -73,7 +74,7 @@ public class MazeView extends Canvas{
         cellSize.addListener(resize);
         wallThickness.addListener(resize);
         
-        ChangeListener redraw = (ChangeListener) (a, b, c) -> redraw();
+        ChangeListener redraw = (a, b, c) -> redraw();
         
         cellColor = new SimpleObjectProperty();
         wallColor = new SimpleObjectProperty();
@@ -195,7 +196,7 @@ public class MazeView extends Canvas{
         gc.setStroke(wallColor.get());
         gc.setLineWidth(wall);
         double mod = (wall % 2 == 1) ? -0.5 : 0;
-        if (!playing || showUnvisited.get() || visited[x][y]) {
+        if (showAll || showUnvisited.get() || visited[x][y]) {
             if (!maze.canGo(x, y, Maze.NORTH))
                 gc.strokeLine(           gx + mod,            gy + mod, gx + cell + mod,            gy + mod);
             if (!maze.canGo(x, y, Maze.WEST))

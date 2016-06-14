@@ -219,7 +219,7 @@ public class MazeMaker extends Application implements Initializable{
     public void stopPlayback() {
         pausePlayback();
         timeline = null;
-        mazeview.playing = false;
+        mazeview.showAll = true;
         mazeview.redraw();
         if (gifWriter != null) {
             gifWriter.close();
@@ -281,7 +281,7 @@ public class MazeMaker extends Application implements Initializable{
                     gifWriter.snapshot();
             cleanUp();
         } else {
-            mazeview.playing = true;
+            mazeview.showAll = false;
             mazeview.visited[0][0] = true;
             mazeview.drawCell(0,0);
             timeline = new Timeline(new KeyFrame(Duration.millis(getFrameDelay()),
