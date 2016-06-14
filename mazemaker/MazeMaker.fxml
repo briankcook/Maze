@@ -29,6 +29,10 @@
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
+              <MenuItem mnemonicParsing="true" onAction="#export" text="Export to PNG">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Maze">
@@ -242,6 +246,18 @@
                      </graphic>
                      <tooltip>
                         <Tooltip text="Load Maze" />
+                     </tooltip>
+                  </Button>
+                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#export">
+                     <graphic>
+                        <ImageView pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@resources/export.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Export to PNG" />
                      </tooltip>
                   </Button>
                   <Separator orientation="VERTICAL">

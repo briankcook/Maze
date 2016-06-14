@@ -193,6 +193,10 @@ public class MazeMaker extends Application implements Initializable{
         MazeIO.saveMaze(mazeview.getMaze());
     }
     
+    public void export() {
+        IO.SaveToPNG(mazeview);
+    }
+    
     public void generate() {
         runActor(makeActor(getGenerator()), getInstant());
     }
