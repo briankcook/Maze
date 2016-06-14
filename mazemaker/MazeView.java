@@ -129,6 +129,8 @@ public class MazeView extends Canvas{
             }
             drawCell(current.x, current.y);
             drawCell(selection.x, selection.y);
+            drawStart();
+            drawGoal();
             selection = current;
         }
     }
@@ -158,24 +160,11 @@ public class MazeView extends Canvas{
     public void redraw() {
         if (maze == null)
             return;
-        int cell = cellSize.get();
-        int wall = wallThickness.get();
         for (int x = 0 ; x < maze.width ; x++)
             for (int y = 0 ; y < maze.height ; y++)
                 drawCell(x, y);
-        GraphicsContext gc = getGraphicsContext2D();
-        Point goal = maze.getGoal();
-        gc.setFill(goalColor.get());
-        gc.fillOval(goal.x * cell + wall * 2, 
-                    goal.y * cell + wall * 2, 
-                    cell - wall * 2,
-                    cell - wall * 2);
-        Point start = maze.getStart();
-        gc.setFill(spriteColor.get());
-        gc.fillOval(start.x * cell + wall * 2, 
-                    start.y * cell + wall * 2, 
-                    cell - wall * 2,
-                    cell - wall * 2);
+        drawStart();
+        drawGoal();
     }
     
     public void drawCell(int x, int y) {
@@ -255,6 +244,30 @@ public class MazeView extends Canvas{
         }
         
         gc.fillPolygon(xs, ys, xs.length);
+    }
+    
+    public void drawGoal() {
+        int cell = cellSize.get();
+        int wall = wallThickness.get();
+        GraphicsContext gc = getGraphicsContext2D();
+        Point goal = maze.getGoal();
+        gc.setFill(goalColor.get());
+        gc.fillOval(goal.x * cell + wall * 2, 
+                    goal.y * cell + wall * 2, 
+                    cell - wall * 2,
+                    cell - wall * 2);
+    }
+    
+    public void drawStart() {
+        int cell = cellSize.get();
+        int wall = wallThickness.get();
+        GraphicsContext gc = getGraphicsContext2D();
+        Point start = maze.getStart();
+        gc.setFill(spriteColor.get());
+        gc.fillOval(start.x * cell + wall * 2, 
+                    start.y * cell + wall * 2, 
+                    cell - wall * 2,
+                    cell - wall * 2);
     }
     
     /*
