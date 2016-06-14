@@ -41,38 +41,27 @@ public class Kruskal implements MazeActor{
     public Datum[] step() {
         if (sets == 1)
             return new Datum[]{};
-        Edge edge = edges.remove(0);
+        Edge edge;
+        int set1;
+        int set2;
         
-        Datum update1 = prev1;
-        Datum update2 = prev2;
-        
-        update1.facing = null;
-        update2.facing = null;
+        do {
+            edge = edges.remove(0);
+            set1 = setTags[edge.x1][edge.y1];
+            set2 = setTags[edge.x2][edge.y2];
+        } while (set1 == set2);
         
         prev1 = new Datum(edge.x1, edge.y1, null);
         prev2 = new Datum(edge.x2, edge.y2, null);
         
-        int set1 = setTags[edge.x1][edge.y1];
-        int set2 = setTags[edge.x2][edge.y2];
+        sets--;
+        maze.toggleConnection(prev1, prev2);
+        for (int i = 0 ; i < maze.width ; i++) 
+            for (int j = 0 ; j < maze.height ; j++) 
+                if (setTags[i][j] == set2)
+                    setTags[i][j] = set1;
         
-        if (set1 != set2) {
-            sets--;
-            maze.toggleConnection(prev1, prev2);
-            for (int i = 0 ; i < maze.width ; i++) 
-                for (int j = 0 ; j < maze.height ; j++) 
-                    if (setTags[i][j] == set2)
-                        setTags[i][j] = set1;
-        }
-        
-        Direction facing = new Direction(edge.x2-edge.x1, edge.y2-edge.y1, 0);
-        for (Direction direction : Maze.getDirections()) {
-            if (facing.x == direction.x && facing.y == direction.y) {
-                prev1.facing = direction;
-                prev2.facing = Maze.turn(direction, Maze.AROUND);
-            }
-        }
-        
-        return new Datum[]{prev1, prev2, update1, update2};
+        return new Datum[]{prev1, prev2};
     }
 
     private class Edge {

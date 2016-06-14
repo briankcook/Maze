@@ -38,6 +38,7 @@ public class MazeMaker extends Application implements Initializable{
     private static final String BRANCHINGBS = "Branching Backtrace";
     private static final String COINFLIP = "Random Binary Tree";
     private static final String KRUSKAL = "Randomized Kruskal's";
+    private static final String PRIM = "Randomized Prim's";
     
     private static final String RIGHTHAND = "Right Hand Rule";
     private static final String LEFTHAND = "Left hand Rule";
@@ -91,7 +92,8 @@ public class MazeMaker extends Application implements Initializable{
             BACKSTEP,
             BRANCHINGBS,
             COINFLIP,
-            KRUSKAL});
+            KRUSKAL,
+            PRIM});
         
         initComboBox(solverCombo, new String[]{
             RIGHTHAND,
@@ -320,6 +322,9 @@ public class MazeMaker extends Application implements Initializable{
             case MazeMaker.KRUSKAL:
                 maze.reset();
                 return new Kruskal(maze);
+            case MazeMaker.PRIM:
+                maze.reset();
+                return new Prim(maze);
             case MazeMaker.RIGHTHAND:
                 return new WallFollower(maze, true);
             case MazeMaker.LEFTHAND:
