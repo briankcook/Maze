@@ -21,8 +21,8 @@ public interface MazeIO {
             out.write(goal.x);
             out.write(goal.y);
             
-            for (byte[] column : maze.getCellData()) 
-                for (byte cell : column) 
+            for (byte[] row : maze.getCellData()) 
+                for (byte cell : row) 
                     out.write(cell);
         } catch (Exception e) { 
             Logger.getAnonymousLogger().log(Level.WARNING, "Maze save failed", e);
@@ -41,8 +41,8 @@ public interface MazeIO {
             maze = new Maze(width, height);
             maze.setGoal(new Point(goalX, goalY));
             
-            for (int i = 0 ; i < height ; i ++) 
-                for (int j = 0 ; j < width ; j++) 
+            for (int i = 0 ; i < width ; i ++) 
+                for (int j = 0 ; j < height ; j++) 
                     maze.setCell(i, j, (byte)in.read());
             
             return maze;
