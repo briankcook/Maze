@@ -95,13 +95,25 @@ public class MazeMaker extends Application implements Initializable{
         
         initComboBox(spriteCombo, MazeView.getSpriteTypes());
         
-        cellColor.setValue(Color.WHITE);
-        visitedColor.setValue(Color.PINK);
-        wallColor.setValue(Color.BLACK);
-        spriteColor.setValue(Color.BLUE);
-        goalColor.setValue(Color.GRAY);
+        mazeview = new MazeView(new Maze(getMazeWidth(), getMazeHeight()),
+                                getCellSize(),
+                                getWallThickness());
         
-        newMaze();
+        cellColor.setValue(Color.WHITE);
+        wallColor.setValue(Color.BLACK);
+        goalColor.setValue(Color.GRAY);
+        spriteColor.setValue(Color.BLUE);
+        visitedColor.setValue(Color.PINK);
+        
+        mazeview.cellColor.bind(cellColor.valueProperty());
+        mazeview.wallColor.bind(wallColor.valueProperty());
+        mazeview.goalColor.bind(goalColor.valueProperty());
+        mazeview.spriteColor.bind(spriteColor.valueProperty());
+        mazeview.visitedColor.bind(visitedColor.valueProperty());
+        
+        mazeview.showUnvisited.bind(showUnvisitedBox.selectedProperty());
+        
+        scrollPane.setContent(mazeview);
     }
     
     private TextFlow parse(List<String> lines) {
@@ -160,11 +172,11 @@ public class MazeMaker extends Application implements Initializable{
     */
     
     public void newMaze() {
-        setMaze(new Maze(getMazeWidth(), getMazeHeight()));
+        mazeview.setMaze(new Maze(getMazeWidth(), getMazeHeight()));
     }
     
     public void openMaze() {
-        setMaze(MazeIO.openMaze());
+        mazeview.setMaze(MazeIO.openMaze());
     }
     
     public void saveMaze() {
@@ -173,12 +185,12 @@ public class MazeMaker extends Application implements Initializable{
     
     public void generate() {
         mazeview.runActor(makeActor(getGenerator(), getHBias(), getVBias()),
-                          getSprite(), getFrameDelay(), getInstant(), getShowUnvisited());
+                          getSprite(), getFrameDelay(), getInstant());
     }
     
     public void solve() {
         mazeview.runActor(makeActor(getSolver(), getHBias(), getVBias()),
-                          getSprite(), getFrameDelay(), false, getShowUnvisited());
+                          getSprite(), getFrameDelay(), false);
     }
     
     public void cleanUp() {
@@ -225,30 +237,6 @@ public class MazeMaker extends Application implements Initializable{
         mazeview.pencil();
     }
     
-    /*
-    COLOR HANDLING
-    */
-    
-    public void setCellColor() {
-        mazeview.setCellColor(cellColor.getValue());
-    }
-    
-    public void setVisitedColor() {
-        mazeview.setVisitedColor(visitedColor.getValue());
-    }
-    
-    public void setWallColor() {
-        mazeview.setWallColor(wallColor.getValue());
-    }
-    
-    public void setSpriteColor() {
-        mazeview.setSpriteColor(spriteColor.getValue());
-    }
-    
-    public void setGoalColor() {
-        mazeview.setGoalColor(goalColor.getValue());
-    }
-    
     public void resize() {
         mazeview.setSize(getCellSize(), getWallThickness());
     }
@@ -281,16 +269,6 @@ public class MazeMaker extends Application implements Initializable{
             default:
                 return null;
         }
-    }
-    
-    private void setMaze(Maze maze) {
-        mazeview = new MazeView(maze, getCellSize(), getWallThickness());
-        setCellColor();
-        setVisitedColor();
-        setWallColor();
-        setSpriteColor();
-        setGoalColor();
-        scrollPane.setContent(mazeview);
     }
     
     private int getMazeWidth() {
@@ -331,10 +309,6 @@ public class MazeMaker extends Application implements Initializable{
     
     private String getSolver() {
         return (String)solverCombo.getValue();
-    }
-    
-    private boolean getShowUnvisited() {
-        return showUnvisitedBox.isSelected();
     }
     
     private String getSprite() {

@@ -180,11 +180,11 @@
                               <Label text="Goal" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                               <Label text="Sprite" GridPane.rowIndex="6" />
                               <Label text="Sprite Color" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                              <ColorPicker fx:id="cellColor" onAction="#setCellColor" GridPane.rowIndex="3" />
-                              <ColorPicker fx:id="visitedColor" onAction="#setVisitedColor" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <ColorPicker fx:id="wallColor" onAction="#setWallColor" GridPane.rowIndex="5" />
-                              <ColorPicker fx:id="goalColor" onAction="#setGoalColor" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <ColorPicker fx:id="spriteColor" onAction="#setSpriteColor" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <ColorPicker fx:id="cellColor" GridPane.rowIndex="3" />
+                              <ColorPicker fx:id="visitedColor" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <ColorPicker fx:id="wallColor" GridPane.rowIndex="5" />
+                              <ColorPicker fx:id="goalColor" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <ColorPicker fx:id="spriteColor" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                               <ComboBox fx:id="spriteCombo" prefWidth="80.0" GridPane.rowIndex="7" />
                               <TextField fx:id="cellField" onAction="#resize" GridPane.rowIndex="1" />
                               <TextField fx:id="wallField" onAction="#resize" GridPane.columnIndex="1" GridPane.rowIndex="1" />

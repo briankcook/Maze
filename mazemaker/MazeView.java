@@ -4,6 +4,11 @@ import java.awt.Point;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.Cursor;
 import javafx.scene.ImageCursor;
 import javafx.scene.canvas.Canvas;
@@ -11,6 +16,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 import mazemaker.io.GifWriter;
 import mazemaker.maze.*;
@@ -40,21 +46,20 @@ public class MazeView extends Canvas{
     private static final ImageCursor PENCIL_CURSOR = new ImageCursor(new Image(
             MazeView.class.getResourceAsStream("resources/pencil.png")), 0, 32);
     
-    private final Maze maze;
-    
+    private Maze maze;
     private int cellSize;
     private int wallThickness;
-    private boolean showUnvisited;
     private boolean[][] visited;
     private Timeline timeline;
     private Point selection;
     private int editMode;
 
-    private Color cellColor;
-    private Color visitedColor;
-    private Color wallColor;
-    private Color spriteColor;
-    private Color goalColor;
+    final BooleanProperty showUnvisited;
+    final ObjectProperty<Paint> cellColor;
+    final ObjectProperty<Paint> wallColor;
+    final ObjectProperty<Paint> goalColor;
+    final ObjectProperty<Paint> spriteColor;
+    final ObjectProperty<Paint> visitedColor;
     
     private GifWriter gifWriter;
     
@@ -65,10 +70,27 @@ public class MazeView extends Canvas{
         this.cellSize = cellSize;
         this.wallThickness = wallThickness;
         visited = new boolean[maze.width][maze.height];
-        showUnvisited = true;
         selection = null;
         editMode = SELECT_MODE;
+        
+        showUnvisited = new SimpleBooleanProperty();
+        
+        ChangeListener redraw = (ChangeListener) (a, b, c) -> { redraw(); };
+        
+        cellColor = new SimpleObjectProperty();
+        wallColor = new SimpleObjectProperty();
+        goalColor = new SimpleObjectProperty();
+        spriteColor = new SimpleObjectProperty();
+        visitedColor = new SimpleObjectProperty();
+        
+        cellColor.addListener(redraw);
+        wallColor.addListener(redraw);
+        goalColor.addListener(redraw);
+        spriteColor.addListener(redraw);
+        visitedColor.addListener(redraw);
+        
         redraw();
+        
         setOnMousePressed(this::handlePress);
         setOnMouseReleased(this::handleRelease);
         setOnMouseDragged(this::handleDrag);
@@ -137,7 +159,7 @@ public class MazeView extends Canvas{
                 drawCell(x, y);
         Point goal = maze.getGoal();
         GraphicsContext gc = getGraphicsContext2D();
-        gc.setFill(goalColor);
+        gc.setFill(goalColor.get());
         gc.fillOval(goal.x * cellSize + wallThickness * 2, 
                     goal.y * cellSize + wallThickness * 2, 
                     cellSize - wallThickness * 2,
@@ -157,15 +179,15 @@ public class MazeView extends Canvas{
         GraphicsContext gc = getGraphicsContext2D();
         
         if (visited[x][y])
-            gc.setFill(visitedColor);
+            gc.setFill(visitedColor.get());
         else
-            gc.setFill(cellColor);
+            gc.setFill(cellColor.get());
         gc.fillRect(gx, gy, cellSize, cellSize);
         
-        gc.setStroke(wallColor);
+        gc.setStroke(wallColor.get());
         gc.setLineWidth(wallThickness);
         double mod = (wallThickness % 2 == 1) ? -0.5 : 0;
-        if (showUnvisited || visited[x][y]) {
+        if (timeline == null || visited[x][y]) {
             if (!maze.canGo(x, y, Maze.NORTH))
                 gc.strokeLine(           gx + mod,            gy + mod, gx + cellSize + mod,            gy + mod);
             if (!maze.canGo(x, y, Maze.WEST))
@@ -182,7 +204,7 @@ public class MazeView extends Canvas{
         int gy = datum.y * cellSize + wallThickness * 2;
         int scale = cellSize - wallThickness * 2;
         GraphicsContext gc = getGraphicsContext2D();
-        gc.setFill(spriteColor);
+        gc.setFill(spriteColor.get());
         switch (spriteName) {
             case CIRCLE:
                 gc.fillOval(gx, gy, scale, scale);
@@ -230,10 +252,9 @@ public class MazeView extends Canvas{
     ACTIONS
     */
     
-    public void runActor(MazeActor actor, String sprite, int frameDelay, boolean instant, boolean showUnvisited) {
+    public void runActor(MazeActor actor, String sprite, int frameDelay, boolean instant) {
         if (gifWriter == null)
             cleanUp();
-        this.showUnvisited = showUnvisited;
         redraw();
         if (actor == null)
             return;
@@ -266,6 +287,7 @@ public class MazeView extends Canvas{
             timeline.setCycleCount(Animation.INDEFINITE);
             timeline.play();
         }
+        redraw();
     }
     
     public void cleanUp() {
@@ -284,7 +306,6 @@ public class MazeView extends Canvas{
     }
     
     public void stop() {
-        showUnvisited = true;
         pause();
         timeline = null;
         redraw();
@@ -336,29 +357,10 @@ public class MazeView extends Canvas{
         return maze;
     }
 
-    public void setCellColor(Color cellColor) {
-        this.cellColor = cellColor;
-        redraw();
-    }
-
-    public void setVisitedColor(Color visitedColor) {
-        this.visitedColor = visitedColor;
-        redraw();
-    }
-
-    public void setWallColor(Color wallColor) {
-        this.wallColor = wallColor;
-        redraw();
-    }
-
-    public void setSpriteColor(Color spriteColor) {
-        this.spriteColor = spriteColor;
-        redraw();
-    }
-
-    public void setGoalColor(Color goalColor) {
-        this.goalColor = goalColor;
-        redraw();
+    public void setMaze(Maze maze) {
+        this.maze = maze;
+        visited = new boolean[maze.width][maze.height];
+        setSize(cellSize, wallThickness);
     }
     
     public static String[] getSpriteTypes() {
