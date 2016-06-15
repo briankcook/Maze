@@ -9,6 +9,7 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -68,7 +69,7 @@ public class MazeMaker extends Application implements Initializable{
     @FXML private ScrollPane scrollPane;
     
     private MazeView mazeview;
-    private Timeline timeline;
+    private Timeline playback;
     private GifWriter gifWriter;
     
     @Override
@@ -200,11 +201,11 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void generate() {
-        runActor(makeActor(getGenerator()), getInstant());
+        startActor(makeActor(getGenerator()), getInstant());
     }
     
     public void solve() {
-        runActor(makeActor(getSolver()), false);
+        startActor(makeActor(getSolver()), false);
     }
     
     public void cleanUp() {
@@ -213,18 +214,18 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void pausePlayback() {
-        if (timeline != null)
-            timeline.stop();
+        if (playback != null)
+            playback.stop();
     }
     
     public void playPlayback() {
-        if (timeline != null)
-            timeline.play();
+        if (playback != null)
+            playback.play();
     }
     
     public void stopPlayback() {
         pausePlayback();
-        timeline = null;
+        playback = null;
         mazeview.setShowAll(true);
         mazeview.redraw();
         if (gifWriter != null) {
@@ -241,13 +242,13 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void speedUp() {
-        if (timeline != null)
-            timeline.setRate(timeline.getRate() / SPEEDFACTOR);
+        if (playback != null)
+            playback.setRate(playback.getRate() / SPEEDFACTOR);
     }
     
     public void slowDown() {
-        if (timeline != null)
-            timeline.setRate(timeline.getRate() * SPEEDFACTOR);
+        if (playback != null)
+            playback.setRate(playback.getRate() * SPEEDFACTOR);
     }
     
     public void help() {
@@ -270,39 +271,38 @@ public class MazeMaker extends Application implements Initializable{
     ACTOR LOGIC
     */
     
-    public void runActor(MazeActor actor, boolean instant) {
+    private void act(MazeActor actor) {
+        if (gifWriter != null)
+            gifWriter.snapshot();
+        Datum[] data = actor.step();
+        if (data.length == 0) {
+            stopPlayback();
+            return;
+        }
+        for (Datum datum : data) {
+            mazeview.visit(datum.x, datum.y);
+            mazeview.drawCell(datum.x, datum.y); 
+            if (datum.facing != null)
+                mazeview.drawActor(datum, getSprite());
+        }
+    }
+    
+    public void startActor(MazeActor actor, boolean instant) {
+        if (actor == null)
+            return;
         if (gifWriter == null)
             cleanUp();
         mazeview.redraw();
-        if (actor == null)
-            return;
         actor.init();
         if (instant) {
-            while (actor.step().length > 0)
-                if (gifWriter != null)
-                    gifWriter.snapshot();
+            while (actor.step().length > 0);
             cleanUp();
         } else {
             mazeview.setShowAll(false);
-            timeline = new Timeline(new KeyFrame(Duration.millis(getFrameDelay()),
-                ae -> {
-                    if (gifWriter != null)
-                        gifWriter.snapshot();
-                    Datum[] data = actor.step();
-                    if (data.length == 0) {
-                        stopPlayback();
-                    } else {
-                        for (Datum datum : data) {
-                            mazeview.visit(datum.x, datum.y);
-                            mazeview.drawCell(datum.x, datum.y); 
-                            if (datum.facing != null)
-                                mazeview.drawActor(datum, getSprite());
-                        }
-                    }
-                }
-            ));
-            timeline.setCycleCount(Animation.INDEFINITE);
-            timeline.play();
+            playback = new Timeline(new KeyFrame(Duration.millis(getFrameDelay()), 
+                                    (e) -> act(actor)));
+            playback.setCycleCount(Animation.INDEFINITE);
+            playback.play();
         }
         mazeview.redraw();
     }
