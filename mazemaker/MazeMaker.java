@@ -3,6 +3,7 @@ package mazemaker;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -33,6 +34,8 @@ import mazemaker.maze.generators.*;
 import mazemaker.maze.solvers.*;
 
 public class MazeMaker extends Application implements Initializable{
+    
+    private static final int FRAMEDELAY = 100;
         
     private static final String BACKSTEP = "Backtrace";
     private static final String BRANCHINGBS = "Branching Backtrace";
@@ -44,8 +47,6 @@ public class MazeMaker extends Application implements Initializable{
     private static final String LEFTHAND = "Left hand Rule";
     private static final String RANDOMTURNS = "Random Turns";
     
-    private static final double SPEEDFACTOR = 0.7;
-    
     private final Alert help = new Alert(AlertType.INFORMATION);
     private final Alert about = new Alert(AlertType.INFORMATION);
     
@@ -54,7 +55,6 @@ public class MazeMaker extends Application implements Initializable{
     @FXML private TextField cellField;
     @FXML private TextField wallField;
     @FXML private ComboBox genCombo;
-    @FXML private CheckBox instantBox;
     @FXML private Slider biasSlider;
     @FXML private ComboBox solverCombo;
     @FXML private Slider speedSlider;
@@ -89,7 +89,7 @@ public class MazeMaker extends Application implements Initializable{
  
             @Override
             protected double computeValue() {
-                // log scale with ticks at 0.001, 0.01, 0.1, 1.0, 10.0 
+                // log scale with ticks at 0.01, 0.1, 1, 10, 100 x
                 return Math.pow(10, speedSlider.getValue());
             }
         });
@@ -196,10 +196,12 @@ public class MazeMaker extends Application implements Initializable{
     */
     
     public void newMaze() {
+        playback.stop();
         mazeview.setMaze(new Maze(getMazeWidth(), getMazeHeight()));
     }
     
     public void openMaze() {
+        playback.stop();
         mazeview.setMaze(MazeIO.openMaze());
     }
     
@@ -212,62 +214,11 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void generate() {
-        runActor(makeActor(getGenerator()), getInstant());
+        runActor(makeActor(getGenerator()));
     }
     
     public void solve() {
-        runActor(makeActor(getSolver()), false);
-    }
-    
-    public void cleanUp() {
-        mazeview.clear();
-        stopPlayback();
-    }
-    
-    public void pausePlayback() {
-        playback.stop();
-    }
-    
-    public void playPlayback() {
-        mazeview.setShowAll(false);
-        mazeview.redraw();
-        playback.play();
-    }
-    
-    public void stopPlayback() {
-        pausePlayback();
-        playback.jumpTo(Duration.ZERO);
-        mazeview.setShowAll(true);
-        mazeview.redraw();
-        if (gifWriter != null) {
-            gifWriter.close();
-            gifWriter = null;
-        }
-    }
-    
-    public void record() {
-        cleanUp();
-        gifWriter = new GifWriter(mazeview, (int)(playback.getRate() * 100));
-        if (!gifWriter.init())
-            gifWriter = null;
-    }
-    
-    public void speedUp() {
-        if (playback != null)
-            playback.setRate(playback.getRate() / SPEEDFACTOR);
-    }
-    
-    public void slowDown() {
-        if (playback != null)
-            playback.setRate(playback.getRate() * SPEEDFACTOR);
-    }
-    
-    public void help() {
-        help.showAndWait();
-    }
-    
-    public void about() {
-        about.showAndWait();
+        runActor(makeActor(getSolver()));
     }
     
     public void pointer() {
@@ -278,26 +229,64 @@ public class MazeMaker extends Application implements Initializable{
         mazeview.setMode(MazeView.PENCIL_MODE);
     }
     
+    public void pausePlayback() {
+        playback.pause();
+    }
+    
+    public void playPlayback() {
+        if (playback.getStatus() == Animation.Status.STOPPED) {
+            mazeview.setShowAll(false);
+            mazeview.redraw();
+        }
+        playback.play();
+    }
+    
+    public void stopPlayback() {
+        playback.stop();
+        mazeview.setShowAll(true);
+        mazeview.clear();
+        mazeview.redraw();
+        if (gifWriter != null) {
+            gifWriter.close();
+            gifWriter = null;
+        }
+    }
+    
+    public void record() {
+        stopPlayback();
+        gifWriter = new GifWriter(mazeview, (int)(playback.getRate() * FRAMEDELAY));
+        if (!gifWriter.init())
+            gifWriter = null;
+    }
+    
+    public void help() {
+        help.showAndWait();
+    }
+    
+    public void about() {
+        about.showAndWait();
+    }
+    
     /*
     ACTOR LOGIC
     */
     
-    public void runActor(MazeActor actor, boolean instant) {
+    public void runActor(MazeActor actor) {
+        stopPlayback();
         if (actor == null)
             return;
-        if (gifWriter == null)
-            cleanUp();
-        mazeview.redraw();
         actor.init();
         List<Datum[]> steps = actor.run();
         List<KeyFrame> frames = playback.getKeyFrames();
         frames.clear();
-        for (int i = 0 ; i < steps.size() ; i++) {
+        int i = 0;
+        for ( /* */ ; i < steps.size() ; i++) {
             Datum[] step = steps.get(i);
-            Duration duration = Duration.millis(100 * i);
+            Duration duration = Duration.millis(FRAMEDELAY * i);
             frames.add(new KeyFrame(duration, e -> mazeview.draw(step, getSprite())));
         }
-        cleanUp();
+        frames.add(new KeyFrame(Duration.millis(FRAMEDELAY * i), e -> mazeview.redraw()));
+        stopPlayback();
     }
     
     private MazeActor makeActor(String name) {
@@ -351,10 +340,6 @@ public class MazeMaker extends Application implements Initializable{
     
     private String getGenerator() {
         return (String)genCombo.getValue();
-    }
-    
-    private boolean getInstant() {
-        return instantBox.isSelected();
     }
     
     private String getSolver() {

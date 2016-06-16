@@ -45,10 +45,6 @@
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="H" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
-              <MenuItem mnemonicParsing="true" onAction="#cleanUp" text="Clean Up">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="C" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Playback">
@@ -124,11 +120,6 @@
                               <Insets left="5.0" right="5.0" />
                            </VBox.margin>
                         </Slider>
-                        <CheckBox fx:id="instantBox" mnemonicParsing="false" text="Instant Generation">
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </CheckBox>
                         <Separator prefWidth="200.0">
                            <padding>
                               <Insets top="5.0" />
@@ -281,18 +272,6 @@
                      </graphic>
                      <tooltip>
                         <Tooltip text="Solve Maze" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#cleanUp">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/clear.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Clean Up" />
                      </tooltip>
                   </Button>
                   <Separator orientation="VERTICAL">
