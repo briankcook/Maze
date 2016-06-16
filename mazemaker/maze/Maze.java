@@ -11,6 +11,7 @@ public class Maze {
     public static final int FACINGMASK = 0b00110000;
     public static final int HASFACINGMASK = 0b01000000;
     
+    //                                                   x   y     connection           facing
     public static final Direction NORTH = new Direction( 0, -1, (byte)0b00000001, (byte)0b00000000);
     public static final Direction SOUTH = new Direction( 0,  1, (byte)0b00000010, (byte)0b00010000);
     public static final Direction EAST  = new Direction( 1,  0, (byte)0b00000100, (byte)0b00100000);
@@ -108,6 +109,16 @@ public class Maze {
         }
     }
     
+    private byte face(byte cellData, Direction direction) {
+        return (byte)(cellData | direction.facing | HASFACINGMASK);
+    }
+    
+    public Datum datum(int x, int y, Direction facing) {
+        if (facing == null)
+            return new Datum(x, y, cellData[x][y]);
+        return new Datum(x, y, face(cellData[x][y], facing));
+    }
+    
     public static boolean wall(byte cellData, Direction direction) {
         return (cellData & direction.mask) == 0;
     }
@@ -118,9 +129,5 @@ public class Maze {
     
     public static boolean hasFacing(byte cellData) {
         return (cellData & HASFACINGMASK) > 0;
-    }
-    
-    public static byte face(byte cellData, Direction direction) {
-        return (byte)(cellData | direction.facing | HASFACINGMASK);
     }
 }

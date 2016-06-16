@@ -43,7 +43,7 @@ public class WallFollower extends MazeActor {
             y += facing.y;
             moved = true;
         }
-        return new Datum[]{new Datum(update.x, update.y, maze.getCellData(update.x, update.y)), 
-                           new Datum(x, y, Maze.face(maze.getCellData(x, y), facing))};
+        return new Datum[]{maze.datum(update.x, update.y, null), 
+                           maze.datum(x, y, facing)};
     }
 }

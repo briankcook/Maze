@@ -52,7 +52,7 @@ public class RandomTurns extends MazeActor{
             y += facing.y;
         }
         
-        return new Datum[]{new Datum(previousCell.x, previousCell.y, maze.getCellData(previousCell.x, previousCell.y)), 
-                           new Datum(x, y, maze.face(maze.getCellData(x, y), facing))};
+        return new Datum[]{maze.datum(previousCell.x, previousCell.y, null), 
+                           maze.datum(x, y, facing)};
     }
 }

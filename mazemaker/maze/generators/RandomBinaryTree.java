@@ -48,7 +48,7 @@ public class RandomBinaryTree extends MazeActor{
         }
         if (y == maze.height)
             return new Datum[]{};
-        return new Datum[]{new Datum(current.x, current.y, maze.getCellData(current.x, current.y)),
-                           new Datum(update.x, update.y, maze.getCellData(update.x, update.y))};
+        return new Datum[]{maze.datum(current.x, current.y, null),
+                           maze.datum(update.x, update.y, null)};
     }
 }

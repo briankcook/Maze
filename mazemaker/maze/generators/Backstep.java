@@ -60,8 +60,8 @@ public class Backstep extends MazeActor {
             maze.toggleConnection(new Point(x,y), history.peek());
             visited[x][y] = true;
         }
-        return new Datum[]{new Datum(update.x, update.y, maze.getCellData(update.x, update.y)), 
-                           new Datum(x, y, Maze.face(maze.getCellData(x, y), Maze.NORTH))};
+        return new Datum[]{maze.datum(update.x, update.y, null), 
+                           maze.datum(x, y, Maze.NORTH)};
     }
     
     private void moveTo(Point cell) {

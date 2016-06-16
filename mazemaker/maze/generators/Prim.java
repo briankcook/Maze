@@ -44,8 +44,8 @@ public class Prim extends MazeActor {
         
         visited[edge.b.x][edge.b.y] = true;
         
-        return new Datum[] {new Datum(edge.a.x, edge.a.y, maze.getCellData(edge.a.x, edge.a.y)), 
-                            new Datum(edge.b.x, edge.b.y, maze.getCellData(edge.b.x, edge.b.y))};
+        return new Datum[] {maze.datum(edge.a.x, edge.a.y, null), 
+                            maze.datum(edge.b.x, edge.b.y, null)};
     }
 
     private class Edge {

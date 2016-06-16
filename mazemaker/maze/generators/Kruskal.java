@@ -58,8 +58,8 @@ public class Kruskal extends MazeActor{
                 if (setTags[i][j] == set2)
                     setTags[i][j] = set1;
         
-        return new Datum[]{new Datum(a.x, a.y, maze.getCellData(a.x, a.y)), 
-                           new Datum(b.x, b.y, maze.getCellData(b.x, b.y))};
+        return new Datum[]{maze.datum(a.x, a.y,null), 
+                           maze.datum(b.x, b.y,null)};
     }
 
     private class Edge {
