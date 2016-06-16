@@ -17,10 +17,6 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="true" onAction="#newMaze" text="New">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
               <MenuItem mnemonicParsing="true" onAction="#openMaze" text="Open">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
@@ -79,290 +75,265 @@
         </menus>
       </MenuBar>
       <BorderPane layoutY="34.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="26.0">
-         <left>
-            <ScrollPane nodeOrientation="RIGHT_TO_LEFT" prefWidth="213.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
-               <content>
-                  <VBox alignment="TOP_CENTER" nodeOrientation="LEFT_TO_RIGHT" prefWidth="198.0">
-                     <children>
-                        <Label text="Settings">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </Label>
-                        <GridPane hgap="4.0">
-                          <columnConstraints>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="94.0" prefWidth="99.0" />
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="94.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label text="Maze Rows" />
-                              <Label text="Maze Columns" GridPane.columnIndex="1" />
-                              <TextField fx:id="rowsField" GridPane.rowIndex="1" />
-                              <TextField fx:id="colsField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                           </children>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </GridPane>
-                        <Separator prefWidth="200.0">
-                           <padding>
-                              <Insets top="2.0" />
-                           </padding></Separator>
-                        <Label text="Generation Algorithm" />
-                        <ComboBox fx:id="genCombo" prefWidth="190.0" />
-                        <Label text="Horizontal Bias" />
-                        <Slider fx:id="biasSlider" blockIncrement="1.0" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" showTickMarks="true" snapToTicks="true" value="3.0">
-                           <VBox.margin>
-                              <Insets left="5.0" right="5.0" />
-                           </VBox.margin>
-                        </Slider>
-                        <Separator prefWidth="200.0">
-                           <padding>
-                              <Insets top="5.0" />
-                           </padding>
-                        </Separator>
-                        <Label text="Solving Algorithm" />
-                        <ComboBox fx:id="solverCombo" prefWidth="190.0" />
-                        <Separator prefWidth="200.0">
-                           <padding>
-                              <Insets top="5.0" />
-                           </padding>
-                        </Separator>
-                        <Label text="Animation Speed" />
-                        <Slider fx:id="speedSlider" majorTickUnit="1.0" max="2.0" min="-2.0" minorTickCount="0" showTickMarks="true" />
-                        <CheckBox fx:id="showUnvisitedBox" mnemonicParsing="false" text="Show Unvisited Cells" />
-                        <Separator prefWidth="200.0">
-                           <padding>
-                              <Insets top="5.0" />
-                           </padding>
-                        </Separator>
-                        <Label text="Appearance">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </Label>
-                        <GridPane hgap="4.0">
-                          <columnConstraints>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="99.0" />
-                            <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" prefWidth="99.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="20.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label text="Unvisited Cells" GridPane.rowIndex="2" />
-                              <Label text="Visited Cells" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <Label text="Walls" GridPane.rowIndex="4" />
-                              <Label text="Goal" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                              <Label text="Sprite" GridPane.rowIndex="6" />
-                              <Label text="Sprite Color" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                              <ColorPicker fx:id="cellColor" GridPane.rowIndex="3" />
-                              <ColorPicker fx:id="visitedColor" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <ColorPicker fx:id="wallColor" GridPane.rowIndex="5" />
-                              <ColorPicker fx:id="goalColor" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <ColorPicker fx:id="spriteColor" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                              <ComboBox fx:id="spriteCombo" prefWidth="80.0" GridPane.rowIndex="7" />
-                              <TextField fx:id="cellField" GridPane.rowIndex="1" />
-                              <TextField fx:id="wallField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label text="Walls (px)" GridPane.columnIndex="1" />
-                              <Label text="Cell Size (px)" GridPane.valignment="BOTTOM" />
-                           </children>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </GridPane>
-                     </children>
-                     <padding>
-                        <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
-                     </padding>
-                  </VBox>
-               </content>
-               <BorderPane.margin>
-                  <Insets />
-               </BorderPane.margin></ScrollPane>
-         </left>
-         <top>
-            <ToolBar BorderPane.alignment="CENTER">
-              <items>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#newMaze">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/new.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="New Blank Maze" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#saveMaze">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/save.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Save Maze" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#openMaze">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/open.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Load Maze" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#export">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/export.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Export to PNG" />
-                     </tooltip>
-                  </Button>
-                  <Separator orientation="VERTICAL">
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <padding>
-                        <Insets left="3.0" />
-                     </padding></Separator>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#generate">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/generate.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Generate Maze" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#solve">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/solve.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Solve Maze" />
-                     </tooltip>
-                  </Button>
-                  <Separator orientation="VERTICAL">
-                     <padding>
-                        <Insets left="3.0" />
-                     </padding></Separator>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#pointer">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/pointer.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Select Mode" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#pencil">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/pencil.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Draw Mode (toggle walls)" />
-                     </tooltip>
-                  </Button>
-                  <Separator orientation="VERTICAL">
-                     <padding>
-                        <Insets left="3.0" />
-                     </padding></Separator>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#pausePlayback">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/pause.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Pause Playback" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#playPlayback">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/start.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Resume Playback" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#stopPlayback">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/stop.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Stop Playback" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#record">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/record.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Record Next Action" />
-                     </tooltip>
-                  </Button>
-              </items>
-            </ToolBar>
-         </top>
          <center>
             <ScrollPane fx:id="scrollPane" BorderPane.alignment="CENTER">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding></ScrollPane>
          </center>
+         <left>
+            <BorderPane prefWidth="210.0" BorderPane.alignment="CENTER">
+               <center>
+                  <Accordion BorderPane.alignment="CENTER">
+                    <panes>
+                      <TitledPane animated="false" text="Generate">
+                           <content>
+                              <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <GridPane hgap="4.0">
+                                      <columnConstraints>
+                                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="94.0" prefWidth="99.0" />
+                                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="94.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <Label text="Maze Rows" />
+                                          <Label text="Maze Columns" GridPane.columnIndex="1" />
+                                          <TextField fx:id="rowsField" GridPane.rowIndex="1" />
+                                          <TextField fx:id="colsField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </GridPane>
+                                    <Label text="Generation Algorithm">
+                                       <padding>
+                                          <Insets top="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <ComboBox fx:id="genCombo" prefWidth="190.0" />
+                                    <Label text="Horizontal Bias">
+                                       <padding>
+                                          <Insets top="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Slider fx:id="biasSlider" blockIncrement="1.0" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" showTickMarks="true" snapToTicks="true" value="3.0">
+                                       <VBox.margin>
+                                          <Insets left="5.0" right="5.0" />
+                                       </VBox.margin>
+                                    </Slider>
+                                    <CheckBox fx:id="genBox" mnemonicParsing="false" text="Save animation for playback">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </CheckBox>
+                                    <Button mnemonicParsing="false" onAction="#generate" text="GENERATE">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </content>
+                        </TitledPane>
+                      <TitledPane animated="false" text="Solve">
+                           <content>
+                              <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Label text="Solving Algorithm" />
+                                    <ComboBox fx:id="solverCombo" prefWidth="190.0" />
+                                    <CheckBox fx:id="solveBox" mnemonicParsing="false" text="Save animation for playback">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </CheckBox>
+                                    <Button mnemonicParsing="false" onAction="#solve" text="SOLVE">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </content>
+                        </TitledPane>
+                        <TitledPane prefHeight="200.0" prefWidth="200.0" text="Appearance">
+                           <content>
+                              <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <GridPane hgap="4.0">
+                                      <columnConstraints>
+                                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="99.0" />
+                                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" prefWidth="99.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="20.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <Label text="Unvisited Cells" GridPane.rowIndex="2" />
+                                          <Label text="Visited Cells" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                          <Label text="Walls" GridPane.rowIndex="4" />
+                                          <Label text="Goal" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                          <Label text="Sprite" GridPane.rowIndex="6" />
+                                          <Label text="Sprite Color" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                          <ColorPicker fx:id="cellColor" GridPane.rowIndex="3" />
+                                          <ColorPicker fx:id="visitedColor" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                          <ColorPicker fx:id="wallColor" GridPane.rowIndex="5" />
+                                          <ColorPicker fx:id="goalColor" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                          <ColorPicker fx:id="spriteColor" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                          <ComboBox fx:id="spriteCombo" prefWidth="80.0" GridPane.rowIndex="7" />
+                                          <TextField fx:id="cellField" GridPane.rowIndex="1" />
+                                          <TextField fx:id="wallField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                          <Label text="Walls (px)" GridPane.columnIndex="1" />
+                                          <Label text="Cell Size (px)" GridPane.valignment="BOTTOM" />
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </GridPane>
+                                 </children>
+                              </VBox>
+                           </content>
+                        </TitledPane>
+                    </panes>
+                  </Accordion>
+               </center>
+               <top>
+                  <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+                     <children>
+                        <HBox alignment="CENTER" spacing="3.0">
+                           <children>
+                            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#saveMaze">
+                                 <graphic>
+                                    <ImageView pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/save.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                                 <tooltip>
+                                    <Tooltip text="Save Maze" />
+                                 </tooltip>
+                              </Button>
+                            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#openMaze">
+                                 <graphic>
+                                    <ImageView pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/open.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                                 <tooltip>
+                                    <Tooltip text="Load Maze" />
+                                 </tooltip>
+                              </Button>
+                            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#export">
+                                 <graphic>
+                                    <ImageView pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/export.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                                 <tooltip>
+                                    <Tooltip text="Export to PNG" />
+                                 </tooltip>
+                              </Button>
+                            <Button fx:id="modeButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#mode" />
+                           </children>
+                           <VBox.margin>
+                              <Insets top="2.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets top="5.0" />
+                           </VBox.margin>
+                        </Separator>
+                        <Label text="Current animation:">
+                           <VBox.margin>
+                              <Insets top="3.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Label fx:id="animLabel" text="none" />
+                        <CheckBox fx:id="showUnvisitedBox" mnemonicParsing="false" text="Show Unvisited Cells">
+                           <VBox.margin>
+                              <Insets top="5.0" />
+                           </VBox.margin></CheckBox>
+                        <Label text="Animation Speed">
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding></Label>
+                        <Slider fx:id="speedSlider" majorTickUnit="1.0" max="2.0" min="-2.0" minorTickCount="0" showTickMarks="true" />
+                        <HBox alignment="CENTER" spacing="3.0">
+                           <children>
+                            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#pausePlayback">
+                                 <graphic>
+                                    <ImageView pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/pause.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                                 <tooltip>
+                                    <Tooltip text="Pause Playback" />
+                                 </tooltip>
+                              </Button>
+                            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#playPlayback">
+                                 <graphic>
+                                    <ImageView pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/start.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                                 <tooltip>
+                                    <Tooltip text="Resume Playback" />
+                                 </tooltip>
+                              </Button>
+                            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#stopPlayback">
+                                 <graphic>
+                                    <ImageView pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/stop.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                                 <tooltip>
+                                    <Tooltip text="Stop Playback" />
+                                 </tooltip>
+                              </Button>
+                            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#record">
+                                 <graphic>
+                                    <ImageView pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/record.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                                 <tooltip>
+                                    <Tooltip text="Record Next Action" />
+                                 </tooltip>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" />
+                     </padding>
+                  </VBox>
+               </top>
+            </BorderPane>
+         </left>
       </BorderPane>
    </children>
 </AnchorPane>

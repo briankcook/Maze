@@ -314,6 +314,10 @@ public class MazeView extends Canvas{
         resize();
     }
     
+    public int getMode() {
+        return editMode;
+    }
+    
     public void setMode(int mode) {
         editMode = mode;
     }

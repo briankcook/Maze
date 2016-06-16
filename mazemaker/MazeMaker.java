@@ -17,12 +17,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -50,21 +55,37 @@ public class MazeMaker extends Application implements Initializable{
     private final Alert help = new Alert(AlertType.INFORMATION);
     private final Alert about = new Alert(AlertType.INFORMATION);
     
+    private final ImageView pencilImage = new ImageView(
+            new Image(getClass().getResourceAsStream("resources/pencil.png"))); 
+    private final ImageView cursorImage = new ImageView(
+            new Image(getClass().getResourceAsStream("resources/pointer.png"))); 
+    
+    private final Tooltip pencilTooltip = new Tooltip("Switch to Draw Mode)"); 
+    private final Tooltip cursorTooltip = new Tooltip("Switch to Cursor Mode"); 
+    
+    @FXML private Button modeButton;
+    @FXML private Label animLabel;
+    @FXML private CheckBox showUnvisitedBox;
+    @FXML private Slider speedSlider;
+    
     @FXML private TextField rowsField;
     @FXML private TextField colsField;
-    @FXML private TextField cellField;
-    @FXML private TextField wallField;
     @FXML private ComboBox genCombo;
     @FXML private Slider biasSlider;
+    @FXML private CheckBox genBox;
+    
     @FXML private ComboBox solverCombo;
-    @FXML private Slider speedSlider;
-    @FXML private CheckBox showUnvisitedBox;
+    @FXML private CheckBox solverBox;
+    
+    @FXML private TextField cellField;
+    @FXML private TextField wallField;
     @FXML private ColorPicker cellColor;
     @FXML private ColorPicker visitedColor;
     @FXML private ColorPicker wallColor;
     @FXML private ColorPicker spriteColor;
     @FXML private ColorPicker goalColor;
     @FXML private ComboBox spriteCombo;
+    
     @FXML private ScrollPane scrollPane;
     
     private MazeView mazeview;
@@ -93,6 +114,9 @@ public class MazeMaker extends Application implements Initializable{
                 return Math.pow(10, speedSlider.getValue());
             }
         });
+        
+        modeButton.setGraphic(pencilImage);
+        modeButton.setTooltip(pencilTooltip);
         
         initDialog(help, "Help", parse(IO.readFile("help.text")));
         initDialog(about, "About", parse(IO.readFile("about.text")));
@@ -195,11 +219,6 @@ public class MazeMaker extends Application implements Initializable{
     GUI ACTIONS
     */
     
-    public void newMaze() {
-        playback.stop();
-        mazeview.setMaze(new Maze(getMazeWidth(), getMazeHeight()));
-    }
-    
     public void openMaze() {
         playback.stop();
         mazeview.setMaze(MazeIO.openMaze());
@@ -213,20 +232,26 @@ public class MazeMaker extends Application implements Initializable{
         IO.saveToPNG(mazeview);
     }
     
+    public void mode() {
+        if (mazeview.getMode() == MazeView.SELECT_MODE) {
+            mazeview.setMode(MazeView.PENCIL_MODE);
+            modeButton.setGraphic(cursorImage);
+            modeButton.setTooltip(cursorTooltip);
+        } else {
+            mazeview.setMode(MazeView.SELECT_MODE);
+            modeButton.setGraphic(pencilImage);
+            modeButton.setTooltip(pencilTooltip);
+        }
+    }
+    
     public void generate() {
+        playback.stop();
+        mazeview.setMaze(new Maze(getMazeWidth(), getMazeHeight()));
         runActor(makeActor(getGenerator()));
     }
     
     public void solve() {
         runActor(makeActor(getSolver()));
-    }
-    
-    public void pointer() {
-        mazeview.setMode(MazeView.SELECT_MODE);
-    }
-    
-    public void pencil() {
-        mazeview.setMode(MazeView.PENCIL_MODE);
     }
     
     public void pausePlayback() {
@@ -271,7 +296,7 @@ public class MazeMaker extends Application implements Initializable{
     ACTOR LOGIC
     */
     
-    public void runActor(MazeActor actor) {
+    private void runActor(MazeActor actor) {
         stopPlayback();
         if (actor == null)
             return;
