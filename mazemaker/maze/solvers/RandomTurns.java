@@ -5,7 +5,7 @@ import mazemaker.maze.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class RandomTurns implements MazeActor{
+public class RandomTurns extends MazeActor{
     
     private final Maze maze;
     private final ArrayList<Direction> choices;
@@ -14,7 +14,7 @@ public class RandomTurns implements MazeActor{
     private Direction facing;
     private int x;
     private int y;
-    private Datum previousCell;
+    private Point previousCell;
     
     public RandomTurns(Maze maze) {
         this.maze = maze;
@@ -28,11 +28,11 @@ public class RandomTurns implements MazeActor{
         x = start.x;
         y = start.y;
         facing = Maze.SOUTH;
-        previousCell = new Datum(x, y, maze.getCellData(x, y));
+        previousCell = new Point(x, y);
     }
     
     @Override
-    public Datum[] step() {
+    protected Datum[] step() {
         if (maze.isGoal(x, y)) 
             return new Datum[]{};
         
@@ -52,6 +52,7 @@ public class RandomTurns implements MazeActor{
             y += facing.y;
         }
         
-        return new Datum[]{previousCell, new Datum(x, y, maze.face(maze.getCellData(x, y), facing))};
+        return new Datum[]{new Datum(previousCell.x, previousCell.y, maze.getCellData(previousCell.x, previousCell.y)), 
+                           new Datum(x, y, maze.face(maze.getCellData(x, y), facing))};
     }
 }

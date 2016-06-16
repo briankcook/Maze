@@ -1,17 +1,16 @@
 package mazemaker.maze.generators;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import mazemaker.maze.*;
 
-public class Kruskal implements MazeActor{
+public class Kruskal extends MazeActor{
     
     private final Maze maze;
     
     private int[][] setTags;
     private ArrayList<Edge> edges;
-    private Datum prev1;
-    private Datum prev2;
     private int sets;
     
     public Kruskal(Maze maze) {
@@ -33,12 +32,10 @@ public class Kruskal implements MazeActor{
         }
         sets = maze.width * maze.height;
         Collections.shuffle(edges);
-        prev1 = new Datum(0, 0, maze.getCellData(0, 0));
-        prev2 = new Datum(0, 0, maze.getCellData(0, 0));
     }
     
     @Override
-    public Datum[] step() {
+    protected Datum[] step() {
         if (sets == 1)
             return new Datum[]{};
         Edge edge;
@@ -51,17 +48,18 @@ public class Kruskal implements MazeActor{
             set2 = setTags[edge.x2][edge.y2];
         } while (set1 == set2);
         
-        prev1 = new Datum(edge.x1, edge.y1, maze.getCellData(edge.x1, edge.y1));
-        prev2 = new Datum(edge.x2, edge.y2, maze.getCellData(edge.x2, edge.y2));
+        Point a = new Point(edge.x1, edge.y1);
+        Point b = new Point(edge.x2, edge.y2);
         
         sets--;
-        maze.toggleConnection(prev1, prev2);
+        maze.toggleConnection(a, b);
         for (int i = 0 ; i < maze.width ; i++) 
             for (int j = 0 ; j < maze.height ; j++) 
                 if (setTags[i][j] == set2)
                     setTags[i][j] = set1;
         
-        return new Datum[]{prev1, prev2};
+        return new Datum[]{new Datum(a.x, a.y, maze.getCellData(a.x, a.y)), 
+                           new Datum(b.x, b.y, maze.getCellData(b.x, b.y))};
     }
 
     private class Edge {

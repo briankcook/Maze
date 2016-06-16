@@ -3,7 +3,7 @@ package mazemaker.maze.solvers;
 import java.awt.Point;
 import mazemaker.maze.*;
 
-public class WallFollower implements MazeActor {
+public class WallFollower extends MazeActor {
     
     private final Maze maze;
     private final int preferredDirection;
@@ -30,8 +30,8 @@ public class WallFollower implements MazeActor {
     }
     
     @Override
-    public Datum[] step() {
-        Datum update = new Datum(x, y, maze.getCellData(x, y));
+    protected Datum[] step() {
+        Point update = new Point(x, y);
         if (maze.isGoal(x, y)) 
             return new Datum[]{};
         if (moved || !maze.canGo(x, y, facing)) {
@@ -43,6 +43,7 @@ public class WallFollower implements MazeActor {
             y += facing.y;
             moved = true;
         }
-        return new Datum[]{update, new Datum(x, y, Maze.face(maze.getCellData(x, y), facing))};
+        return new Datum[]{new Datum(update.x, update.y, maze.getCellData(update.x, update.y)), 
+                           new Datum(x, y, Maze.face(maze.getCellData(x, y), facing))};
     }
 }

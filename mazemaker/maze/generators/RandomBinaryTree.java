@@ -1,9 +1,10 @@
 package mazemaker.maze.generators;
 
+import java.awt.Point;
 import java.util.Random;
 import mazemaker.maze.*;
 
-public class RandomBinaryTree implements MazeActor{
+public class RandomBinaryTree extends MazeActor{
     
     private final Maze maze;
     private final int hWeight;
@@ -28,9 +29,9 @@ public class RandomBinaryTree implements MazeActor{
     }
     
     @Override
-    public Datum[] step() {
-        Datum current = new Datum(x, y, maze.getCellData(x, y));
-        Datum update = new Datum(x, y, maze.getCellData(x, y));
+    protected Datum[] step() {
+        Point current = new Point(x, y);
+        Point update = new Point(x, y);
         if (maze.isValid(x-1, y-1))
             if (r.nextInt(hWeight+vWeight) + 1 > vWeight)
                 update.x -= 1; 
@@ -47,6 +48,7 @@ public class RandomBinaryTree implements MazeActor{
         }
         if (y == maze.height)
             return new Datum[]{};
-        return new Datum[]{new Datum(x, y, maze.getCellData(x, y)), current, update};
+        return new Datum[]{new Datum(current.x, current.y, maze.getCellData(current.x, current.y)),
+                           new Datum(update.x, update.y, maze.getCellData(update.x, update.y))};
     }
 }

@@ -166,6 +166,15 @@ public class MazeView extends Canvas{
         drawGoal();
     }
     
+    public void draw(Datum[] update, String sprite) {
+        for (Datum datum : update) {
+            visit(datum.x, datum.y);
+            drawCell(datum.x, datum.y, datum.cellData); 
+            if (Maze.hasFacing(datum.cellData))
+                drawActor(datum, sprite);
+        }
+    }
+    
     public void drawCell(int x, int y) {
         drawCell(x, y, maze.getCellData(x, y));
     }
