@@ -31,7 +31,7 @@ public class WallFollower implements MazeActor {
     
     @Override
     public Datum[] step() {
-        Datum update = new Datum(x, y, null);
+        Datum update = new Datum(x, y, maze.getCellData(x, y));
         if (maze.isGoal(x, y)) 
             return new Datum[]{};
         if (moved || !maze.canGo(x, y, facing)) {
@@ -43,6 +43,6 @@ public class WallFollower implements MazeActor {
             y += facing.y;
             moved = true;
         }
-        return new Datum[]{update, new Datum(x, y, facing)};
+        return new Datum[]{update, new Datum(x, y, Maze.face(maze.getCellData(x, y), facing))};
     }
 }

@@ -29,8 +29,8 @@ public class RandomBinaryTree implements MazeActor{
     
     @Override
     public Datum[] step() {
-        Datum current = new Datum(x, y, null);
-        Datum update = new Datum(x, y, null);
+        Datum current = new Datum(x, y, maze.getCellData(x, y));
+        Datum update = new Datum(x, y, maze.getCellData(x, y));
         if (maze.isValid(x-1, y-1))
             if (r.nextInt(hWeight+vWeight) + 1 > vWeight)
                 update.x -= 1; 
@@ -47,6 +47,6 @@ public class RandomBinaryTree implements MazeActor{
         }
         if (y == maze.height)
             return new Datum[]{};
-        return new Datum[]{new Datum(x, y, Maze.NORTH), current, update};
+        return new Datum[]{new Datum(x, y, maze.getCellData(x, y)), current, update};
     }
 }

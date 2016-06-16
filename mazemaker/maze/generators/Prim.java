@@ -28,8 +28,8 @@ public class Prim implements MazeActor {
         for (Direction direction : Maze.getDirections())
             if (maze.isValid(start.x + direction.x, start.y + direction.y))
                 edges.add(new Edge(start, maze.look(start.x, start.y, direction)));
-        prev1 = new Datum(0, 0, null);
-        prev2 = new Datum(0, 0, null);
+        prev1 = new Datum(0, 0, maze.getCellData(0, 0));
+        prev2 = new Datum(0, 0, maze.getCellData(0, 0));
         visited[start.x][start.y] = true;
     }
     
@@ -49,8 +49,8 @@ public class Prim implements MazeActor {
         
         visited[edge.b.x][edge.b.y] = true;
         
-        prev1 = new Datum(edge.a.x, edge.a.y, null);
-        prev2 = new Datum(edge.b.x, edge.b.y, null);
+        prev1 = new Datum(edge.a.x, edge.a.y, maze.getCellData(edge.a.x, edge.a.y));
+        prev2 = new Datum(edge.b.x, edge.b.y, maze.getCellData(edge.b.x, edge.b.y));
         
         return new Datum[] {prev1, prev2};
     }

@@ -8,10 +8,13 @@ public class Maze {
     public static final int AROUND = 2;
     public static final int LEFT = 3;
     
-    public static final Direction NORTH = new Direction( 0, -1, 0b00000001);
-    public static final Direction SOUTH = new Direction( 0,  1, 0b00000010);
-    public static final Direction EAST  = new Direction( 1,  0, 0b00000100);
-    public static final Direction WEST  = new Direction(-1,  0, 0b00001000);
+    public static final int FACINGMASK = 0b00110000;
+    public static final int HASFACINGMASK = 0b01000000;
+    
+    public static final Direction NORTH = new Direction( 0, -1, (byte)0b00000001, (byte)0b00000000);
+    public static final Direction SOUTH = new Direction( 0,  1, (byte)0b00000010, (byte)0b00010000);
+    public static final Direction EAST  = new Direction( 1,  0, (byte)0b00000100, (byte)0b00100000);
+    public static final Direction WEST  = new Direction(-1,  0, (byte)0b00001000, (byte)0b00110000);
     
     private static final Direction[] DIRECTIONS = {NORTH, EAST, SOUTH, WEST};
     
@@ -103,5 +106,21 @@ public class Maze {
                 cellData[b.x][b.y] ^= turn(direction, AROUND).mask;
             }
         }
+    }
+    
+    public static boolean wall(byte cellData, Direction direction) {
+        return (cellData & direction.mask) == 0;
+    }
+    
+    public static boolean facing(byte cellData, Direction direction) {
+        return (cellData & FACINGMASK) == direction.facing;
+    }
+    
+    public static boolean hasFacing(byte cellData) {
+        return (cellData & HASFACINGMASK) > 0;
+    }
+    
+    public static byte face(byte cellData, Direction direction) {
+        return (byte)(cellData | direction.facing | HASFACINGMASK);
     }
 }

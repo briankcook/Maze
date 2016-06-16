@@ -33,8 +33,8 @@ public class Kruskal implements MazeActor{
         }
         sets = maze.width * maze.height;
         Collections.shuffle(edges);
-        prev1 = new Datum(0, 0, null);
-        prev2 = new Datum(0, 0, null);
+        prev1 = new Datum(0, 0, maze.getCellData(0, 0));
+        prev2 = new Datum(0, 0, maze.getCellData(0, 0));
     }
     
     @Override
@@ -51,8 +51,8 @@ public class Kruskal implements MazeActor{
             set2 = setTags[edge.x2][edge.y2];
         } while (set1 == set2);
         
-        prev1 = new Datum(edge.x1, edge.y1, null);
-        prev2 = new Datum(edge.x2, edge.y2, null);
+        prev1 = new Datum(edge.x1, edge.y1, maze.getCellData(edge.x1, edge.y1));
+        prev2 = new Datum(edge.x2, edge.y2, maze.getCellData(edge.x2, edge.y2));
         
         sets--;
         maze.toggleConnection(prev1, prev2);

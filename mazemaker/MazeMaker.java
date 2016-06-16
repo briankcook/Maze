@@ -282,7 +282,7 @@ public class MazeMaker extends Application implements Initializable{
         for (Datum datum : data) {
             mazeview.visit(datum.x, datum.y);
             mazeview.drawCell(datum.x, datum.y); 
-            if (datum.facing != null)
+            if (Maze.hasFacing(datum.cellData))
                 mazeview.drawActor(datum, getSprite());
         }
     }

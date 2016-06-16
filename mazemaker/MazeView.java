@@ -167,6 +167,10 @@ public class MazeView extends Canvas{
     }
     
     public void drawCell(int x, int y) {
+        drawCell(x, y, maze.getCellData(x, y));
+    }
+    
+    public void drawCell(int x, int y, byte cellData) {
         int cell = cellSize.get();
         int wall = wallThickness.get();
         int gx = x * cell + wall;
@@ -181,16 +185,19 @@ public class MazeView extends Canvas{
         
         gc.setStroke(wallColor.get());
         gc.setLineWidth(wall);
-        double mod = (wall % 2 == 1) ? -0.5 : 0;
+        if (wall % 2 == 1) {
+            gx -= 0.5;
+            gy -= 0.5;
+        }
         if (showAll || showUnvisited.get() || visited[x][y]) {
-            if (!maze.canGo(x, y, Maze.NORTH))
-                gc.strokeLine(           gx + mod,            gy + mod, gx + cell + mod,            gy + mod);
-            if (!maze.canGo(x, y, Maze.WEST))
-                gc.strokeLine(           gx + mod,            gy + mod,            gx + mod, gy + cell + mod);
-            if (!maze.canGo(x, y, Maze.SOUTH))
-                gc.strokeLine(           gx + mod, gy + cell + mod, gx + cell + mod, gy + cell + mod);
-            if (!maze.canGo(x, y, Maze.EAST))
-                gc.strokeLine(gx + cell + mod,            gy + mod, gx + cell + mod, gy + cell + mod);
+            if (Maze.wall(cellData, Maze.NORTH))
+                gc.strokeLine(       gx,        gy, gx + cell,        gy);
+            if (Maze.wall(cellData, Maze.WEST))
+                gc.strokeLine(       gx,        gy,        gx, gy + cell);
+            if (Maze.wall(cellData, Maze.SOUTH))
+                gc.strokeLine(       gx, gy + cell, gx + cell, gy + cell);
+            if (Maze.wall(cellData, Maze.EAST))
+                gc.strokeLine(gx + cell,        gy, gx + cell, gy + cell);
         }
     }
     
@@ -207,10 +214,10 @@ public class MazeView extends Canvas{
                 gc.fillOval(gx, gy, scale, scale);
                 break;
             case TRIANGLE:
-                drawSprite(TRIANGLESPRITE, gx, gy, scale, datum.facing);
+                drawSprite(TRIANGLESPRITE, gx, gy, scale, datum.cellData);
                 break;
             case POINTER:
-                drawSprite(POINTERSPRITE, gx, gy, scale, datum.facing);
+                drawSprite(POINTERSPRITE, gx, gy, scale, datum.cellData);
                 break;
             case SQUARE:
             default:
@@ -219,18 +226,18 @@ public class MazeView extends Canvas{
         }
     }
     
-    public void drawSprite(double[][] sprite, int x, int y, int scale, Direction facing) {
+    public void drawSprite(double[][] sprite, int x, int y, int scale, byte cellData) {
         GraphicsContext gc = getGraphicsContext2D();
         double[] xs = sprite[0].clone();
         double[] ys = sprite[1].clone();
         
         // flip
-        if (facing.equals(Maze.SOUTH) || facing.equals(Maze.EAST))
+        if (Maze.facing(cellData, Maze.SOUTH) || Maze.facing(cellData, Maze.EAST))
             for (int i = 0 ; i < xs.length ; i++)
                 ys[i] = 1.0 - ys[i];
         
         // rotate
-        if (facing.equals(Maze.EAST) || facing.equals(Maze.WEST)) {
+        if (Maze.facing(cellData, Maze.EAST) || Maze.facing(cellData, Maze.WEST)) {
             double[] temp = xs;
             xs = ys;
             ys = temp;

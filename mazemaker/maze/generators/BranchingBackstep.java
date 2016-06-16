@@ -53,7 +53,7 @@ public class BranchingBackstep implements MazeActor {
     }
     
     private Datum[] subStep() {
-        Datum update = new Datum(x, y, null);
+        Datum update = new Datum(x, y, maze.getCellData(x, y));
         choices.clear();
         
         for (Direction direction : Maze.getDirections())
@@ -74,7 +74,7 @@ public class BranchingBackstep implements MazeActor {
             steps++;
         }
         branches.add(new State(x, y, steps, history));
-        return new Datum[]{update, new Datum(x, y, Maze.NORTH)};
+        return new Datum[]{update, new Datum(x, y, Maze.face(maze.getCellData(x, y), Maze.NORTH))};
     }
     
     private void makeBranch() {

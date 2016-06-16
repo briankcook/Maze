@@ -41,7 +41,7 @@ public class Backstep implements MazeActor {
     
     @Override
     public Datum[] step() {
-        Datum update = new Datum(x, y, null);
+        Datum update = new Datum(x, y, maze.getCellData(x, y));
         choices.clear();
         
         for (Direction direction : Maze.getDirections())
@@ -60,7 +60,7 @@ public class Backstep implements MazeActor {
             maze.toggleConnection(new Point(x,y), history.peek());
             visited[x][y] = true;
         }
-        return new Datum[]{update, new Datum(x, y, Maze.NORTH)};
+        return new Datum[]{update, new Datum(x, y, Maze.face(maze.getCellData(x, y), Maze.NORTH))};
     }
     
     private void moveTo(Point cell) {

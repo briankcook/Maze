@@ -28,7 +28,7 @@ public class RandomTurns implements MazeActor{
         x = start.x;
         y = start.y;
         facing = Maze.SOUTH;
-        previousCell = new Datum(x, y, null);
+        previousCell = new Datum(x, y, maze.getCellData(x, y));
     }
     
     @Override
@@ -42,7 +42,7 @@ public class RandomTurns implements MazeActor{
             if (maze.canGo(x, y, direction) && !previousCell.equals(maze.look(x, y, direction)))
                 choices.add(direction);
         
-        previousCell = new Datum(x, y, null);
+        previousCell = new Datum(x, y, maze.getCellData(x, y));
         
         if (choices.isEmpty()) {
             facing = Maze.turn(facing, Maze.AROUND);
@@ -52,6 +52,6 @@ public class RandomTurns implements MazeActor{
             y += facing.y;
         }
         
-        return new Datum[]{previousCell, new Datum(x, y, facing)};
+        return new Datum[]{previousCell, new Datum(x, y, maze.face(maze.getCellData(x, y), facing))};
     }
 }
