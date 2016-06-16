@@ -69,14 +69,6 @@
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
-              <MenuItem mnemonicParsing="true" onAction="#speedUp" text="Speed Up">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="K" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
-              <MenuItem mnemonicParsing="true" onAction="#slowDown" text="Slow Down">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="L" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
@@ -150,7 +142,7 @@
                            </padding>
                         </Separator>
                         <Label text="Animation Speed" />
-                        <Slider fx:id="speedSlider" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" showTickMarks="true" value="3.0" />
+                        <Slider fx:id="speedSlider" majorTickUnit="1.0" max="2.0" min="-2.0" minorTickCount="0" showTickMarks="true" />
                         <CheckBox fx:id="showUnvisitedBox" mnemonicParsing="false" text="Show Unvisited Cells" />
                         <Separator prefWidth="200.0">
                            <padding>
@@ -381,34 +373,6 @@
                      </graphic>
                      <tooltip>
                         <Tooltip text="Record Next Action" />
-                     </tooltip>
-                  </Button>
-                  <Separator orientation="VERTICAL">
-                     <padding>
-                        <Insets left="3.0" />
-                     </padding></Separator>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#slowDown">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/decrease.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Slow Down" />
-                     </tooltip>
-                  </Button>
-                <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#speedUp">
-                     <graphic>
-                        <ImageView pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@resources/increase.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="Speed Up" />
                      </tooltip>
                   </Button>
               </items>

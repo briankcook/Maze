@@ -1,13 +1,12 @@
 package mazemaker;
 
 import java.net.URL;
-import java.util.Deque;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -85,6 +84,15 @@ public class MazeMaker extends Application implements Initializable{
     public void initialize(URL url, ResourceBundle rb) {
         playback = new Timeline();
         playback.setCycleCount(1);
+        playback.rateProperty().bind(new DoubleBinding(){
+            {super.bind(speedSlider.valueProperty());}
+ 
+            @Override
+            protected double computeValue() {
+                // log scale with ticks at 0.001, 0.01, 0.1, 1.0, 10.0 
+                return Math.pow(10, speedSlider.getValue());
+            }
+        });
         
         initDialog(help, "Help", parse(IO.readFile("help.text")));
         initDialog(about, "About", parse(IO.readFile("about.text")));
@@ -239,7 +247,7 @@ public class MazeMaker extends Application implements Initializable{
     
     public void record() {
         cleanUp();
-        gifWriter = new GifWriter(mazeview, getFrameDelay());
+        gifWriter = new GifWriter(mazeview, (int)(playback.getRate() * 100));
         if (!gifWriter.init())
             gifWriter = null;
     }
@@ -286,7 +294,7 @@ public class MazeMaker extends Application implements Initializable{
         frames.clear();
         for (int i = 0 ; i < steps.size() ; i++) {
             Datum[] step = steps.get(i);
-            Duration duration = Duration.millis(getFrameDelay() * i);
+            Duration duration = Duration.millis(100 * i);
             frames.add(new KeyFrame(duration, e -> mazeview.draw(step, getSprite())));
         }
         cleanUp();
@@ -331,10 +339,6 @@ public class MazeMaker extends Application implements Initializable{
     
     private int getMazeHeight() {
         return Integer.parseInt(rowsField.getText());
-    }
-    
-    private int getFrameDelay() {
-        return (int)Math.pow(10, speedSlider.getMax() - speedSlider.getValue());
     }
     
     private int getHBias() {
