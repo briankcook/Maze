@@ -182,8 +182,8 @@ public class MazeView extends Canvas{
     public void drawCell(int x, int y, byte cellData) {
         int cell = cellSize.get();
         int wall = wallThickness.get();
-        int gx = x * cell + wall;
-        int gy = y * cell + wall;
+        double gx = x * cell + wall;
+        double gy = y * cell + wall;
         GraphicsContext gc = getGraphicsContext2D();
         
         if (visited[x][y])

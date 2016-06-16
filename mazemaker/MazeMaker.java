@@ -283,7 +283,11 @@ public class MazeMaker extends Application implements Initializable{
         for ( /* */ ; i < steps.size() ; i++) {
             Datum[] step = steps.get(i);
             Duration duration = Duration.millis(FRAMEDELAY * i);
-            frames.add(new KeyFrame(duration, e -> mazeview.draw(step, getSprite())));
+            frames.add(new KeyFrame(duration, e -> {
+                if (gifWriter != null)
+                    gifWriter.snapshot();
+                mazeview.draw(step, getSprite());
+            }));
         }
         frames.add(new KeyFrame(Duration.millis(FRAMEDELAY * i), e -> mazeview.redraw()));
         stopPlayback();
