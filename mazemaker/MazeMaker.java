@@ -47,6 +47,7 @@ public class MazeMaker extends Application implements Initializable{
     private static final String COINFLIP = "Random Binary Tree";
     private static final String KRUSKAL = "Randomized Kruskal's";
     private static final String PRIM = "Randomized Prim's";
+    private static final String BLANK = "Blank Maze";
     
     private static final String RIGHTHAND = "Right Hand Rule";
     private static final String LEFTHAND = "Left hand Rule";
@@ -72,10 +73,8 @@ public class MazeMaker extends Application implements Initializable{
     @FXML private TextField colsField;
     @FXML private ComboBox genCombo;
     @FXML private Slider biasSlider;
-    @FXML private CheckBox genBox;
     
     @FXML private ComboBox solverCombo;
-    @FXML private CheckBox solverBox;
     
     @FXML private TextField cellField;
     @FXML private TextField wallField;
@@ -129,7 +128,8 @@ public class MazeMaker extends Application implements Initializable{
             BRANCHINGBS,
             COINFLIP,
             KRUSKAL,
-            PRIM});
+            PRIM,
+            BLANK});
         
         initComboBox(solverCombo, new String[]{
             RIGHTHAND,
@@ -302,6 +302,7 @@ public class MazeMaker extends Application implements Initializable{
             return;
         actor.init();
         List<Datum[]> steps = actor.run();
+        animLabel.setText(animLabel.getText() + " : " + steps.size() + " steps");
         List<KeyFrame> frames = playback.getKeyFrames();
         frames.clear();
         int i = 0;
@@ -320,22 +321,20 @@ public class MazeMaker extends Application implements Initializable{
     
     private MazeActor makeActor(String name) {
         Maze maze = mazeview.getMaze();
+        animLabel.setText(name);
         switch (name) {
             case MazeMaker.BACKSTEP:
-                maze.reset();
                 return new Backstep(maze, getHBias(), getVBias());
             case MazeMaker.BRANCHINGBS:
-                maze.reset();
                 return new BranchingBackstep(maze, getHBias(), getVBias(), 10);
             case MazeMaker.COINFLIP:
-                maze.reset();
                 return new RandomBinaryTree(maze, getHBias(), getVBias());
             case MazeMaker.KRUSKAL:
-                maze.reset();
                 return new Kruskal(maze);
             case MazeMaker.PRIM:
-                maze.reset();
                 return new Prim(maze);
+            case MazeMaker.BLANK:
+                return null;
             case MazeMaker.RIGHTHAND:
                 return new WallFollower(maze, true);
             case MazeMaker.LEFTHAND:
@@ -343,6 +342,7 @@ public class MazeMaker extends Application implements Initializable{
             case MazeMaker.RANDOMTURNS:
                 return new RandomTurns(maze);
             default:
+                animLabel.setText("error");
                 return null;
         }
     }
