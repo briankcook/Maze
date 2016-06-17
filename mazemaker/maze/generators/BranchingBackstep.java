@@ -23,7 +23,8 @@ public class BranchingBackstep extends MazeActor {
     private int steps;
     private Deque<Point> history;
     
-    public BranchingBackstep(Maze maze, int hWeight, int vWeight, int branchFactor) {
+    public BranchingBackstep(String name, Maze maze, int hWeight, int vWeight, int branchFactor) {
+        super(name);
         this.maze = maze;
         this.hWeight = hWeight;
         this.vWeight = vWeight;

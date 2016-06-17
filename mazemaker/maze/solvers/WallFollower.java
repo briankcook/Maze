@@ -14,7 +14,8 @@ public class WallFollower extends MazeActor {
     private int x;
     private int y;
 
-    public WallFollower(Maze maze, boolean rightHanded) {
+    public WallFollower(String name, Maze maze, boolean rightHanded) {
+        super(name);
         this.maze = maze;
         preferredDirection = rightHanded ? Maze.RIGHT : Maze.LEFT;
         alternateDirection = rightHanded ? Maze.LEFT : Maze.RIGHT;

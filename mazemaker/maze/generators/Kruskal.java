@@ -13,7 +13,8 @@ public class Kruskal extends MazeActor{
     private ArrayList<Edge> edges;
     private int sets;
     
-    public Kruskal(Maze maze) {
+    public Kruskal(String name, Maze maze) {
+        super(name);
         this.maze = maze;
     }
     

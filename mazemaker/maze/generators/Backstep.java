@@ -20,7 +20,8 @@ public class Backstep extends MazeActor {
     private int x;
     private int y;
     
-    public Backstep(Maze maze, int hWeight, int vWeight) {
+    public Backstep(String name, Maze maze, int hWeight, int vWeight) {
+        super(name);
         this.maze = maze;
         this.hWeight = hWeight;
         this.vWeight = vWeight;

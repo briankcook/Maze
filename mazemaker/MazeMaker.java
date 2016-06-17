@@ -10,6 +10,7 @@ import javafx.application.Application;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -90,6 +91,7 @@ public class MazeMaker extends Application implements Initializable{
     private MazeView mazeview;
     private Timeline playback;
     private GifWriter gifWriter;
+    private Thread currentTask;
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -271,6 +273,8 @@ public class MazeMaker extends Application implements Initializable{
         mazeview.setShowAll(true);
         mazeview.clear();
         mazeview.redraw();
+        if (currentTask != null)
+            currentTask.interrupt();
         if (gifWriter != null) {
             gifWriter.close();
             gifWriter = null;
@@ -296,51 +300,53 @@ public class MazeMaker extends Application implements Initializable{
     ACTOR LOGIC
     */
     
+    private void createAnimation(String name, List<Datum[]> steps) {
+        mazeview.redraw();
+        
+        CreateAnimationTask cat = new CreateAnimationTask(name, steps);
+        
+        cat.setOnSucceeded(e -> stopPlayback());
+        
+        animLabel.textProperty().bind(cat.messageProperty());
+        
+        currentTask = new Thread(cat);
+        currentTask.start();
+    }
+    
     private void runActor(MazeActor actor) {
         stopPlayback();
         if (actor == null)
             return;
-        actor.init();
-        List<Datum[]> steps = actor.run();
-        animLabel.setText(animLabel.getText() + " : " + steps.size() + " steps");
-        List<KeyFrame> frames = playback.getKeyFrames();
-        frames.clear();
-        int i = 0;
-        for ( /* */ ; i < steps.size() ; i++) {
-            Datum[] step = steps.get(i);
-            Duration duration = Duration.millis(FRAMEDELAY * i);
-            frames.add(new KeyFrame(duration, e -> {
-                if (gifWriter != null)
-                    gifWriter.snapshot();
-                mazeview.draw(step, getSprite());
-            }));
-        }
-        frames.add(new KeyFrame(Duration.millis(FRAMEDELAY * i), e -> mazeview.redraw()));
-        stopPlayback();
+        
+        animLabel.textProperty().bind(actor.messageProperty());
+        
+        actor.setOnSucceeded(e -> createAnimation(actor.getName(), actor.getValue()));
+        
+        currentTask = new Thread(actor);
+        currentTask.start();
     }
     
     private MazeActor makeActor(String name) {
         Maze maze = mazeview.getMaze();
-        animLabel.setText(name);
         switch (name) {
             case MazeMaker.BACKSTEP:
-                return new Backstep(maze, getHBias(), getVBias());
+                return new Backstep(name, maze, getHBias(), getVBias());
             case MazeMaker.BRANCHINGBS:
-                return new BranchingBackstep(maze, getHBias(), getVBias(), 10);
+                return new BranchingBackstep(name, maze, getHBias(), getVBias(), 10);
             case MazeMaker.COINFLIP:
-                return new RandomBinaryTree(maze, getHBias(), getVBias());
+                return new RandomBinaryTree(name, maze, getHBias(), getVBias());
             case MazeMaker.KRUSKAL:
-                return new Kruskal(maze);
+                return new Kruskal(name, maze);
             case MazeMaker.PRIM:
-                return new Prim(maze);
+                return new Prim(name, maze);
             case MazeMaker.BLANK:
                 return null;
             case MazeMaker.RIGHTHAND:
-                return new WallFollower(maze, true);
+                return new WallFollower(name, maze, true);
             case MazeMaker.LEFTHAND:
-                return new WallFollower(maze, false);
+                return new WallFollower(name, maze, false);
             case MazeMaker.RANDOMTURNS:
-                return new RandomTurns(maze);
+                return new RandomTurns(name, maze);
             default:
                 animLabel.setText("error");
                 return null;
@@ -377,6 +383,38 @@ public class MazeMaker extends Application implements Initializable{
     
     private String getSprite() {
         return (String)spriteCombo.getValue();
+    }
+    
+    class CreateAnimationTask extends Task<Void>{
+    
+        private final String name;
+        private final List<Datum[]> steps;
+
+        public CreateAnimationTask(String name, List<Datum[]> steps) {
+            this.name = name;
+            this.steps = steps;
+        }
+
+        @Override
+        protected Void call() {
+            List<KeyFrame> frames = playback.getKeyFrames();
+            frames.clear();
+            int i = 0;
+            for ( /* */ ; i < steps.size() ; i++) {
+                Datum[] step = steps.get(i);
+                Duration duration = Duration.millis(FRAMEDELAY * i);
+                frames.add(new KeyFrame(duration, f -> {
+                    if (gifWriter != null)
+                        gifWriter.snapshot();
+                    mazeview.draw(step, getSprite());
+                }));
+                if (frames.size() % 100 == 0)
+                    updateMessage(name + " : " + frames.size() + "... steps");
+            }
+            frames.add(new KeyFrame(Duration.millis(FRAMEDELAY * i), f -> mazeview.redraw()));
+            updateMessage(name + " : " + frames.size() + " steps");
+            return null;
+        }
     }
     
 }

@@ -12,7 +12,8 @@ public class Prim extends MazeActor {
     private final Random r;
     private final boolean[][] visited;
     
-    public Prim(Maze maze) {
+    public Prim(String name, Maze maze) {
+        super(name);
         this.maze = maze;
         visited = new boolean[maze.width][maze.height];
         r = new Random();

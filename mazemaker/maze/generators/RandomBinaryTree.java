@@ -14,7 +14,8 @@ public class RandomBinaryTree extends MazeActor{
     private int x;
     private int y;
     
-    public RandomBinaryTree(Maze maze, int hWeight, int vWeight) {
+    public RandomBinaryTree(String name, Maze maze, int hWeight, int vWeight) {
+        super(name);
         this.maze = maze;
         this.hWeight = hWeight;
         this.vWeight = vWeight;

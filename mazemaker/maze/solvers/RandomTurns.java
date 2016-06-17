@@ -16,7 +16,8 @@ public class RandomTurns extends MazeActor{
     private int y;
     private Point previousCell;
     
-    public RandomTurns(Maze maze) {
+    public RandomTurns(String name, Maze maze) {
+        super(name);
         this.maze = maze;
         choices = new ArrayList();
         r = new Random();
