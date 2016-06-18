@@ -92,6 +92,8 @@ public class MazeMaker extends Application implements Initializable{
     private Timeline playback;
     private GifWriter gifWriter;
     private Thread currentTask;
+    private List<Datum[]> steps;
+    private int step;
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -104,8 +106,13 @@ public class MazeMaker extends Application implements Initializable{
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        playback = new Timeline();
-        playback.setCycleCount(1);
+        playback = new Timeline(new KeyFrame(new Duration(FRAMEDELAY), f -> {
+            if (step == steps.size())
+                stopPlayback();
+            if (gifWriter != null)
+                gifWriter.snapshot();
+            mazeview.draw(steps.get(step++), getSprite());
+        }));
         playback.rateProperty().bind(new DoubleBinding(){
             {super.bind(speedSlider.valueProperty());}
  
@@ -115,6 +122,7 @@ public class MazeMaker extends Application implements Initializable{
                 return Math.pow(10, speedSlider.getValue());
             }
         });
+        playback.setCycleCount(Animation.INDEFINITE);
         
         modeButton.setGraphic(pencilImage);
         modeButton.setTooltip(pencilTooltip);
@@ -223,6 +231,7 @@ public class MazeMaker extends Application implements Initializable{
     
     public void openMaze() {
         playback.stop();
+        step = 0;
         mazeview.setMaze(MazeIO.openMaze());
     }
     
@@ -248,6 +257,7 @@ public class MazeMaker extends Application implements Initializable{
     
     public void generate() {
         playback.stop();
+        step = 0;
         mazeview.setMaze(new Maze(getMazeWidth(), getMazeHeight()));
         runActor(makeActor(getGenerator()));
     }
@@ -257,7 +267,7 @@ public class MazeMaker extends Application implements Initializable{
     }
     
     public void pausePlayback() {
-        playback.pause();
+        playback.stop();
     }
     
     public void playPlayback() {
@@ -270,6 +280,7 @@ public class MazeMaker extends Application implements Initializable{
     
     public void stopPlayback() {
         playback.stop();
+        step = 0;
         mazeview.setShowAll(true);
         mazeview.clear();
         mazeview.redraw();
@@ -300,17 +311,11 @@ public class MazeMaker extends Application implements Initializable{
     ACTOR LOGIC
     */
     
-    private void createAnimation(String name, List<Datum[]> steps) {
+    private void setAnimation(List<Datum[]> steps) {
         mazeview.redraw();
         
-        CreateAnimationTask cat = new CreateAnimationTask(name, steps);
-        
-        cat.setOnSucceeded(e -> stopPlayback());
-        
-        animLabel.textProperty().bind(cat.messageProperty());
-        
-        currentTask = new Thread(cat);
-        currentTask.start();
+        this.steps = steps;
+        step = 0;
     }
     
     private void runActor(MazeActor actor) {
@@ -320,7 +325,7 @@ public class MazeMaker extends Application implements Initializable{
         
         animLabel.textProperty().bind(actor.messageProperty());
         
-        actor.setOnSucceeded(e -> createAnimation(actor.getName(), actor.getValue()));
+        actor.setOnSucceeded(e -> setAnimation(actor.getValue()));
         
         currentTask = new Thread(actor);
         currentTask.start();
@@ -384,37 +389,4 @@ public class MazeMaker extends Application implements Initializable{
     private String getSprite() {
         return (String)spriteCombo.getValue();
     }
-    
-    class CreateAnimationTask extends Task<Void>{
-    
-        private final String name;
-        private final List<Datum[]> steps;
-
-        public CreateAnimationTask(String name, List<Datum[]> steps) {
-            this.name = name;
-            this.steps = steps;
-        }
-
-        @Override
-        protected Void call() {
-            List<KeyFrame> frames = playback.getKeyFrames();
-            frames.clear();
-            int i = 0;
-            for ( /* */ ; i < steps.size() ; i++) {
-                Datum[] step = steps.get(i);
-                Duration duration = Duration.millis(FRAMEDELAY * i);
-                frames.add(new KeyFrame(duration, f -> {
-                    if (gifWriter != null)
-                        gifWriter.snapshot();
-                    mazeview.draw(step, getSprite());
-                }));
-                if (frames.size() % 100 == 0)
-                    updateMessage(name + " : " + frames.size() + "... steps");
-            }
-            frames.add(new KeyFrame(Duration.millis(FRAMEDELAY * i), f -> mazeview.redraw()));
-            updateMessage(name + " : " + frames.size() + " steps");
-            return null;
-        }
-    }
-    
 }
