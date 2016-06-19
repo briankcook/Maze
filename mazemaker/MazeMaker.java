@@ -318,7 +318,7 @@ public class MazeMaker extends Application implements Initializable{
         step = 0;
     }
     
-    private void runActor(MazeActor actor) {
+    private void runActor(MazeTask actor) {
         stopPlayback();
         if (actor == null)
             return;
@@ -331,7 +331,7 @@ public class MazeMaker extends Application implements Initializable{
         currentTask.start();
     }
     
-    private MazeActor makeActor(String name) {
+    private MazeTask makeActor(String name) {
         Maze maze = mazeview.getMaze();
         switch (name) {
             case MazeMaker.BACKSTEP:

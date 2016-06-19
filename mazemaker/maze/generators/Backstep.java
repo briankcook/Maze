@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Random;
 
-public class Backstep extends MazeActor {
+public class Backstep extends MazeTask {
     
     private final Maze maze;
     private final int hWeight;

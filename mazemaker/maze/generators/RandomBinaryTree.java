@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.util.Random;
 import mazemaker.maze.*;
 
-public class RandomBinaryTree extends MazeActor{
+public class RandomBinaryTree extends MazeTask{
     
     private final Maze maze;
     private final int hWeight;

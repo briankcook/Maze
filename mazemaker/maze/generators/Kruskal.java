@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import mazemaker.maze.*;
 
-public class Kruskal extends MazeActor{
+public class Kruskal extends MazeTask{
     
     private final Maze maze;
     

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.concurrent.Task;
 
-public abstract class MazeActor extends Task<List<Datum[]>> {
+public abstract class MazeTask extends Task<List<Datum[]>> {
     
     private final String name;
     
-    public MazeActor(String name) {
+    public MazeTask(String name) {
         this.name = name;
     }
     /*

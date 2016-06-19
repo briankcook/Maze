@@ -3,7 +3,7 @@ package mazemaker.maze.solvers;
 import java.awt.Point;
 import mazemaker.maze.*;
 
-public class WallFollower extends MazeActor {
+public class WallFollower extends MazeTask {
     
     private final Maze maze;
     private final int preferredDirection;

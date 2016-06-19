@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import mazemaker.maze.*;
 
-public class Prim extends MazeActor {
+public class Prim extends MazeTask {
 
     private final Maze maze;
     private final ArrayList<Edge> edges;

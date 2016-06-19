@@ -5,7 +5,7 @@ import mazemaker.maze.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class RandomTurns extends MazeActor{
+public class RandomTurns extends MazeTask{
     
     private final Maze maze;
     private final ArrayList<Direction> choices;
