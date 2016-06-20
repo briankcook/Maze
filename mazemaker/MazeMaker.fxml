@@ -53,7 +53,7 @@
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
-              <MenuItem mnemonicParsing="true" onAction="#stopPlayback" text="Stop">
+              <MenuItem mnemonicParsing="true" onAction="#stopAll" text="Stop">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
@@ -176,7 +176,7 @@
                                     <Tooltip text="Resume Playback" />
                                  </tooltip>
                               </Button>
-                            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#stopPlayback">
+                            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#stopAll">
                                  <graphic>
                                     <ImageView pickOnBounds="true" preserveRatio="true">
                                        <image>

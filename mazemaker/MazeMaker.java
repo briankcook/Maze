@@ -91,7 +91,7 @@ public class MazeMaker extends Application implements Initializable{
     private MazeView mazeview;
     private Timeline playback;
     private GifWriter gifWriter;
-    private Thread currentTask;
+    private Task currentTask;
     private List<Datum[]> steps;
     private int step;
     
@@ -107,11 +107,13 @@ public class MazeMaker extends Application implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         playback = new Timeline(new KeyFrame(new Duration(FRAMEDELAY), f -> {
-            if (step == steps.size())
-                stopPlayback();
-            if (gifWriter != null)
-                gifWriter.snapshot();
-            mazeview.draw(steps.get(step++), getSprite());
+            if (step == steps.size()) {
+                stopAll();
+            } else {
+                if (gifWriter != null)
+                    gifWriter.snapshot();
+                mazeview.draw(steps.get(step++), (String)spriteCombo.getValue());
+            }
         }));
         playback.rateProperty().bind(new DoubleBinding(){
             {super.bind(speedSlider.valueProperty());}
@@ -133,18 +135,18 @@ public class MazeMaker extends Application implements Initializable{
         initNumField(rowsField, 1, 20, 500, null);
         initNumField(colsField, 1, 20, 500, null);
         
-        initComboBox(genCombo, new String[]{
+        initComboBox(genCombo, 
             BACKSTEP,
             BRANCHINGBS,
             COINFLIP,
             KRUSKAL,
             PRIM,
-            BLANK});
+            BLANK);
         
-        initComboBox(solverCombo, new String[]{
+        initComboBox(solverCombo, 
             RIGHTHAND,
             LEFTHAND,
-            RANDOMTURNS});
+            RANDOMTURNS);
         
         initComboBox(spriteCombo, MazeView.getSpriteTypes());
         
@@ -229,20 +231,31 @@ public class MazeMaker extends Application implements Initializable{
     GUI ACTIONS
     */
     
+    /*
+    Stop all running actions, read maze from file, set as current maze
+    */
     public void openMaze() {
-        playback.stop();
-        step = 0;
+        stopAll();
         mazeview.setMaze(MazeIO.openMaze());
     }
     
+    /*
+    Save current maze to file
+    */
     public void saveMaze() {
         MazeIO.saveMaze(mazeview.getMaze());
     }
     
+    /*
+    Save snapshot of maze to PNG file
+    */
     public void export() {
         IO.saveToPNG(mazeview);
     }
     
+    /*
+    Toggle between cursor and pencil mode for maze editing.
+    */
     public void mode() {
         if (mazeview.getMode() == MazeView.SELECT_MODE) {
             mazeview.setMode(MazeView.PENCIL_MODE);
@@ -255,138 +268,143 @@ public class MazeMaker extends Application implements Initializable{
         }
     }
     
+    /*
+    create new blank maze, set as current maze, run generator
+    */
     public void generate() {
-        playback.stop();
-        step = 0;
-        mazeview.setMaze(new Maze(getMazeWidth(), getMazeHeight()));
-        runActor(makeActor(getGenerator()));
+        int width = Integer.parseInt(colsField.getText());
+        int height = Integer.parseInt(rowsField.getText());
+        
+        Maze maze = new Maze(width, height);
+        
+        mazeview.setMaze(maze);
+        
+        int hBias = (int)biasSlider.getValue();
+        int vBias = (int)(biasSlider.getMax() + biasSlider.getMin() - biasSlider.getValue());
+        
+        String name = (String)genCombo.getValue();
+        
+        switch (name) {
+            case MazeMaker.BACKSTEP:
+                runMazeTask(new Backstep(name, maze, hBias, vBias));
+                break;
+            case MazeMaker.BRANCHINGBS:
+                runMazeTask(new BranchingBackstep(name, maze, hBias, vBias, 10));
+                break;
+            case MazeMaker.COINFLIP:
+                runMazeTask(new RandomBinaryTree(name, maze, hBias, vBias));
+                break;
+            case MazeMaker.KRUSKAL:
+                runMazeTask(new Kruskal(name, maze));
+                break;
+            case MazeMaker.PRIM:
+                runMazeTask(new Prim(name, maze));
+                break;
+            case MazeMaker.BLANK:
+            default:
+                break;
+        }
     }
     
+    /*
+    run solver
+    */
     public void solve() {
-        runActor(makeActor(getSolver()));
+        Maze maze = mazeview.getMaze();
+        
+        String name = (String)solverCombo.getValue();
+        
+        switch (name) {
+            case MazeMaker.RIGHTHAND:
+                runMazeTask(new WallFollower(name, maze, true));
+                break;
+            case MazeMaker.LEFTHAND:
+                runMazeTask(new WallFollower(name, maze, false));
+                break;
+            case MazeMaker.RANDOMTURNS:
+                runMazeTask(new RandomTurns(name, maze));
+                break;
+            default:
+                break;
+        }
     }
     
+    /*
+    Pause playback only
+    */
     public void pausePlayback() {
         playback.stop();
     }
     
+    /*
+    If stopped, refresh view.  Resume playback from current position.
+    */
     public void playPlayback() {
-        if (playback.getStatus() == Animation.Status.STOPPED) {
+        if (step == 0) {
             mazeview.setShowAll(false);
             mazeview.redraw();
         }
-        playback.play();
+        if (steps != null)
+            playback.play();
     }
     
-    public void stopPlayback() {
+    /*
+    Stop all current actions.
+    */
+    public void stopAll() {
+        if (currentTask != null)
+            currentTask.cancel();
         playback.stop();
         step = 0;
         mazeview.setShowAll(true);
         mazeview.clear();
         mazeview.redraw();
-        if (currentTask != null)
-            currentTask.interrupt();
         if (gifWriter != null) {
             gifWriter.close();
             gifWriter = null;
         }
     }
     
+    /*
+    Stop all current actions, create gif recorder
+    */
     public void record() {
-        stopPlayback();
+        stopAll();
         gifWriter = new GifWriter(mazeview, (int)(playback.getRate() * FRAMEDELAY));
         if (!gifWriter.init())
             gifWriter = null;
     }
     
+    /*
+    Show help dialog
+    */
     public void help() {
         help.showAndWait();
     }
     
+    /*
+    Show about dialog
+    */
     public void about() {
         about.showAndWait();
     }
     
     /*
-    ACTOR LOGIC
+    shared logic between generate() and solve()
     */
-    
-    private void setAnimation(List<Datum[]> steps) {
-        mazeview.redraw();
+    private void runMazeTask(MazeTask task) {
+        stopAll();
         
-        this.steps = steps;
-        step = 0;
-    }
-    
-    private void runActor(MazeTask actor) {
-        stopPlayback();
-        if (actor == null)
-            return;
+        animLabel.textProperty().bind(task.messageProperty());
         
-        animLabel.textProperty().bind(actor.messageProperty());
+        task.setOnSucceeded(e -> {
+            steps = task.getValue();
+            step = 0;
+            mazeview.redraw();
+            currentTask = null;
+        });
         
-        actor.setOnSucceeded(e -> setAnimation(actor.getValue()));
-        
-        currentTask = new Thread(actor);
-        currentTask.start();
-    }
-    
-    private MazeTask makeActor(String name) {
-        Maze maze = mazeview.getMaze();
-        switch (name) {
-            case MazeMaker.BACKSTEP:
-                return new Backstep(name, maze, getHBias(), getVBias());
-            case MazeMaker.BRANCHINGBS:
-                return new BranchingBackstep(name, maze, getHBias(), getVBias(), 10);
-            case MazeMaker.COINFLIP:
-                return new RandomBinaryTree(name, maze, getHBias(), getVBias());
-            case MazeMaker.KRUSKAL:
-                return new Kruskal(name, maze);
-            case MazeMaker.PRIM:
-                return new Prim(name, maze);
-            case MazeMaker.BLANK:
-                return null;
-            case MazeMaker.RIGHTHAND:
-                return new WallFollower(name, maze, true);
-            case MazeMaker.LEFTHAND:
-                return new WallFollower(name, maze, false);
-            case MazeMaker.RANDOMTURNS:
-                return new RandomTurns(name, maze);
-            default:
-                animLabel.setText("error");
-                return null;
-        }
-    }
-    
-    /*
-    GUI GETTERS
-    */
-    
-    private int getMazeWidth() {
-        return Integer.parseInt(colsField.getText());
-    }
-    
-    private int getMazeHeight() {
-        return Integer.parseInt(rowsField.getText());
-    }
-    
-    private int getHBias() {
-        return (int)biasSlider.getValue();
-    }
-    
-    private int getVBias() {
-        return (int)(biasSlider.getMax() + biasSlider.getMin() - biasSlider.getValue());
-    }
-    
-    private String getGenerator() {
-        return (String)genCombo.getValue();
-    }
-    
-    private String getSolver() {
-        return (String)solverCombo.getValue();
-    }
-    
-    private String getSprite() {
-        return (String)spriteCombo.getValue();
+        currentTask = task;
+        new Thread(currentTask).start();
     }
 }

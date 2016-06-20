@@ -31,18 +31,25 @@ public abstract class MazeTask extends Task<List<Datum[]>> {
         List steps = new ArrayList();
         Datum[] step = step();
         while (step.length > 0) {
-            if (isCancelled())
+            if (isCancelled()) 
                 break;
             steps.add(step);
             step = step();
             if (steps.size() % 100 == 0)
-                updateMessage(name + " : " + steps.size() + " steps");
+                updateSteps(steps.size());
         }
-        updateMessage(name + " : " + steps.size() + " steps");
+        if (isCancelled())
+            updateMessage("cancelled");
+        else
+            updateSteps(steps.size());
         return steps;
     }
     
     public String getName() {
         return name;
+    }
+    
+    private void updateSteps(int steps) {
+        updateMessage(name + " : " + steps + " steps");
     }
 }

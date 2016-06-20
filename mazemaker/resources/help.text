@@ -1,17 +1,13 @@
 #How to use MazeMaker
-$Making mazes
-     A maze is a rectangular grid of square cells.  Specify the number of rows and columns you would like in your maze, then press the New Maze button to make a new blank maze of that size.
 $Generating mazes
      To generate a maze, select a generation algorithm and click the Generate button.  When generation finishes, press the play button to watch how the maze was generated.
 $Solving mazes
      Once you have generated a maze, you can apply a solving algorithm to solve it.  Select a solving algorithm and click the Solve button to calculate a solution.  When the maze is solved, press the play button to watch the solution algorithm play out.
+$Playback
+     Once you have generated or solved a maze, you can play, pause, resume, stop and record the algorithm animation.  You can adjust playback speed with the speed slider.
+$Recording GIFs
+     Once you have created a generation or solving animation, you can record it by pressing the "record" button, and then pressing "play."
 $Editing
      MazeMaker includes basic maze editing.  
      Cursor Mode: Click and drag the start or end points to move them.  Left click and drag anywhere to mark a visited path (for solving your own mazes).  Right click and drag to erase the marked path.
      Draw Mode: Click and drag to toggle walls that you cross with the cursor.  Start with a blank maze to draw a totally custom maze.
-$Playback
-     Once you have generated or solved a maze, you can play, pause, resume, stop and record the algorithm animation.  You can adjust playback speed with the speed slider.
-$Styling mazes
-     Mazemaker includes some styling options for displaying your maze.  The Cell Size and Walls options are purely for presentation, and can be edited to your liking.  Every maze element can also be given a color of your choice.
-$Recording GIFs
-     To record either generation or solving, press the record button, select a location to save to, and press play.  You will get an alert if your GIF saved successfully.
